@@ -1,0 +1,156 @@
+IC-01 – Anforderungen und offene Entscheidungen klären
+Stand: 31.10.2026 | Labels: UX, Dokumentation | Zeitrahmen: 1 Stunde
+Status: In Arbeit – fachlicher Vorschlag, Anbieterentscheidungen offen
+
+GRUNDLAGE UND GELTUNG
+Original: Checkliste Join - Issue Collector des Nutzers.
+Regeln: F:\codex-lernmaterial\projektstart.md, notizen\code-conventions.md,
+akademie-material\join\join-projektregeln.md und
+code-bibliothek\projekte\join\LERNSTAND-UND-GRENZEN.md.
+Die neue Aufgabenstellung ergänzt das bestehende MPA-Projekt; kein Frameworkwechsel.
+README bleibt auf ausdrücklichen Nutzerwunsch unverändert.
+Dieses Dokument definiert Verhalten; es bestätigt keine fertige Implementierung.
+
+1. PFLICHTFUNKTIONEN AUS DER AUFGABENSTELLUNG
+- Eigene Triage-Spalte; neue manuelle und automatische Tickets standardmäßig dort.
+- Dediziertes E-Mail-Postfach mit zuverlässigem n8n-Eingangstrigger.
+- Absender, Betreff und Nachrichtentext übernehmen.
+- KI bestimmt prägnanten Titel, Kategorie, Priorität und vorhandene Deadline.
+- Beschreibung enthält den Hinweis „Dieses Ticket wurde KI-generiert“.
+- Erfolgreiche Nachrichten in „erledigt“, fehlerhafte in „zu bearbeiten“ verschieben.
+- Nach gespeicherter Ticketanlage Bestätigungsmail an Absender.
+- Bei Verarbeitungsfehlern Hinweis: Anfrage erhalten, Team prüft sie.
+- Ersteller in Taskdetails anzeigen, interne und externe Herkunft unterscheiden.
+- Bei tatsächlichem Spaltenwechsel Ersteller über n8n per E-Mail informieren.
+- Global höchstens zehn automatisch erzeugte Tickets pro Tag; Limit transparent
+  auf Landingpage erklären und bei Überschreitung per E-Mail mitteilen.
+- Stakeholder-Landingpage gemäß Figma, semantisches HTML, Schrift mindestens
+  16 px, Kleingedrucktes mindestens 14 px.
+- Repository, spätere Demo-README, bereinigte n8n-JSON-Exporte und JSDoc.
+- Keine Zugangsdaten, Passwörter oder n8n-Schlüssel in Git.
+
+2. OPTIONAL / NICHT TEIL DER ERSTEN AUSBAUSTUFE
+- Optionale Landingpage-Weiche: Anfrage stellen / Board erkunden.
+- Anhänge, OCR und Sprachnachrichten auswerten.
+- Mehrere Tickets aus einer E-Mail, automatische Zuweisung und automatische
+  Antworten auf fachliche Rückfragen. MVP: eine Anfrage ergibt höchstens ein Ticket.
+- Zusätzliche Dashboards und weitere Eingangskanäle.
+
+3. ENTSCHEIDUNGEN
+Verbindlich aus IC-01: globales Limit zehn automatischer Tickets pro Tag.
+Manuelle Tickets zählen nicht dazu; kein eigenes Kontingent je Absender.
+Noch offen: Mailanbieter, dedizierte Adresse, KI-Anbieter, konkretes Modell,
+API-Zugang und Demo-Budget. Keine Zugangsdaten in diesem Dokument speichern.
+Nach Anbieterwahl Modell auf strukturierte JSON-Ausgabe und deutschsprachige
+Beispielmails prüfen; Modellbezeichnung und Prüfdatum anschließend festhalten.
+
+Folgende fachliche Vorschläge sind noch gemeinsam zu bestätigen:
+A. Zeitzone Europe/Berlin; Tagesgrenze 00:00 Uhr Ortszeit, inklusive Sommerzeit.
+B. Kategorien im MVP: technical-task und user-story (bestehende Join-Werte).
+   Bugs/Defekte werden technical-task; Features/Verbesserungen user-story.
+   Damit keine neue Bug-Kategorie und keine zusätzliche Figma-Abweichung nötig.
+C. Priorität:
+   urgent: nachvollziehbarer Ausfall, blockierte Kernfunktion, Datenverlust oder
+   kritische Sicherheitsstörung; Wörter wie „Ausfall“, „blockiert“, „kritisch“
+   sind Hinweise, keine alleinige Entscheidung.
+   medium: normale Fehler oder konkrete Feature-Anfragen ohne kritische Auswirkung;
+   Standard bei unklarer Dringlichkeit.
+   low: ausdrücklich „optional“, „nice to have“, „bei Gelegenheit“, kosmetischer Wunsch.
+   Negationen beachten („nicht dringend“); Großschreibung allein macht nicht urgent.
+   Bei mehreren Aussagen zählt die geschilderte Auswirkung, nicht das lauteste Wort.
+D. Deadline:
+   Kein genannter Termin -> null, UI „Keine Deadline“, keine erfundene Frist.
+   Explizites Datum übernehmen; „morgen“ relativ zum Empfang in Europe/Berlin.
+   Mehrdeutige, ungültige oder vergangene Frist -> null und Hinweis „Termin klären“
+   in Beschreibung; Anfrage trotzdem in Triage. Datum allein erzwingt kein urgent.
+   Folgearbeit: Formular, Datenmodell, Regeln, Sortierung und Summary müssen
+   fehlende Termine unterstützen; bisherige Deadline-Pflicht gezielt anpassen.
+E. Ersteller:
+   Manuell, angemeldet: intern, Auth-UID, Anzeigename, Konto-E-Mail.
+   Per E-Mail: extern, Absenderadresse und vorhandener Anzeigename; keine automatische
+   Umstufung zu intern allein wegen einer passenden E-Mail-Adresse.
+   Gast: Herkunft guest, Anzeige „Gast“, anonyme UID, keine erfundene E-Mail.
+   Gasttickets erhalten keine Statusmail ohne bekannte Empfängeradresse.
+   Ersteller ist unabhängig von „Assigned to“; Kontakte sind nicht automatisch User.
+F. Limit und Kosten:
+   Vor KI-Aufruf atomar freien Platz reservieren, um parallele Eingänge abzusichern.
+   Erfolgreiche Ticketanlage verbraucht den Platz. Fehlgeschlagene Verarbeitung
+   gibt ihn frei; kein unbegrenztes automatisches Neuversuchen.
+   Tageszuordnung beim Reservieren, auch wenn Verarbeitung über Mitternacht läuft.
+   Zehn Tickets begrenzen nicht alle möglichen KI-Kosten: zusätzlich höchstens zehn
+   KI-Versuche pro Tag im Demo-MVP; fehlgeschlagene KI-Aufrufe zählen dabei mit.
+   Dieses zusätzliche Versuchslimit ist ein Vorschlag, keine Originalanforderung.
+   Token-/Textgrenzen und konkrete Anbieter-Kostenkontrolle nach Modellwahl festlegen.
+G. Nach Limit:
+   Kein KI-Aufruf, kein Ticket; Mail nach „zu bearbeiten“ mit Grund „Tageslimit“.
+   Einmaliger Hinweis an Absender: heute ausgelastet, Anfrage bleibt zur Prüfung erhalten.
+   Keine automatische Nachholung und keine Zusage einer Bearbeitung am Folgetag.
+   Team entscheidet über spätere Verarbeitung; auch diese unterliegt dem Tageslimit.
+H. Wiederholung und Teilfehler:
+   Gleiche Message-ID aus gleichem Postfach nicht erneut als Ticket anlegen.
+   Nach erfolgreicher Ticketanlage, aber fehlgeschlagener Bestätigung oder
+   Ordneraktion: bestehendes Ticket behalten, nur fehlenden Schritt erneut versuchen.
+   Mail bis zur vollständigen Bearbeitung als offen/„zu bearbeiten“ führen.
+   Automatische Antworten/Bounces nicht als neue Anfragen verarbeiten; keine Mail-Schleifen.
+   Nachrichtentext ist Eingabe, keine Anweisung an das System; KI darf Regeln,
+   Empfänger, Zugangsdaten und Limit nicht ändern.
+
+4. NORMALABLAUF
+Mail empfangen -> Duplikat/automatische Antwort prüfen -> Tagesbudget prüfen und
+reservieren -> KI-Auswertung -> Felder validieren -> Ticket in Triage speichern ->
+Bestätigung senden -> Mail nach „erledigt“ verschieben.
+Ein echter späterer Statuswechsel -> Statusmail an bekannten Ersteller.
+Gleicher Status erneut gespeichert -> keine neue Statusmail.
+
+5. ABNAHMEBEISPIELE (SOLLVERHALTEN, NOCH KEINE AUSGEFÜHRTEN TESTS)
+
+N1 Normalfall, Eingang 02.11.2026, freies Budget:
+Betreff: CSV-Export für das Board
+Text: Bitte ergänzt einen CSV-Export der Aufgaben bis zum 06.11.2026.
+Erwartet: user-story, medium, Deadline 2026-11-06, Triage, externer Ersteller,
+KI-Hinweis, genau ein Ticket, Bestätigung, Mail „erledigt“.
+
+N2 Kritischer Fehler:
+Betreff: Anmeldung ausgefallen
+Text: Seit heute können sich alle Teammitglieder nicht mehr anmelden.
+Die Arbeit ist vollständig blockiert. Bitte beheben.
+Erwartet: technical-task, urgent, keine Deadline, Triage.
+
+N3 Fehlende Deadline:
+Betreff: Farbe der Labels
+Text: Nice to have: Die Labels könnten bei Gelegenheit besser unterscheidbare
+Farben bekommen. Es gibt keinen festen Termin.
+Erwartet: user-story, low, null / „Keine Deadline“, normale Bestätigung.
+
+N4 Verarbeitungsfehler:
+Mail wie N1; KI liefert ungültiges JSON oder ist nicht erreichbar.
+Erwartet: kein Ticket, „zu bearbeiten“, Fehlerhinweis an Absender, dokumentierter
+Fehler, keine endlose Wiederholung. KI-Versuch bleibt verbraucht (Vorschlag F).
+Ist auch der Mailversand gestört, bleibt die Benachrichtigung offen; keine
+behauptete erfolgreiche Zustellung.
+
+N5 Limit überschritten:
+Zehn Tickets wurden heute automatisch erstellt; eine weitere neue Mail trifft ein.
+Erwartet: kein KI-Aufruf, kein elftes Ticket, einmalige Limit-Mail, „zu bearbeiten“.
+Nächster Kalendertag Europe/Berlin: neues Tagesbudget; alte Mail bleibt zur Prüfung.
+
+N6 Grenzfall paralleler Eingang:
+Neun Tickets vorhanden, zwei neue Mails gleichzeitig.
+Erwartet: höchstens eine weitere Reservierung/Ticketanlage, andere Mail Limitpfad.
+
+N7 Wiederholung nach Teilfehler:
+Ticket gespeichert, Bestätigung fehlgeschlagen; dieselbe Nachricht wird erneut gelesen.
+Erwartet: kein zweites Ticket, keine zweite Kontingentbelastung, Versand nachholen.
+
+N8 Statusmail:
+N1 von Triage nach In progress verschieben -> genau eine Statusmail.
+Ein Gastticket verschieben -> Status gespeichert, keine Mail an erfundene Adresse.
+
+6. OFFENE PUNKTE VOR DONE
+[ ] Dedizierten Mailanbieter und Adresse bestätigen.
+[ ] KI-Anbieter, exaktes Modell und Budget festlegen.
+[ ] Fachliche Vorschläge A–H bestätigen oder ändern, insbesondere fehlende Deadline,
+    Gäste, zusätzliche KI-Versuchsgrenze und zurückgestellte Mails.
+[ ] Beispielmails gemeinsam anhand der endgültigen Regeln durchgehen.
+[ ] Folge-Trellokarten mit den Entscheidungen abgleichen.
+IC-01 erst dann Done; keine Behauptung einer implementierten Automatisierung.

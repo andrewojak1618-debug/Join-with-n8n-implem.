@@ -1,0 +1,60 @@
+<form class="auth-form" id="loginForm" novalidate data-component="login-form">
+  <label class="form-field" for="loginEmail" data-component="auth-form-field">
+    <span class="form-field__label">Email</span>
+    <input
+      class="form-field__input"
+      id="loginEmail"
+      name="email"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
+      aria-describedby="loginEmailError"
+    />
+    <span
+      class="form-field__icon form-field__icon--mail"
+      aria-hidden="true"
+    ></span>
+    <span
+      class="form-field__error"
+      id="loginEmailError"
+      aria-live="polite"
+    ></span>
+  </label>
+
+  <label
+    class="form-field"
+    for="loginPassword"
+    data-component="auth-form-field"
+  >
+    <span class="form-field__label">Password</span>
+    <input
+      class="form-field__input"
+      id="loginPassword"
+      name="password"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password"
+      aria-describedby="loginPasswordError"
+    />
+    <span
+      class="form-field__icon form-field__icon--lock"
+      aria-hidden="true"
+    ></span>
+    <span
+      class="form-field__error"
+      id="loginPasswordError"
+      aria-live="polite"
+    ></span>
+  </label>
+
+  <p class="auth-form__message" id="loginError"></p>
+
+  <div class="auth-form__actions">
+    <button class="auth-form__submit" id="loginSubmitButton" type="submit">
+      Log in
+    </button>
+    <button class="auth-form__guest" id="guestLoginButton" type="button">
+      Guest Log in
+    </button>
+  </div>
+</form>

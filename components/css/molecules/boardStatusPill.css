@@ -1,0 +1,14 @@
+.board-status-pill {
+  width: 136px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  align-self: start;
+  justify-content: center;
+  padding: 4px 16px;
+  border-radius: 8px;
+  color: var(--color-white);
+  font-size: 16px;
+  line-height: 20px;
+  white-space: nowrap;
+}

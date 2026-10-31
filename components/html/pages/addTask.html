@@ -1,0 +1,19 @@
+<section class="add-task-content" aria-labelledby="addTaskTitle">
+  <div class="add-task-header">
+    <h1 id="addTaskTitle">Add Task</h1>
+    <button class="add-task-close" id="addTaskClose" type="button" aria-label="Close and return to board" hidden>
+      <img src="./components/assets/img/icons/cancel_icon.svg" alt="" aria-hidden="true" />
+    </button>
+  </div>
+
+  <p class="add-task-feedback add-task-feedback--success" id="addTaskSuccessMessage" role="status" aria-live="polite"
+    hidden>
+    <span>Task added to board</span>
+    <img src="./components/assets/img/icons/check_icon.svg" alt="" aria-hidden="true" />
+  </p>
+  <p class="add-task-feedback add-task-feedback--error" id="addTaskErrorMessage" role="alert" hidden>
+    Task could not be saved. Please try again.
+  </p>
+  <div data-include="./components/html/organisms/addTaskForm.html"></div>
+  <div class="add-task-form__overlay" id="addTaskFormOverlay" aria-hidden="true" hidden></div>
+</section>

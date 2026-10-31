@@ -1,0 +1,252 @@
+<section
+  class="board-detail-overlay"
+  id="boardTaskDetail"
+  aria-labelledby="boardTaskDetailTitle"
+  aria-modal="true"
+  role="dialog"
+  hidden
+>
+  <article class="board-detail-card" id="boardTaskDetailCard">
+    <button
+      class="board-detail-close"
+      type="button"
+      id="boardTaskDetailClose"
+      aria-label="Close task details"
+    >
+      x
+    </button>
+
+    <div class="board-detail-view" id="boardTaskDetailView">
+      <span class="board-status-pill board-detail-category" id="boardTaskDetailCategory"
+        >Task</span
+      >
+      <h2 class="board-detail-title" id="boardTaskDetailTitle">Task title</h2>
+      <p class="board-detail-description" id="boardTaskDetailDescription">Task description</p>
+      <dl class="board-detail-list">
+        <div class="board-detail-row">
+          <dt>Due date:</dt>
+          <dd id="boardTaskDetailDueDate">-</dd>
+        </div>
+        <div class="board-detail-row">
+          <dt>Priority:</dt>
+          <dd class="board-detail-priority">
+            <span id="boardTaskDetailPriority">-</span>
+            <img id="boardTaskDetailPriorityIcon" alt="" aria-hidden="true" hidden />
+          </dd>
+        </div>
+        <div class="board-detail-row board-detail-row--stacked">
+          <dt>Assigned To:</dt>
+          <dd id="boardTaskDetailAssignee" class="board-detail-assignees">-</dd>
+        </div>
+        <div class="board-detail-row board-detail-row--stacked">
+          <dt>Subtasks</dt>
+          <dd id="boardTaskDetailSubtasks" class="board-detail-subtasks">-</dd>
+        </div>
+      </dl>
+      <div class="board-detail-actions">
+        <button
+          class="board-detail-action"
+          type="button"
+          id="boardTaskDeleteButton"
+        >
+          <img
+            src="./components/assets/img/icons/delete.svg"
+            alt=""
+            aria-hidden="true"
+          />
+          Delete
+        </button>
+        <span class="board-detail-actions__divider" aria-hidden="true"></span>
+        <button
+          class="board-detail-action"
+          type="button"
+          id="boardTaskEditButton"
+        >
+          <img
+            src="./components/assets/img/icons/edit.svg"
+            alt=""
+            aria-hidden="true"
+          />
+          Edit
+        </button>
+      </div>
+    </div>
+
+    <form
+      class="board-detail-edit-form"
+      id="boardTaskEditForm"
+      novalidate
+      hidden
+    >
+      <label>
+        <span>Title</span>
+        <input
+          id="boardTaskEditTitle"
+          type="text"
+          aria-describedby="boardTaskEditTitleError"
+        />
+        <span
+          class="board-detail-field-error"
+          id="boardTaskEditTitleError"
+          aria-live="polite"
+        ></span>
+      </label>
+      <label>
+        <span>Description</span>
+        <textarea id="boardTaskEditDescription" rows="4"></textarea>
+      </label>
+      <label>
+        <span>Due date</span>
+        <input
+          id="boardTaskEditDueDate"
+          type="date"
+          aria-describedby="boardTaskEditDueDateError"
+        />
+        <span
+          class="board-detail-field-error"
+          id="boardTaskEditDueDateError"
+          aria-live="polite"
+        ></span>
+      </label>
+      <fieldset class="add-task-priority">
+        <legend>Priority</legend>
+        <div class="add-task-priority__options">
+          <label
+            class="add-task-priority__option add-task-priority__option--urgent"
+          >
+            <input type="radio" name="boardEditPriority" value="urgent" />
+            <span
+              >Urgent
+              <img
+                src="./components/assets/img/icons/red_arrow_up.svg"
+                alt=""
+                aria-hidden="true"
+            /></span>
+          </label>
+          <label
+            class="add-task-priority__option add-task-priority__option--medium"
+          >
+            <input type="radio" name="boardEditPriority" value="medium" />
+            <span
+              >Medium
+              <img
+                src="./components/assets/img/icons/medium_even_orange.svg"
+                alt=""
+                aria-hidden="true"
+            /></span>
+          </label>
+          <label
+            class="add-task-priority__option add-task-priority__option--low"
+          >
+            <input type="radio" name="boardEditPriority" value="low" />
+            <span
+              >Low
+              <img
+                src="./components/assets/img/icons/green_arrow_down.svg"
+                alt=""
+                aria-hidden="true"
+            /></span>
+          </label>
+        </div>
+      </fieldset>
+      <div class="board-detail-field">
+        <span>Category</span>
+        <div class="contact-dropdown" data-board-edit-dropdown>
+          <button
+            class="contact-dropdown__button"
+            id="boardTaskEditCategoryButton"
+            type="button"
+            aria-expanded="false"
+            aria-controls="boardTaskEditCategoryPanel"
+          >
+            Select task category
+          </button>
+          <div
+            class="contact-dropdown__panel"
+            id="boardTaskEditCategoryPanel"
+            role="listbox"
+            aria-label="Task categories"
+            hidden
+          >
+            <button
+              class="contact-dropdown__option contact-dropdown__option--single"
+              type="button"
+              role="option"
+              data-value="technical-task"
+            >
+              Technical Task
+            </button>
+            <button
+              class="contact-dropdown__option contact-dropdown__option--single"
+              type="button"
+              role="option"
+              data-value="user-story"
+            >
+              User Story
+            </button>
+          </div>
+          <input id="boardTaskEditCategory" type="hidden" />
+        </div>
+      </div>
+      <div class="board-detail-field">
+        <span>Assigned to</span>
+        <div class="contact-dropdown" id="boardEditAssigneesDropdown">
+          <button
+            class="contact-dropdown__button"
+            id="boardEditAssigneesButton"
+            type="button"
+            aria-expanded="false"
+            aria-controls="boardEditAssigneesPanel"
+          >
+            Select contacts to assign
+          </button>
+          <div
+            class="contact-dropdown__panel"
+            id="boardEditAssigneesPanel"
+            role="listbox"
+            aria-label="Assignable contacts"
+            hidden
+          ></div>
+          <div
+            class="contact-dropdown__selected"
+            id="boardEditAssigneesSelected"
+            aria-live="polite"
+          ></div>
+        </div>
+      </div>
+
+      <div class="board-detail-field">
+        <span>Subtasks</span>
+        <div class="add-task-subtask-input">
+          <input
+            id="boardTaskEditSubtaskInput"
+            type="text"
+            placeholder="Add new subtask"
+            autocomplete="off"
+          />
+          <span class="add-task-subtask-controls">
+            <button
+              class="add-task-subtask-icon add-task-subtask-add"
+              id="boardEditSubtaskAdd"
+              type="button"
+              aria-label="Add subtask"
+            >
+              +
+            </button>
+          </span>
+        </div>
+        <ul class="add-task-subtask-list" id="boardTaskEditSubtaskList"></ul>
+      </div>
+      <div class="board-detail-actions">
+        <button class="board-detail-primary" type="submit">
+          Ok
+          <img
+            src="./components/assets/img/icons/check.svg"
+            alt=""
+            aria-hidden="true"
+          />
+        </button>
+      </div>
+    </form>
+  </article>
+</section>

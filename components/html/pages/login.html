@@ -1,0 +1,32 @@
+<main class="auth-page auth-page--login">
+  <div data-include="./components/html/atoms/authLogo.html"></div>
+
+  <p
+    class="auth-signup-success"
+    id="signupSuccessMessage"
+    role="status"
+    aria-live="polite"
+    hidden
+  >
+    You Signed Up successfully
+  </p>
+
+  <div class="auth-signup-hint">
+    <span>Not a Join user?</span>
+    <a
+      href="./signup.html"
+      data-page="signup"
+      class="auth-signup-hint__button"
+    >
+      Sign up
+    </a>
+  </div>
+
+  <section class="auth-card" aria-labelledby="login-title">
+    <h1 class="auth-card__title" id="login-title">Log in</h1>
+
+    <div data-include="./components/html/organisms/loginForm.html"></div>
+  </section>
+
+  <div data-include="./components/html/molecules/authFooter.html"></div>
+</main>

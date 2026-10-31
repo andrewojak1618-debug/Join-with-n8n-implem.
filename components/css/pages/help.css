@@ -1,0 +1,141 @@
+.help-content {
+  min-height: calc(100vh - var(--app-topbar-height));
+  padding: 134px 56px 72px 84px;
+}
+
+.help-content__inner {
+  width: min(100%, 1120px);
+  display: grid;
+  gap: 24px;
+}
+
+.help-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.help-content h1,
+.help-content h2,
+.help-content p {
+  margin: 0;
+}
+
+.help-content h1 {
+  color: var(--color-text-dark);
+  font-size: 56px;
+  line-height: 1;
+}
+
+.help-content h2 {
+  color: var(--color-text-dark);
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.help-content p {
+  color: var(--color-black);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.help-content span {
+  color: var(--color-greeting);
+}
+
+.help-back-button {
+  width: 48px;
+  height: 48px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-transparent);
+  color: var(--color-greeting);
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.help-back-button:hover {
+  background: var(--color-background-soft);
+}
+
+.help-steps {
+  display: grid;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: help-step;
+}
+
+.help-steps li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 24px;
+  counter-increment: help-step;
+}
+
+.help-steps li::before {
+  content: counter(help-step) ".";
+  color: var(--color-text-dark);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.help-steps strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--color-text-dark);
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.help-steps p {
+  grid-column: 2;
+}
+
+@media (max-width: 1279px) {
+  .help-content {
+    min-height: calc(
+      100vh - var(--app-topbar-height) - var(--app-bottom-nav-height)
+    );
+    padding: 48px 24px;
+  }
+
+  .help-content__inner {
+    width: 100%;
+  }
+}
+
+@media (max-width: 479px) {
+  .help-content {
+    padding: 64px 16px 40px;
+  }
+
+  .help-heading {
+    align-items: flex-start;
+  }
+
+  .help-content h1 {
+    font-size: 40px;
+  }
+
+  .help-content h2 {
+    font-size: 26px;
+  }
+
+  .help-content p {
+    font-size: 16px;
+  }
+
+  .help-steps li {
+    grid-template-columns: 36px minmax(0, 1fr);
+    column-gap: 16px;
+  }
+}

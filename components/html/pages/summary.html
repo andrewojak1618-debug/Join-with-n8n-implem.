@@ -1,0 +1,73 @@
+<section class="summary-content" aria-labelledby="summaryTitle">
+  <div class="summary-heading">
+    <h1 id="summaryTitle">Join 360</h1>
+    <p>Key Metrics at a Glance</p>
+  </div>
+  <p id="summaryLoadError" role="alert" hidden></p>
+
+  <div class="summary-dashboard">
+    <section class="summary-metrics" aria-label="Task overview">
+      <a class="summary-card summary-card--small" href="./board.html" data-page="board">
+        <div class="summary-card__main">
+          <span class="summary-card__icon" aria-hidden="true">
+            <img class="summary-card__icon-image summary-card__icon-image--default"
+              src="./components/assets/img/icons/to_do_pen_icons.svg" alt="" />
+            <img class="summary-card__icon-image summary-card__icon-image--hover"
+              src="./components/assets/img/icons/to_do_pen_icons_white.svg" alt="" />
+          </span>
+          <div class="summary-card__text">
+            <strong id="summaryTodoCount">0</strong>
+            <span>To-do</span>
+          </div>
+        </div>
+      </a>
+      <a class="summary-card summary-card--small" href="./board.html" data-page="board">
+        <div class="summary-card__main">
+          <span class="summary-card__icon" aria-hidden="true">
+            <img class="summary-card__icon-image summary-card__icon-image--default"
+              src="./components/assets/img/icons/check_done_icons.svg" alt="" />
+            <img class="summary-card__icon-image summary-card__icon-image--hover"
+              src="./components/assets/img/icons/check_done_icons_white.svg" alt="" />
+          </span>
+          <div class="summary-card__text">
+            <strong id="summaryDoneCount">0</strong>
+            <span>Done</span>
+          </div>
+        </div>
+      </a>
+      <a class="summary-card summary-card--urgent" href="./board.html" data-page="board">
+        <div class="summary-card__main">
+          <span class="summary-card__icon summary-card__icon--urgent" aria-hidden="true">
+            <img src="./components/assets/img/icons/urgent_icons.svg" alt="" />
+          </span>
+          <div class="summary-card__text">
+            <strong id="summaryUrgentCount">0</strong>
+            <span>Urgent</span>
+          </div>
+        </div>
+        <div class="summary-deadline">
+          <strong id="summaryDeadlineDate">No upcoming deadline</strong>
+          <span>Upcoming Deadline</span>
+        </div>
+      </a>
+      <a class="summary-card summary-card--count" href="./board.html" data-page="board">
+        <strong id="summaryBoardCount">0</strong>
+        <span>Tasks in Board</span>
+      </a>
+      <a class="summary-card summary-card--count" href="./board.html" data-page="board">
+        <strong id="summaryProgressCount">0</strong>
+        <span>Tasks in Progress</span>
+      </a>
+      <a class="summary-card summary-card--count" href="./board.html" data-page="board">
+        <strong id="summaryFeedbackCount">0</strong>
+        <span>Awaiting Feedback</span>
+      </a>
+    </section>
+
+    <section class="summary-greeting" aria-label="Signed in user">
+      <p id="summaryGreetingTime">Good morning,</p>
+      <h2 id="summaryGreeting" lang="de">Guest</h2>
+      <p id="summaryUserType">Signed in user is being checked.</p>
+    </section>
+  </div>
+</section>

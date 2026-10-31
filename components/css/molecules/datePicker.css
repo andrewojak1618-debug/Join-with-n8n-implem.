@@ -1,0 +1,160 @@
+.date-picker {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.date-picker input {
+  padding-right: 48px;
+  cursor: pointer;
+}
+
+.date-picker__toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.date-picker__toggle img {
+  width: 20px;
+  height: 20px;
+}
+
+.date-picker__popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: min(100%, 320px);
+  padding: 12px;
+  border: 1px solid var(--color-border-medium);
+  border-radius: 8px;
+  background: var(--color-white);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.date-picker__popover[hidden] {
+  display: none;
+}
+
+.date-picker__header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.date-picker__header button,
+.date-picker__day {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-main);
+  cursor: pointer;
+}
+
+.date-picker__header button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.date-picker__header button:hover,
+.date-picker__day:hover:not(:disabled) {
+  background: var(--color-background-soft);
+}
+
+.date-picker__weekdays,
+.date-picker__days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.date-picker__weekdays {
+  margin-bottom: 4px;
+  color: var(--color-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.date-picker__day {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-size: 14px;
+}
+
+.date-picker__day--today {
+  outline: 1px solid var(--color-accent-light);
+}
+
+.date-picker__day--selected {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.date-picker__day:disabled {
+  color: var(--color-placeholder-light);
+  cursor: default;
+}
+
+.date-picker__scroll-fields {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .date-picker__popover {
+    position: static;
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .date-picker__header,
+  .date-picker__weekdays,
+  .date-picker__days {
+    display: none;
+  }
+
+  .date-picker__scroll-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .date-picker__scroll-fields label {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+    color: var(--color-muted);
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .date-picker__scroll-fields select {
+    width: 100%;
+    min-height: 104px;
+    padding: 0;
+    border: 1px solid var(--color-border-medium);
+    border-radius: 6px;
+    background: var(--color-white);
+    color: var(--color-text-main);
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .date-picker__scroll-fields option {
+    padding: 6px 2px;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,35 @@
+<header class="summary-topbar">
+  <img
+    class="summary-topbar__logo"
+    src="./components/assets/img/icons/Logo for Favicon construction.svg"
+    alt=""
+  />
+  <p>Kanban Project Management Tool</p>
+  <div class="summary-user-actions">
+    <button
+      class="summary-help"
+      type="button"
+      data-page="help"
+      aria-label="Help"
+    >
+      <img src="./components/assets/img/icons/help.svg" alt="" aria-hidden="true" />
+    </button>
+    <button
+      class="summary-avatar"
+      type="button"
+      id="appTopbarMenuButton"
+      aria-label="Open user menu"
+      aria-controls="appTopbarMenu"
+      aria-expanded="false"
+      aria-haspopup="true"
+    >
+      <span id="summaryUserInitials">?</span>
+    </button>
+    <nav class="summary-user-menu" id="appTopbarMenu" aria-label="User menu" hidden>
+      <a class="summary-user-menu__help" href="./help.html" data-page="help">Help</a>
+      <a href="./legalNotice.html" data-page="legal-notice">Legal notice</a>
+      <a href="./privacyPolicy.html" data-page="privacy-policy">Privacy Policy</a>
+      <button type="button" id="appTopbarLogoutButton">Log out</button>
+    </nav>
+  </div>
+</header>

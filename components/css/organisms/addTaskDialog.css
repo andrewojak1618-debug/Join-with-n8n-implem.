@@ -1,0 +1,54 @@
+.add-task-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--color-overlay-backdrop);
+}
+
+.add-task-dialog-overlay[hidden] {
+  display: none;
+}
+
+.add-task-dialog-card {
+  position: relative;
+  width: min(100%, 1000px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 40px;
+  border-radius: 30px;
+  background: var(--color-white);
+  box-shadow: var(--shadow-soft);
+}
+
+.add-task-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.add-task-dialog-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--color-transparent);
+  cursor: pointer;
+}
+
+.add-task-dialog-error {
+  color: var(--color-error);
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.add-task-dialog-error[hidden] {
+  display: none;
+}
+
+.add-task-dialog-card .add-task-form {
+  gap: 32px;
+}

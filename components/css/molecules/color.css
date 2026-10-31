@@ -1,0 +1,58 @@
+:root {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-overlay-backdrop: rgba(0, 0, 0, 0.3);
+
+  --color-background: #f7f8fa;
+  --color-background-soft: #f6f7f8;
+  --color-surface: #ffffff;
+  --color-text: #1f2937;
+  --color-text-dark: #000000;
+  --color-text-main: #2a3140;
+  --color-text-auth: #2a3647;
+  --color-text-hint: #a8a8a8;
+  --color-muted: #667085;
+  --color-placeholder: #71747a;
+  --color-placeholder-light: #d1d1d1;
+  --color-link-muted: #d5dae3;
+  --color-scrollbar-thumb: #c4c4c4;
+
+  --color-primary: #2f3949;
+  --color-primary-dark: #101b33;
+  --color-primary-auth: #2a3647;
+  --color-primary-auth-hover: #091931;
+  --color-primary-hover: #29abe2;
+  --color-accent: #2a7de1;
+  --color-accent-light: #29abe2;
+  --color-accent-line: #6aa7e8;
+  --color-accent-link: #007cee;
+  --color-greeting: #24465a;
+
+  --color-hover-subtle: #2a3d59;
+  --color-hover-overlay-light: rgba(255, 255, 255, 0.12);
+
+  --color-border: #dde3ea;
+  --color-border-medium: #d6d6d6;
+  --color-border-focus: #205161;
+  --color-border-dark: #8a8f98;
+  --color-border-auth: #a8a8a8;
+  --color-border-strong: #6f6f6f;
+  --color-empty-state: #e7e7e7;
+
+  --color-required: #d45b6a;
+  --color-error: #d12b2b;
+  --color-priority-medium: #eea830;
+  --color-priority-urgent: #ff3d00;
+  --color-priority-low: #7ae229;
+  --color-category-user-story: #3f42ff;
+  --color-category-technical: #6fd0c1;
+  --color-progress: #6b83ff;
+
+  --shadow-soft: 0 0 14px rgba(0, 0, 0, 0.12);
+  --shadow-side-panel: 4px 0 6px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-card-strong: 0 2px 4px rgba(0, 0, 0, 0.14);
+  --shadow-card-hover: 0 4px 18px rgba(0, 0, 0, 0.16);
+  --shadow-topbar: 0 2px 8px rgba(0, 0, 0, 0.12);
+}

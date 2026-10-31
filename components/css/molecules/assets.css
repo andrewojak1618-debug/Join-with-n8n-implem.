@@ -1,0 +1,14 @@
+img {
+  max-width: 100%;
+}
+
+.summary-sidebar__logo img {
+  width: 100px;
+  height: auto;
+}
+
+.summary-nav__icon img {
+  width: 30px;
+  height: 30px;
+  display: block;
+}

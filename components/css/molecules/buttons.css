@@ -1,0 +1,42 @@
+﻿button {
+    border: unset;
+    cursor: pointer;
+}
+
+.auth-form button {
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+.button-hover {
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease,
+    box-shadow 100ms ease,
+    color 100ms ease;
+}
+
+.button-hover--raised:hover,
+.button-hover--raised:focus-within {
+  border-color: var(--color-border-dark);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.button-hover--secondary:not(:disabled):hover,
+.button-hover--secondary:not(:disabled):focus-visible {
+  border-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-card-hover);
+  color: var(--color-primary-hover);
+}
+
+.button-hover--primary:not(:disabled):hover,
+.button-hover--primary:not(:disabled):focus-visible {
+  border-color: var(--color-primary-hover);
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.button-hover:disabled {
+  box-shadow: none;
+}

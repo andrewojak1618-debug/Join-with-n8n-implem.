@@ -1,0 +1,74 @@
+.board-card-move {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: none;
+}
+
+.board-card-move__toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--color-transparent);
+}
+
+.board-card-move__menu {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  z-index: 10;
+  display: grid;
+  gap: 2px;
+  min-width: 126px;
+  padding: 12px;
+  border-radius: 0 20px 20px 20px;
+  background: var(--color-primary-auth);
+  color: var(--color-white);
+  box-shadow: var(--shadow-soft);
+}
+
+.board-card-move__menu[hidden] {
+  display: none;
+}
+
+.board-card-move__title {
+  font-weight: 700;
+  padding: 0 8px 2px;
+}
+
+.board-card-move__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--color-transparent);
+  color: var(--color-white);
+  text-align: left;
+  transition: background 100ms ease;
+}
+
+.board-card-move__option:hover {
+  background: var(--color-primary-auth-hover);
+}
+
+@media (max-width: 1279px), (any-pointer: coarse) {
+  .board-card-move {
+    display: block;
+  }
+
+  .board-card-move__toggle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .board-card-move__menu {
+    top: 48px;
+  }
+
+  .board-card-move__option {
+    min-height: 44px;
+  }
+}

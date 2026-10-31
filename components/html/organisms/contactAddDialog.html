@@ -1,0 +1,97 @@
+<section
+  class="contacts-overlay"
+  id="contactAddOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="contactAddTitle"
+  hidden
+>
+  <article class="contacts-dialog contacts-dialog--add">
+    <button
+      class="contacts-dialog-close"
+      type="button"
+      id="contactAddClose"
+      aria-label="Close add contact"
+    >
+      x
+    </button>
+    <div class="contacts-dialog-side">
+      <img src="./components/assets/img/icons/Join logo vector.svg" alt="" />
+      <h2 id="contactAddTitle">Add contact</h2>
+      <p class="contacts-dialog-subtitle contacts-dialog-accent">
+        Tasks are better with a team!
+      </p>
+    </div>
+    <div class="contacts-dialog-body">
+      <span
+        class="contacts-dialog-avatar contacts-dialog-avatar--empty"
+        id="contactAddAvatar"
+      >
+        <img src="./components/assets/img/icons/person.svg" alt="" />
+      </span>
+
+      <form class="contacts-dialog-form" id="contactAddForm" novalidate>
+        <div class="contacts-dialog-field">
+          <input
+            id="contactAddName"
+            type="text"
+            placeholder="Name"
+            aria-describedby="contactAddNameError"
+          />
+          <img src="./components/assets/img/icons/person.svg" alt="" />
+          <span
+            class="contacts-dialog-field-error"
+            id="contactAddNameError"
+            aria-live="polite"
+          ></span>
+        </div>
+        <div class="contacts-dialog-field">
+          <input
+            id="contactAddEmail"
+            type="email"
+            placeholder="Email"
+            aria-describedby="contactAddEmailError"
+          />
+          <img src="./components/assets/img/icons/mail.svg" alt="" />
+          <span
+            class="contacts-dialog-field-error"
+            id="contactAddEmailError"
+            aria-live="polite"
+          ></span>
+        </div>
+        <div class="contacts-dialog-field">
+          <input
+            id="contactAddPhone"
+            type="tel"
+            placeholder="Phone"
+            inputmode="tel"
+            autocomplete="tel"
+            maxlength="24"
+            aria-describedby="contactAddPhoneError"
+          />
+          <img src="./components/assets/img/icons/call.svg" alt="" />
+          <span
+            class="contacts-dialog-field-error"
+            id="contactAddPhoneError"
+            aria-live="polite"
+          ></span>
+        </div>
+        <p class="contacts-dialog-error" id="contactAddError"></p>
+        <div class="contacts-dialog-actions">
+          <button
+            class="contacts-dialog-secondary"
+            type="button"
+            id="contactAddCancel"
+          >
+            Cancel
+            <img src="./components/assets/img/icons/cancel_icon.svg" alt="" />
+          </button>
+          <button class="contacts-dialog-primary" type="submit">
+            Create contact
+            <img src="./components/assets/img/icons/check_icon.svg" alt="" />
+          </button>
+        </div>
+      </form>
+    </div>
+  </article>
+</section>

@@ -1,0 +1,25 @@
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+  body {
+    overflow: hidden;
+  }
+
+  body::before {
+    content: "Please rotate your device to portrait mode.";
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 180px 32px 32px;
+    background-color: var(--color-primary-auth);
+    background-image: url("../../assets/img/icons/Join logo vector.svg");
+    background-repeat: no-repeat;
+    background-position: center calc(50% - 54px);
+    background-size: 100px auto;
+    color: var(--color-white);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+  }
+}

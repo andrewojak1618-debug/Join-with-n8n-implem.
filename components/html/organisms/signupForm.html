@@ -1,0 +1,76 @@
+<form
+  class="auth-form"
+  data-component="signup-form"
+  id="signupForm"
+  novalidate
+>
+  <label class="form-field" data-component="auth-form-field" for="signupName">
+    <span class="form-field__label">Name</span>
+    <input
+      class="form-field__input"
+      id="signupName"
+      name="name"
+      type="text"
+      placeholder="Name"
+      autocomplete="name"
+      aria-describedby="signupNameError"
+    />
+    <span class="form-field__icon form-field__icon--user" aria-hidden="true"></span>
+    <span class="form-field__error" id="signupNameError" aria-live="polite"></span>
+  </label>
+
+  <label class="form-field" data-component="auth-form-field" for="signupEmail">
+    <span class="form-field__label">Email</span>
+    <input
+      class="form-field__input"
+      id="signupEmail"
+      name="email"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
+      aria-describedby="signupEmailError"
+    />
+    <span class="form-field__icon form-field__icon--mail" aria-hidden="true"></span>
+    <span class="form-field__error" id="signupEmailError" aria-live="polite"></span>
+  </label>
+
+  <label class="form-field" data-component="auth-form-field" for="signupPassword">
+    <span class="form-field__label">Password</span>
+    <input
+      class="form-field__input"
+      id="signupPassword"
+      name="password"
+      type="password"
+      placeholder="Password"
+      autocomplete="new-password"
+      aria-describedby="signupPasswordError"
+    />
+    <span class="form-field__icon form-field__icon--lock" aria-hidden="true"></span>
+    <span class="form-field__error" id="signupPasswordError" aria-live="polite"></span>
+  </label>
+
+  <label
+    class="form-field"
+    data-component="auth-form-field"
+    for="signupConfirmPassword"
+  >
+    <span class="form-field__label">Confirm Password</span>
+    <input
+      class="form-field__input"
+      id="signupConfirmPassword"
+      name="confirmPassword"
+      type="password"
+      placeholder="Confirm Password"
+      autocomplete="new-password"
+      aria-describedby="signupConfirmPasswordError"
+    />
+    <span class="form-field__icon form-field__icon--lock" aria-hidden="true"></span>
+    <span class="form-field__error" id="signupConfirmPasswordError" aria-live="polite"></span>
+  </label>
+
+  <div data-include="./components/html/molecules/privacyConsent.html"></div>
+
+  <p class="auth-form__message" id="signupMessage"></p>
+
+  <div data-include="./components/html/atoms/authSubmitButton.html"></div>
+</form>

@@ -1,0 +1,17 @@
+HERKUNFT DES GRUNDPROJEKTS
+
+Dieses Repository erweitert das gemeinsam entwickelte Kanban-Projekt Join
+um einen KI-gestützten Issue Collector mit n8n.
+
+Ursprüngliches Team-Repository: https://github.com/willidevac/Join
+Übernommener Fork: https://github.com/andrewojak1618-debug/Join
+Ausgangsstand: 6d844d6a12d90ca187f0f24d9db6901514f557a2
+
+Der vorhandene Join-Code stammt aus der bisherigen Teamarbeit und ihren
+Beitragenden. Die neue Git-Historie ist ein technischer Projektneustart;
+sie bedeutet nicht, dass der übernommene Code allein neu erstellt wurde.
+Die ursprünglichen Beiträge bleiben im verlinkten Projekt nachvollziehbar.
+
+Ab dem 31.10.2026 wird die n8n-Erweiterung in einem eigenen Repository
+fortgeführt. Vorhandene Rechte und Hinweise am übernommenen Code bleiben
+unberührt. Diese Datei erteilt keine zusätzliche Lizenz.

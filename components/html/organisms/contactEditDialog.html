@@ -1,0 +1,87 @@
+<section
+  class="contacts-overlay"
+  id="contactEditOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="contactEditTitle"
+  hidden
+>
+  <article class="contacts-dialog">
+    <button
+      class="contacts-dialog-close"
+      type="button"
+      id="contactEditClose"
+      aria-label="Close edit contact"
+    >
+      x
+    </button>
+    <div class="contacts-dialog-side">
+      <img src="./components/assets/img/icons/Join logo vector.svg" alt="" />
+      <h2 id="contactEditTitle" class="contacts-dialog-accent">Edit contact</h2>
+    </div>
+    <div class="contacts-dialog-body">
+      <span class="contacts-dialog-avatar" id="contactEditAvatar"></span>
+      <form class="contacts-dialog-form" id="contactEditForm" novalidate>
+        <div class="contacts-dialog-field">
+          <input
+            id="contactEditName"
+            type="text"
+            placeholder="Name"
+            aria-describedby="contactEditNameError"
+          />
+          <img src="./components/assets/img/icons/person.svg" alt="" />
+          <span
+            class="contacts-dialog-field-error"
+            id="contactEditNameError"
+            aria-live="polite"
+          ></span>
+        </div>
+        <div class="contacts-dialog-field">
+          <input
+            id="contactEditEmail"
+            type="email"
+            placeholder="Email"
+            aria-describedby="contactEditEmailError"
+          />
+          <img src="./components/assets/img/icons/mail.svg" alt="" />
+          <span
+            class="contacts-dialog-field-error"
+            id="contactEditEmailError"
+            aria-live="polite"
+          ></span>
+        </div>
+        <div class="contacts-dialog-field">
+          <input
+            id="contactEditPhone"
+            type="tel"
+            placeholder="Phone"
+            inputmode="tel"
+            autocomplete="tel"
+            maxlength="24"
+            aria-describedby="contactEditPhoneError"
+          />
+          <img src="./components/assets/img/icons/call.svg" alt="" />
+          <span
+            class="contacts-dialog-field-error"
+            id="contactEditPhoneError"
+            aria-live="polite"
+          ></span>
+        </div>
+        <p class="contacts-dialog-error" id="contactEditError"></p>
+        <div class="contacts-dialog-actions">
+          <button
+            class="contacts-dialog-secondary"
+            type="button"
+            id="contactEditDelete"
+          >
+            Delete
+          </button>
+          <button class="contacts-dialog-primary" type="submit">
+            Save
+            <img src="./components/assets/img/icons/check_icon.svg" alt="" />
+          </button>
+        </div>
+      </form>
+    </div>
+  </article>
+</section>

@@ -1,0 +1,41 @@
+<section
+  class="add-task-dialog-overlay"
+  id="addTaskDialog"
+  aria-labelledby="addTaskDialogTitle"
+  aria-modal="true"
+  role="dialog"
+  hidden
+>
+  <article class="add-task-dialog-card" id="addTaskDialogCard">
+    <div class="add-task-dialog-header">
+      <h2 id="addTaskDialogTitle">Add Task</h2>
+      <button
+        class="add-task-dialog-close"
+        type="button"
+        id="addTaskDialogClose"
+        aria-label="Close add task dialog"
+      >
+        <img
+          src="./components/assets/img/icons/cancel_icon.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+    <p
+      class="add-task-dialog-error"
+      id="addTaskErrorMessage"
+      role="alert"
+      hidden
+    >
+      Task could not be saved. Please try again.
+    </p>
+    <div data-include="./components/html/organisms/addTaskForm.html"></div>
+    <div
+      class="add-task-form__overlay"
+      id="addTaskFormOverlay"
+      aria-hidden="true"
+      hidden
+    ></div>
+  </article>
+</section>

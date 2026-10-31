@@ -1,0 +1,273 @@
+<form
+  class="add-task-form"
+  id="addTaskForm"
+  aria-label="Add task form"
+  novalidate
+>
+  <fieldset class="add-task-form__fieldset" id="addTaskFormFieldset">
+  <div class="add-task-form__fields">
+    <div class="add-task-form__column">
+      <label class="add-task-field" for="taskTitle">
+        <span>Title<strong>*</strong></span>
+        <input
+          id="taskTitle"
+          name="taskTitle"
+          type="text"
+          placeholder="Enter a title"
+          aria-describedby="taskTitleError"
+        />
+        <span
+          class="add-task-field__error"
+          id="taskTitleError"
+          aria-live="polite"
+        ></span>
+      </label>
+
+      <label class="add-task-field" for="taskDescription">
+        <span>Description</span>
+        <textarea
+          id="taskDescription"
+          name="taskDescription"
+          rows="5"
+          placeholder="Enter a Description"
+        ></textarea>
+      </label>
+
+      <div class="add-task-field">
+        <label class="add-task-field__control-label" for="taskDueDate">
+          Due date<strong>*</strong>
+        </label>
+        <span
+          data-include="./components/html/molecules/addTaskDatePicker.html"
+        ></span>
+        <span
+          class="add-task-field__error"
+          id="taskDueDateError"
+          aria-live="polite"
+        ></span>
+      </div>
+    </div>
+
+    <div class="add-task-form__divider" aria-hidden="true"></div>
+
+    <div class="add-task-form__column">
+      <fieldset class="add-task-priority">
+        <legend>Priority</legend>
+        <div class="add-task-priority__options">
+          <label
+            class="add-task-priority__option add-task-priority__option--urgent button-hover button-hover--raised"
+          >
+            <input type="radio" name="taskPriority" value="urgent" />
+            <span
+              >Urgent
+              <img
+                src="./components/assets/img/icons/red_arrow_up.svg"
+                alt=""
+                aria-hidden="true"
+            /></span>
+          </label>
+          <label
+            class="add-task-priority__option add-task-priority__option--medium button-hover button-hover--raised"
+          >
+            <input type="radio" name="taskPriority" value="medium" checked />
+            <span
+              >Medium
+              <img
+                src="./components/assets/img/icons/medium_even_orange.svg"
+                alt=""
+                aria-hidden="true"
+            /></span>
+          </label>
+          <label
+            class="add-task-priority__option add-task-priority__option--low button-hover button-hover--raised"
+          >
+            <input type="radio" name="taskPriority" value="low" />
+            <span
+              >Low
+              <img
+                src="./components/assets/img/icons/green_arrow_down.svg"
+                alt=""
+                aria-hidden="true"
+            /></span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="add-task-field">
+        <label class="add-task-field__control-label" for="taskAssigneesButton">
+          Assigned to
+        </label>
+        <div
+          class="contact-dropdown"
+          id="taskAssigneesDropdown"
+          data-component="contact-dropdown"
+        >
+          <button
+            class="contact-dropdown__button"
+            id="taskAssigneesButton"
+            type="button"
+            aria-expanded="false"
+            aria-controls="taskAssigneesPanel"
+          >
+            Select contacts to assign
+          </button>
+          <div
+            class="contact-dropdown__panel"
+            id="taskAssigneesPanel"
+            role="listbox"
+            aria-label="Assignable contacts"
+            hidden
+          ></div>
+          <div
+            class="contact-dropdown__selected"
+            id="taskAssigneesSelected"
+            aria-live="polite"
+          ></div>
+        </div>
+      </div>
+
+      <div class="add-task-field">
+        <label class="add-task-field__control-label" for="taskCategoryButton">
+          Category<strong>*</strong>
+        </label>
+        <div
+          class="contact-dropdown"
+          id="taskCategoryDropdown"
+          data-component="contact-dropdown"
+        >
+          <button
+            class="contact-dropdown__button"
+            id="taskCategoryButton"
+            type="button"
+            aria-expanded="false"
+            aria-controls="taskCategoryPanel"
+            aria-describedby="taskCategoryError"
+          >
+            Select task category
+          </button>
+          <div
+            class="contact-dropdown__panel"
+            id="taskCategoryPanel"
+            role="listbox"
+            aria-label="Task categories"
+            hidden
+          >
+            <button
+              class="contact-dropdown__option contact-dropdown__option--single"
+              type="button"
+              role="option"
+              data-category-value="technical-task"
+            >
+              Technical Task
+            </button>
+            <button
+              class="contact-dropdown__option contact-dropdown__option--single"
+              type="button"
+              role="option"
+              data-category-value="user-story"
+            >
+              User Story
+            </button>
+          </div>
+          <input type="hidden" id="taskCategory" name="taskCategory" />
+        </div>
+        <span
+          class="add-task-field__error"
+          id="taskCategoryError"
+          aria-live="polite"
+        ></span>
+      </div>
+
+      <div class="add-task-field add-task-subtasks">
+        <label
+          class="add-task-field__control-label"
+          id="taskSubtasksLabel"
+          for="taskSubtasks"
+        >
+          Subtasks
+        </label>
+        <div class="add-task-subtask-input" id="taskSubtasksInputWrapper">
+          <input
+            id="taskSubtasks"
+            name="taskSubtasks"
+            type="text"
+            placeholder="Add new subtask"
+            aria-labelledby="taskSubtasksLabel"
+          />
+          <span class="add-task-subtask-controls">
+            <button
+              class="add-task-subtask-icon add-task-subtask-add"
+              id="taskSubtaskAdd"
+              type="button"
+              aria-label="Add subtask"
+            >
+              +
+            </button>
+            <span class="add-task-subtask-confirm">
+              <button
+                class="add-task-subtask-icon"
+                id="taskSubtaskClear"
+                type="button"
+                aria-label="Clear subtask input"
+              >
+                <img
+                  src="./components/assets/img/icons/cancel_icon.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+              <span class="add-task-subtask__divider" aria-hidden="true"></span>
+              <button
+                class="add-task-subtask-icon"
+                id="taskSubtaskConfirm"
+                type="button"
+                aria-label="Add subtask"
+              >
+                <img
+                  src="./components/assets/img/icons/check_edit_subtask.svg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </button>
+            </span>
+          </span>
+        </div>
+        <ul
+          class="add-task-subtask-list"
+          id="taskSubtaskList"
+          aria-label="Added subtasks"
+        ></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="add-task-form__footer">
+    <p><strong>*</strong>This field is required</p>
+    <div class="add-task-form__actions">
+      <button
+        class="add-task-button add-task-button--secondary button-hover button-hover--secondary"
+        type="reset"
+      >
+        <span>Clear</span>
+        <img
+          src="./components/assets/img/icons/cancel_icon.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
+      <button
+        class="add-task-button add-task-button--primary button-hover button-hover--primary"
+        id="createTaskButton"
+        type="submit"
+      >
+        <span>Create Task</span>
+        <img
+          src="./components/assets/img/icons/check_icon.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  </div>
+  </fieldset>
+</form>

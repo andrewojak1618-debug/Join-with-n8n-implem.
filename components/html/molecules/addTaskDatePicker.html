@@ -1,0 +1,64 @@
+<span class="date-picker" id="addTaskDatePicker">
+  <input
+    id="taskDueDate"
+    name="taskDueDate"
+    type="text"
+    placeholder="dd/mm/yyyy"
+    autocomplete="off"
+    aria-describedby="taskDueDateError"
+    aria-haspopup="dialog"
+    aria-controls="taskDueDateCalendar"
+    aria-expanded="false"
+    readonly
+  />
+  <button
+    class="date-picker__toggle"
+    id="taskDueDateToggle"
+    type="button"
+    aria-label="Open due date calendar"
+    aria-controls="taskDueDateCalendar"
+    aria-expanded="false"
+  >
+    <img
+      src="./components/assets/img/icons/event_icons.svg"
+      alt=""
+      aria-hidden="true"
+    />
+  </button>
+  <div
+    class="date-picker__popover"
+    id="taskDueDateCalendar"
+    role="dialog"
+    aria-label="Choose due date"
+    hidden
+  >
+    <div class="date-picker__header">
+      <button id="taskDueDatePreviousMonth" type="button" aria-label="Previous month">
+        &lsaquo;
+      </button>
+      <strong id="taskDueDateMonth" aria-live="polite"></strong>
+      <button id="taskDueDateNextMonth" type="button" aria-label="Next month">
+        &rsaquo;
+      </button>
+    </div>
+    <div class="date-picker__weekdays" aria-hidden="true">
+      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span>
+      <span>Fri</span><span>Sat</span><span>Sun</span>
+    </div>
+    <div class="date-picker__days" id="taskDueDateDays"></div>
+    <div class="date-picker__scroll-fields" id="taskDueDateScrollFields">
+      <label>
+        <span>Day</span>
+        <select id="taskDueDateDay" size="3" aria-label="Due date day"></select>
+      </label>
+      <label>
+        <span>Month</span>
+        <select id="taskDueDateMonthSelect" size="3" aria-label="Due date month"></select>
+      </label>
+      <label>
+        <span>Year</span>
+        <select id="taskDueDateYear" size="3" aria-label="Due date year"></select>
+      </label>
+    </div>
+  </div>
+</span>

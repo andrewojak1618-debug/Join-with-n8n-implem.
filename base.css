@@ -1,0 +1,93 @@
+@import url("./components/css/molecules/color.css");
+@import url("./components/css/molecules/buttons.css");
+@import url("./components/css/molecules/auth.css");
+@import url("./components/css/molecules/assets.css");
+@import url("./components/css/molecules/contactDropdown.css");
+@import url("./components/css/molecules/addTaskValidation.css");
+@import url("./components/css/molecules/datePicker.css");
+@import url("./components/css/molecules/languageSwitch.css");
+@import url("./components/css/molecules/pageTransition.css");
+@import url("./components/css/molecules/orientationNotice.css");
+@import url("./components/css/molecules/boardStatusPill.css");
+@import url("./components/css/organisms/appShell.css");
+@import url("./components/css/organisms/boardDetail.css");
+@import url("./components/css/organisms/addTaskDialog.css");
+@import url("./components/css/organisms/contactsDialog.css");
+@import url("./components/css/pages/login.css");
+@import url("./components/css/pages/signup.css");
+@import url("./components/css/pages/privacyPolicy.css");
+@import url("./components/css/pages/legalNotice.css");
+@import url("./components/css/pages/summary.css");
+@import url("./components/css/pages/addTask.css");
+@import url("./components/css/pages/addTaskSubtaskItem.css");
+@import url("./components/css/pages/addTaskResponsive.css");
+@import url("./components/css/pages/board.css");
+@import url("./components/css/pages/boardCardMove.css");
+@import url("./components/css/pages/boardColumn.css");
+@import url("./components/css/pages/boardSearch.css");
+@import url("./components/css/pages/contacts.css");
+@import url("./components/css/pages/help.css");
+
+:root {
+  --font-body: Arial, Helvetica, sans-serif;
+  --content-max-width: 1440px;
+}
+
+/* Responsive tiers: 320 base, 480 mobile, 768 tablet, 1024 desktop, 1280 wide. */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.start-screen {
+  width: min(100%, 560px);
+  padding: 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.start-screen h1 {
+  margin: 0 0 12px;
+  color: var(--color-accent);
+  font-size: 40px;
+  line-height: 1.1;
+}
+
+.start-screen p {
+  margin: 0 0 24px;
+  color: var(--color-muted);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+body.no-scroll {
+  position: fixed;
+  width: 100%;
+}

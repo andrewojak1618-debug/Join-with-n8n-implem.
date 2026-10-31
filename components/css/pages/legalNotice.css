@@ -1,0 +1,129 @@
+.legal-view[hidden] {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .privacy-internal-content.legal-page--legal {
+    width: 100%;
+    padding-right: 96px;
+    padding-left: 96px;
+  }
+
+  .privacy-internal-content.legal-page--legal h1 {
+    margin-bottom: 26px;
+  }
+
+  .privacy-internal-content.legal-page--legal .privacy-copy h3 {
+    font-size: 27px;
+  }
+
+  .privacy-internal-content.legal-page--legal .privacy-copy {
+    gap: 35px;
+  }
+
+  body[data-page="legal-notice"] .legal-view--internal .summary-topbar,
+  body[data-page="legal-notice"] .privacy-public-topbar {
+    padding-right: 96px;
+    padding-left: 96px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .summary-avatar {
+    width: 56px;
+    height: 56px;
+    border-width: 3px;
+  }
+}
+
+@media (max-width: 767px) {
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .privacy-internal-content {
+    padding-top: 48px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .privacy-internal-content
+    h1 {
+    margin-bottom: 32px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .privacy-copy {
+    gap: 24px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .privacy-copy
+    h3 {
+    font-size: 27px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .privacy-copy
+    p {
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .summary-topbar__logo {
+    width: 32px;
+    height: 39px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--internal
+    .summary-avatar {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--external
+    .privacy-internal-content {
+    padding-top: 48px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--external
+    .privacy-internal-content
+    h1 {
+    margin-bottom: 32px;
+    font-size: 47px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--external
+    .privacy-copy {
+    gap: 35px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--external
+    .privacy-copy
+    h3 {
+    font-size: 27px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--external
+    .privacy-copy
+    p {
+    font-size: 16px;
+  }
+
+  body[data-page="legal-notice"]
+    .legal-view--external
+    .summary-topbar__logo {
+    width: 32px;
+    height: 39px;
+  }
+}

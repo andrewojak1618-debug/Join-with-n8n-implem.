@@ -1,0 +1,72 @@
+.add-task-subtask {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px 6px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  color: var(--color-text-main);
+}
+
+.add-task-subtask:hover {
+  background: var(--color-background);
+}
+
+.add-task-subtask__title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.add-task-subtask__title::before {
+  content: "\2022";
+  margin-right: 8px;
+}
+
+.add-task-subtask__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 80ms ease;
+}
+
+.add-task-subtask:hover .add-task-subtask__actions,
+.add-task-subtask:focus-within .add-task-subtask__actions,
+.add-task-subtask--editing .add-task-subtask__actions {
+  opacity: 1;
+}
+
+.add-task-subtask__action {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.add-task-subtask__action:hover {
+  background: var(--color-white);
+}
+
+.add-task-subtask__action img {
+  width: 18px;
+  height: 18px;
+}
+
+.add-task-subtask__edit {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border-dark);
+  border-radius: 8px;
+  background: var(--color-white);
+  color: var(--color-text-main);
+  font-size: 16px;
+}

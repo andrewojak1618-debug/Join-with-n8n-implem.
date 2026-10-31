@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: tasks
+    // Shared Join task documents for signed-in users.
+    // Fields:
+    //   - title: string, required, 1-120 chars
+    //   - description: string, optional, max 1000 chars
+    //   - dueDate: string, required, 10-40 chars
+    //   - priority: string, required, low|medium|urgent
+    //   - status: string, required, todo|in-progress|feedback|done
+    //   - category: string, required, 1-80 chars
+    //   - assignedTo: list, optional, max 50 items
+    //   - subtasks: list, optional, max 50 items
+    //   - createdAt: timestamp, required, immutable
+    //   - updatedAt: timestamp, required
+    //
+    // Collection: contacts
+    // Shared Join contacts for signed-in users.
+    // Fields:
+    //   - name: string, required, 1-80 chars
+    //   - email: string, required, valid email, max 120 chars
+    //   - phone: string, optional, max 40 chars
+    //   - color: string, optional, hex color, 4-9 chars
+    //   - createdAt: timestamp, required, immutable
+    //   - updatedAt: timestamp, required
+    //
+    // Collection: users
+    // Private Firebase user profile documents.
+    // Document ID: Firebase Auth uid
+    // Fields:
+    //   - name: string, required, 1-80 chars
+    //   - email: string, required, valid email, max 120 chars
+    //   - createdAt: timestamp, required, immutable
+    //   - updatedAt: timestamp, required
+    //
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasOnlyFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidString(value, min, max) {
+      return value is string && value.size() >= min && value.size() <= max;
+    }
+
+    function isValidEmail(value) {
+      return value is string &&
+        value.size() <= 120 &&
+        value.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    function isValidHexColor(value) {
+      return value is string &&
+        value.size() >= 4 &&
+        value.size() <= 9 &&
+        value.matches('^#[A-Fa-f0-9]{3,8}$');
+    }
+
+    function hasValidTimestamps() {
+      return request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp;
+    }
+
+    function createdAtUnchanged() {
+      return request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function isValidTask(data) {
+      return hasOnlyFields([
+        'title', 'description', 'dueDate', 'priority', 'status',
+        'category', 'assignedTo', 'subtasks', 'createdAt', 'updatedAt'
+      ]) &&
+      hasRequiredFields(['title', 'dueDate', 'priority', 'status', 'category', 'createdAt', 'updatedAt']) &&
+      isValidString(data.title, 1, 120) &&
+      (!('description' in data) || isValidString(data.description, 0, 1000)) &&
+      isValidString(data.dueDate, 10, 40) &&
+      data.priority in ['low', 'medium', 'urgent'] &&
+      data.status in ['todo', 'in-progress', 'feedback', 'done'] &&
+      isValidString(data.category, 1, 80) &&
+      (!('assignedTo' in data) || (data.assignedTo is list && data.assignedTo.size() <= 50)) &&
+      (!('subtasks' in data) || (data.subtasks is list && data.subtasks.size() <= 50)) &&
+      hasValidTimestamps();
+    }
+
+    function isValidContact(data) {
+      return hasOnlyFields(['name', 'email', 'phone', 'color', 'createdAt', 'updatedAt']) &&
+        hasRequiredFields(['name', 'email', 'createdAt', 'updatedAt']) &&
+        isValidString(data.name, 1, 80) &&
+        isValidEmail(data.email) &&
+        (!('phone' in data) || isValidString(data.phone, 0, 40)) &&
+        (!('color' in data) || isValidHexColor(data.color)) &&
+        hasValidTimestamps();
+    }
+
+    function isValidUser(data) {
+      return hasOnlyFields(['name', 'email', 'createdAt', 'updatedAt']) &&
+        hasRequiredFields(['name', 'email', 'createdAt', 'updatedAt']) &&
+        isValidString(data.name, 1, 80) &&
+        isValidEmail(data.email) &&
+        hasValidTimestamps();
+    }
+
+    match /tasks/{taskId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidTask(request.resource.data);
+      allow update: if isAuthenticated() && isValidTask(request.resource.data) && createdAtUnchanged();
+      allow delete: if isAuthenticated();
+    }
+
+    match /contacts/{contactId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidContact(request.resource.data);
+      allow update: if isAuthenticated() && isValidContact(request.resource.data) && createdAtUnchanged();
+      allow delete: if isAuthenticated();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && createdAtUnchanged();
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,82 @@
+.board-header__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-right: 40px;
+}
+
+.board-search {
+  width: 300px;
+  display: flex;
+  align-items: center;
+  padding: 13px 16px;
+  border: 1px solid var(--color-border-medium);
+  border-radius: 10px;
+  background: var(--color-white);
+  transition: border-color 100ms ease;
+}
+
+.board-search:focus-within {
+  border-color: var(--color-border-focus);
+}
+
+.board-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: var(--color-transparent);
+  box-shadow: none;
+  font-size: 16px;
+}
+
+.board-search__btn {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 0 0 0 12px;
+  border: 0;
+  border-left: 1px solid var(--color-border-medium);
+  background: var(--color-transparent);
+  color: var(--color-text-main);
+  cursor: pointer;
+}
+
+.board-columns[hidden] {
+  display: none;
+}
+
+.board-search-no-results {
+  margin-top: 24px;
+  color: var(--color-muted);
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  animation: boardCardIn 0.5s ease forwards;
+}
+
+@keyframes boardCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.board-columns--animate-in .board-card {
+  animation: boardCardIn 0.5s ease;
+}
+
+@media (max-width: 767px) {
+  .board-header__right {
+    display: contents;
+  }
+
+  .board-search {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}

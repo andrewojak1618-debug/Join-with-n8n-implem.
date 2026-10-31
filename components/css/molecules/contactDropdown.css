@@ -1,0 +1,166 @@
+.contact-dropdown {
+  position: relative;
+  display: grid;
+  gap: 8px;
+}
+
+.contact-dropdown__button {
+  min-height: 48px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border-dark);
+  border-radius: 8px;
+  background: var(--color-white);
+  color: var(--color-placeholder);
+  font-size: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.contact-dropdown__button::after {
+  content: "";
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  background: url("../../assets/img/icons/arrow_drop_task.svg") center / contain
+    no-repeat;
+  transition: transform 100ms ease;
+}
+
+.contact-dropdown.is-open .contact-dropdown__button::after {
+  transform: rotate(180deg);
+}
+
+.contact-dropdown.is-open .contact-dropdown__selected {
+  display: none;
+}
+
+.contact-dropdown__option--single {
+  width: 100%;
+  border: unset;
+  background: none;
+  text-align: left;
+}
+
+.contact-dropdown__option--single.is-selected {
+  background: var(--color-background-soft);
+}
+
+.contact-dropdown__panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--color-border-dark);
+  border-radius: 8px;
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+}
+
+.contact-dropdown__panel[hidden] {
+  display: none;
+}
+
+.contact-dropdown__option {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.contact-dropdown__option:hover {
+  background: var(--color-background-soft);
+}
+
+.contact-dropdown__option:has(input:checked) {
+  background: var(--color-primary-auth);
+  color: var(--color-white);
+}
+
+.contact-dropdown__option:has(input:checked):hover {
+  background: var(--color-primary-auth-hover);
+}
+
+.contact-dropdown__option:has(input:checked) + .contact-dropdown__option:has(input:checked) {
+  margin-top: 6px;
+  border-top: 1px solid var(--color-border-medium);
+}
+
+.contact-dropdown__option input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-left: auto;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border-dark);
+  border-radius: 4px;
+  background-color: var(--color-white);
+  cursor: pointer;
+}
+
+.contact-dropdown__option input[type="checkbox"]:checked {
+  border-color: var(--color-white);
+  background: var(--color-primary-auth) url("../../assets/img/icons/check.svg") center / 14px no-repeat;
+}
+
+.contact-dropdown__option input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+.contact-dropdown__avatar {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--color-white);
+  border-radius: 50%;
+  color: var(--color-white);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.contact-dropdown__avatar--overflow {
+  background: var(--color-border-dark);
+  font-size: 16px;
+}
+
+.contact-dropdown__empty {
+  margin: 0;
+  padding: 12px;
+  color: var(--color-muted);
+}
+
+.contact-dropdown__selected {
+  min-height: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-dropdown__selected:empty {
+  display: none;
+}
+
+.contact-dropdown__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-background-soft);
+  color: var(--color-text-main);
+  font-size: 16px;
+}

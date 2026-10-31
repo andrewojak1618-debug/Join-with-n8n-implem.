@@ -1,0 +1,201 @@
+.auth-page--signup {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 96px 24px 64px;
+}
+
+.auth-card--signup {
+  position: relative;
+  width: clamp(376px, calc(100vw - 392px), 600px);
+  min-height: 630px;
+  padding: 51px clamp(32px, calc(25.5vw - 164px), 89px) 32px;
+  display: grid;
+  align-content: start;
+  background-color: var(--color-surface);
+  border-radius: 30px;
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-16px);
+}
+
+.auth-page--signup .auth-card__back {
+  top: 63px;
+  left: clamp(42px, 5.4vw, 54px);
+}
+
+.auth-page--signup .auth-card__title {
+  margin-bottom: 51px;
+}
+
+.auth-page--signup .auth-form {
+  gap: 24px;
+}
+
+.auth-page--signup .form-field__input {
+  width: 100%;
+  height: 48px;
+  padding: 12px 52px 12px 21px;
+  color: var(--color-text);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  outline: none;
+  font-size: 20px;
+}
+
+.auth-page--signup .form-field__input::placeholder {
+  color: var(--color-placeholder);
+}
+
+.auth-page--signup .form-field__input:focus {
+  border-color: var(--color-accent-light);
+}
+
+.auth-page--signup .privacy-consent {
+  position: relative;
+  margin-top: 16px;
+}
+
+.auth-page--signup .privacy-consent__control {
+  gap: 10px;
+}
+
+.auth-page--signup .privacy-consent__checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+.auth-page--signup .privacy-consent__label {
+  color: var(--color-placeholder);
+  font-size: 17px;
+}
+
+.auth-page--signup .privacy-consent__link {
+  color: var(--color-greeting);
+}
+
+.auth-page--signup .auth-form__message:empty {
+  display: none;
+}
+
+.auth-page--signup .auth-form__message:empty + .auth-form__submit {
+  margin-top: 6px;
+}
+
+.auth-page--signup .auth-footer {
+  bottom: 48px;
+  font-size: 17px;
+}
+
+.auth-page--signup .auth-footer a {
+  color: var(--color-placeholder);
+}
+
+@media (max-width: 767px) {
+  .auth-page--signup {
+    align-content: start;
+    padding:
+      var(--auth-page-mobile-top) 16px
+      clamp(56px, 10svh, 96px);
+  }
+
+  .auth-card--signup {
+    width: min(100%, 560px);
+    min-height: clamp(500px, calc(35svh + 270px), 595px);
+    padding:
+      clamp(20px, 4svh, 36px) 16px
+      clamp(20px, 3.5svh, 32px);
+    border-radius: 30px;
+    transform: none;
+  }
+
+  .auth-page--signup .auth-card__back {
+    top: clamp(24px, 4.5svh, 42px);
+    left: clamp(4px, calc(20vw - 58px), 46px);
+  }
+
+  .auth-page--signup .auth-card__title {
+    margin-bottom: clamp(30px, 4.4svh, 40px);
+    font-size: clamp(38px, min(12vw, 7svh), 47px);
+  }
+
+  .auth-page--signup .auth-card__title::after {
+    width: 88px;
+  }
+
+  .auth-page--signup .auth-form {
+    gap: clamp(12px, 2.2svh, 20px);
+  }
+
+  .auth-page--signup .auth-form > .form-field + .form-field {
+    margin-top: clamp(0px, 0.6svh, 4px);
+  }
+
+  .auth-page--signup .form-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    margin-bottom: 0;
+  }
+
+  .auth-page--signup .form-field__error {
+    position: static;
+    min-width: 0;
+    min-height: 16px;
+    margin-inline: 8px;
+    font-size: 13px;
+    line-height: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  .auth-page--signup .form-field__error:empty {
+    display: block;
+  }
+
+  .auth-page--signup .form-field__icon {
+    top: calc(clamp(42px, 7svh, 50px) / 2);
+  }
+
+  .auth-page--signup .form-field__input {
+    height: clamp(42px, 7svh, 50px);
+    border-color: var(--color-border-strong);
+    font-size: clamp(16px, 5vw, 20px);
+  }
+
+  .auth-page--signup .form-field__input::placeholder {
+    color: var(--color-placeholder);
+  }
+
+  .auth-page--signup .privacy-consent {
+    margin-top: clamp(10px, calc(11svh - 62px), 40px);
+  }
+
+  .auth-form__message:empty {
+    display: none;
+  }
+
+  .auth-page--signup .auth-form__message:empty + .auth-form__submit {
+    margin-top: 8px;
+  }
+
+  .auth-form__submit {
+    min-width: 180px;
+    height: clamp(42px, 7svh, 51px);
+    font-size: 16px;
+  }
+
+  .auth-page--signup .auth-footer {
+    bottom: max(clamp(12px, 3svh, 28px), env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 479px) {
+  .privacy-consent__control {
+    gap: 8px;
+  }
+
+  .auth-page--signup .privacy-consent__label {
+    font-size: clamp(16px, 4.3vw, 17px);
+  }
+}

@@ -1,0 +1,25 @@
+.board-column__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.board-column__add {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--color-text-main);
+  border-radius: 8px;
+  color: var(--color-text-main);
+  font-size: 20px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.board-column__add:hover,
+.board-column__add:focus-visible {
+  border-color: var(--color-accent-light);
+  color: var(--color-accent-light);
+}

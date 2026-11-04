@@ -124,11 +124,17 @@ function updateLegalViewMode(documentType) {
 }
 
 
+/**
+ * Initializes the language controls on the privacy page.
+ */
 function initPrivacyLanguageSwitch() {
   initLegalPage("privacy");
 }
 
 
+/**
+ * Initializes the language controls on the legal notice page.
+ */
 function initLegalNoticeLanguageSwitch() {
   initLegalPage("legal");
 }

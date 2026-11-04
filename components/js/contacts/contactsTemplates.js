@@ -26,9 +26,9 @@ function getContactItemTemplate(contact) {
  * @returns {Promise<Element|null>} First template root element, if present.
  */
 async function createTemplateElement(templatePath) {
-  const response = await fetch(templatePath);
+  const content = await getHtmlContent(templatePath);
   const wrapper = document.createElement("div");
-  wrapper.innerHTML = await response.text();
+  wrapper.innerHTML = content;
   return wrapper.firstElementChild;
 }
 

@@ -7,7 +7,8 @@ const sourceRoot = path.resolve(__dirname, "..", "components", "js");
 
 
 test("documents function parameters and return values consistently", () => {
-  const issues = getSourceFiles(sourceRoot).flatMap(getJsdocIssues);
+  const files = [path.resolve(sourceRoot, "..", "..", "main.js"), ...getSourceFiles(sourceRoot)];
+  const issues = files.flatMap(getJsdocIssues);
   assert.deepEqual(issues, []);
 });
 
@@ -29,12 +30,19 @@ function getJsdocIssues(filePath) {
 
 
 function getDocumentedFunctions(source) {
-  const pattern = /\/\*\*(?<doc>[\s\S]*?)\*\/\s*(?:async\s+)?function\s+(?<name>[A-Za-z_$][\w$]*)\s*\((?<params>[^\r\n]*)\)\s*\{/g;
+  const pattern = /^(?:export\s+)?(?:async\s+)?function\s+(?<name>[A-Za-z_$][\w$]*)\s*\((?<params>[^\r\n]*)\)\s*\{/gm;
   return [...source.matchAll(pattern)].map((match) => ({
-    doc: match.groups.doc,
+    doc: getLeadingJsdoc(source.slice(0, match.index)),
     name: match.groups.name,
     params: getParameterNames(match.groups.params),
   }));
+}
+
+
+function getLeadingJsdoc(prefix) {
+  const start = prefix.lastIndexOf("/**");
+  const candidate = prefix.slice(start);
+  return start >= 0 && /^\/\*\*(?:(?!\*\/)[\s\S])*\*\/\s*$/.test(candidate) ? candidate : "";
 }
 
 
@@ -50,6 +58,7 @@ function validateJsdocEntry(filePath, entry) {
   const issues = entry.params
     .filter((parameter) => !hasCompleteParamTag(entry.doc, parameter))
     .map((parameter) => `${label} is missing a complete @param for ${parameter}`);
+  if (!entry.doc) issues.push(`${label} is missing JSDoc`);
   issues.push(...getUnexpectedParamIssues(label, entry));
   if (hasInvalidParamTag(entry.doc)) issues.push(`${label} has an incomplete @param tag`);
   if (hasInvalidReturnTag(entry.doc)) issues.push(`${label} has an incomplete @returns tag`);
@@ -88,3 +97,13 @@ function hasInvalidParamTag(doc) {
 function hasInvalidReturnTag(doc) {
   return /@returns?\b/.test(doc) && !/@returns?\s+\{[^\r\n]+\}\s+\S/.test(doc);
 }
+
+
+
+test("detects undocumented functions after a documented function", () => {
+  const entries = getDocumentedFunctions("/** Documented. */\nfunction first() {}\nfunction missing() {}");
+  assert.equal(entries[0].doc.includes("Documented"), true);
+  const issues = validateJsdocEntry("sample.js", entries[1]);
+  assert.equal(issues.length, 1);
+  assert.match(issues[0], /missing is missing JSDoc$/);
+});

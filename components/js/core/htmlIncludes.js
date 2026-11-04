@@ -29,7 +29,10 @@ async function replaceHtmlInclude(placeholder) {
  * @returns {Promise<string>} The HTML text of the file.
  */
 async function getHtmlContent(path) {
-  if (!htmlCache.has(path)) htmlCache.set(path, fetchHtml(path));
+  if (!htmlCache.has(path)) htmlCache.set(path, fetchHtml(path).catch((error) => {
+    htmlCache.delete(path);
+    throw error;
+  }));
   return htmlCache.get(path);
 }
 
@@ -41,5 +44,17 @@ async function getHtmlContent(path) {
  */
 async function fetchHtml(path) {
   const response = await fetch(path);
+  if (!response.ok) throw new Error(`HTML could not be loaded: ${path} (HTTP ${response.status})`);
   return response.text();
+}
+
+
+/**
+ * Displays a safe startup error instead of an empty page or server response.
+ */
+function showPageLoadError() {
+  const message = document.createElement("p");
+  message.setAttribute("role", "alert");
+  message.textContent = "Page could not be loaded. Please reload to try again.";
+  document.getElementById("app").replaceChildren(message);
 }

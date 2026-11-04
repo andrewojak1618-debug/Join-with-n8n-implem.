@@ -5,7 +5,7 @@ const { loadBrowserScripts } = require("./helpers/scriptContext");
 
 const context = loadBrowserScripts([
   "components/js/core/shared.js",
-  "components/js/contacts/contactsDialog.js",
+  "components/js/contacts/contact-validation.js", "components/js/contacts/contactsDialog.js",
 ]);
 
 const validContact = {
@@ -77,7 +77,7 @@ test("trims every contact form value before validation and storage", () => {
   };
   const document = { getElementById: (id) => elements[id] };
   const formContext = loadBrowserScripts([
-    "components/js/core/shared.js", "components/js/contacts/contactsDialog.js",
+    "components/js/core/shared.js", "components/js/contacts/contact-validation.js", "components/js/contacts/contactsDialog.js",
   ], { document });
   assert.deepEqual(JSON.parse(JSON.stringify(formContext.getContactFormValues("contactAdd"))), validContact);
 });
@@ -87,7 +87,7 @@ test("shows and clears contact email feedback after blur", () => {
   const elements = createContactValidationElements();
   const document = { getElementById: (id) => elements[id] };
   const formContext = loadBrowserScripts([
-    "components/js/core/shared.js", "components/js/contacts/contactsDialog.js",
+    "components/js/core/shared.js", "components/js/contacts/contact-validation.js", "components/js/contacts/contactsDialog.js",
   ], { document });
   formContext.handleContactValidationEvent({ type: "focusout", target: elements.contactAddEmail }, "contactAdd");
   assert.equal(elements.contactAddEmailError.textContent, "Please enter a valid email address.");

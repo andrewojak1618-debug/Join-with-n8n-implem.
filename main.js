@@ -66,20 +66,23 @@ let pageTransitionRunning = false;
 
 /**
  * Starts the app after DOM load and chooses between intro and normal render.
+ * @returns {Promise<void>} Resolves after startup or visible error feedback.
  */
 async function initApp() {
   document.addEventListener("click", handlePageLinkClick);
-  if (getValidPage() === "login") {
-    await renderSignupWithTransition();
-    return;
+  try {
+    if (getValidPage() === "login") await renderSignupWithTransition();
+    else await renderCurrentPage();
+  } catch {
+    showPageLoadError();
   }
-  await renderCurrentPage();
 }
 
 
 /**
  * Renders the page from the URL once auth is ready and runs its init code.
  * @param {Object} [options] - Render options, e.g. { animate: true }.
+ * @returns {Promise<void>} Resolves after the page has initialized.
  */
 async function renderCurrentPage(options = {}) {
   await waitForFirebaseAuth();
@@ -99,6 +102,7 @@ async function renderCurrentPage(options = {}) {
  * @param {string} content - The raw HTML of the page template.
  * @param {boolean} [shouldAnimate] - True to fade the new page in.
  * @param {string} page - The route key of the page.
+ * @returns {Promise<void>} Resolves after the markup has been inserted.
  */
 async function renderPageContent(content, shouldAnimate, page) {
   const app = document.getElementById("app");
@@ -234,6 +238,7 @@ function isUserAuthenticated() {
 
 /**
  * Waits until Firebase has restored the auth session, when Firebase is used.
+ * @returns {Promise<void>} Resolves when the auth session is ready.
  */
 async function waitForFirebaseAuth() {
   if (window.joinFirebaseReady) await window.joinFirebaseReady;
@@ -242,6 +247,8 @@ async function waitForFirebaseAuth() {
 
 /**
  * Reads the route config and tells whether a page needs login.
+ * @param {string} page - Route key to inspect.
+ * @returns {boolean} True when the route requires authentication.
  */
 function isProtectedPage(page) {
   return Boolean(routes[page].protected);
@@ -250,6 +257,7 @@ function isProtectedPage(page) {
 
 /**
  * Replaces the URL with the login page when access is not allowed.
+ * @returns {null} Signals that navigation has been redirected.
  */
 function redirectToLoginPage() {
   window.location.replace(createPageUrl("login"));
@@ -334,6 +342,7 @@ function initStaticPage(page) {
 /**
  * Runs the page-specific startup code after the markup was rendered.
  * @param {string} page - The route key of the rendered page.
+ * @returns {Promise<void>} Resolves after page startup completes.
  */
 async function initPage(page) {
   initStaticPage(page);

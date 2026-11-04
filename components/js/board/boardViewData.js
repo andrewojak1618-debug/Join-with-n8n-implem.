@@ -107,19 +107,31 @@ function getBoardClausePhrases(clause) {
   const phrases = [];
   let currentPhrase = [];
   words.forEach((word) => {
-    const normalizedWord = word.toLocaleLowerCase();
-    if (boardPreviewStopWords.has(normalizedWord)) {
-      appendBoardPreviewPhrase(phrases, currentPhrase);
-      currentPhrase = [];
-    } else if (!currentPhrase.length && boardPreviewActionWords.has(normalizedWord)) return;
-    else currentPhrase.push(word);
-    if (currentPhrase.length === 2) {
-      appendBoardPreviewPhrase(phrases, currentPhrase);
-      currentPhrase = [];
-    }
+    currentPhrase = collectBoardPreviewWord(word, currentPhrase, phrases);
   });
   appendBoardPreviewPhrase(phrases, currentPhrase);
   return phrases;
+}
+
+
+/**
+ * Extends a phrase or flushes it at a stop word or the two-word limit.
+ * @param {string} word - Current word from the clause.
+ * @param {string[]} currentPhrase - Words collected so far.
+ * @param {string[]} phrases - Completed phrases to extend.
+ * @returns {string[]} Words remaining for the next iteration.
+ */
+function collectBoardPreviewWord(word, currentPhrase, phrases) {
+  const normalizedWord = word.toLocaleLowerCase();
+  if (boardPreviewStopWords.has(normalizedWord)) {
+    appendBoardPreviewPhrase(phrases, currentPhrase);
+    return [];
+  }
+  if (!currentPhrase.length && boardPreviewActionWords.has(normalizedWord)) return currentPhrase;
+  currentPhrase.push(word);
+  if (currentPhrase.length < 2) return currentPhrase;
+  appendBoardPreviewPhrase(phrases, currentPhrase);
+  return [];
 }
 
 

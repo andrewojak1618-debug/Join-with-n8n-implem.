@@ -1,0 +1,8 @@
+{
+  "from": { "value": [{ "name": "Testperson", "address": "stakeholder@example.test" }] },
+  "to": { "value": [{ "address": "collector@example.test" }] },
+  "id": "synthetic-login-001",
+  "messageId": "<synthetic-login-001@example.test>",
+  "subject": "Testfall: Anmeldung blockiert",
+  "text": "Das gesamte Testteam kann sich nicht anmelden. Ein Termin steht noch nicht fest."
+}

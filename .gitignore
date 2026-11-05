@@ -6,3 +6,14 @@ todo.md
 notes.md
 figmaImages/
 desktop.ini
+
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+serviceAccount*.json
+*-firebase-adminsdk-*.json
+client_secret*.json
+n8n/local/
+tests/local/

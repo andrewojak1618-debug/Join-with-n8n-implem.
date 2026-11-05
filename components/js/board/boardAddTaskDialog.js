@@ -1,6 +1,3 @@
-let addTaskDialogTargetStatus = "todo";
-
-
 /**
  * Loads the add task form once and wires the dialog controls.
  */
@@ -54,7 +51,7 @@ function bindAddTaskDialogTriggers() {
 function handleAddTaskTriggerClick(event) {
   if (!isDesktopAddTaskDialogViewport()) return;
   event.preventDefault();
-  openAddTaskDialog(event.currentTarget.dataset.taskStatus);
+  openAddTaskDialog();
 }
 
 
@@ -73,11 +70,9 @@ function bindAddTaskDialogCancelButton() {
 
 
 /**
- * Opens the add task dialog preselected for one board column.
- * @param {string} [status] - The column status to preselect.
+ * Opens the add task dialog for a new Triage task.
  */
-function openAddTaskDialog(status) {
-  addTaskDialogTargetStatus = addTaskStatuses.includes(status) ? status : "todo";
+function openAddTaskDialog() {
   resetAddTaskDialogForm();
   getElement("addTaskDialog").hidden = false;
   getElement("addTaskDialogCard").scrollTop = 0;

@@ -290,9 +290,6 @@ function handlePageLinkClick(event) {
  */
 function getLinkParams(link) {
   const params = {};
-  if (link.dataset.taskStatus) {
-    params.status = link.dataset.taskStatus;
-  }
   if (link.dataset.from) {
     params.from = link.dataset.from;
   }

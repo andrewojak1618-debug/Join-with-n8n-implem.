@@ -1,5 +1,4 @@
 const addTaskRedirectDelay = 900;
-const addTaskStatuses = ["todo", "in-progress", "feedback", "done"];
 let addTaskRedirectTimer;
 
 
@@ -165,7 +164,7 @@ function getAddTaskData() {
     assignedTo: getAddTaskAssignee(),
     category: getAddTaskCategory(),
     subtasks: getAddTaskSubtasks(),
-    status: getAddTaskStatus(),
+    status: "triage",
     createdAt: new Date().toISOString(),
   };
 }
@@ -181,16 +180,6 @@ function initAddTaskCloseButton() {
   if (from !== "board") return;
   closeButton.hidden = false;
   closeButton.addEventListener("click", () => navigateToPage("board"));
-}
-
-
-/**
- * Uses a valid status passed by a board column and defaults to To do.
- */
-function getAddTaskStatus() {
-  if (typeof addTaskDialogTargetStatus !== "undefined") return addTaskDialogTargetStatus;
-  const status = new URLSearchParams(window.location.search).get("status");
-  return addTaskStatuses.includes(status) ? status : "todo";
 }
 
 

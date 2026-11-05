@@ -1,5 +1,5 @@
 .board-content {
-  width: min(100%, 1160px);
+  width: min(100%, 1480px);
   padding: 92px 36px 48px 64px;
 }
 
@@ -44,7 +44,7 @@
 
 .board-columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 26px;
 }
 
@@ -286,77 +286,6 @@ body.board-dragging * {
 
 .board-toast[hidden] {
   display: none;
-}
-
-@media (max-width: 1279px) {
-  .board-content {
-    padding: 72px 24px 48px;
-  }
-
-  .board-columns {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
-  .board-task-list {
-    width: 100%;
-    min-width: 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-  }
-
-  .board-task-list::-webkit-scrollbar {
-    display: none;
-  }
-
-  .board-task-list .board-card {
-    flex: 0 0 clamp(240px, 78%, 320px);
-    cursor: pointer;
-    scroll-snap-align: start;
-  }
-
-  .board-task-list .board-card:active {
-    cursor: pointer;
-  }
-
-  .board-empty-state {
-    flex: 1 1 100%;
-  }
-}
-
-@media (max-width: 767px) {
-  .board-header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-  }
-
-  .board-header h1 {
-    font-size: 40px;
-  }
-
-  .board-add-task {
-    grid-row: 1;
-    grid-column: 2;
-    width: 48px;
-    min-height: 48px;
-    padding: 0;
-  }
-
-  .board-add-task__label {
-    display: none;
-  }
-
-  .board-columns {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
 }
 
 .board-task-list--droppable {

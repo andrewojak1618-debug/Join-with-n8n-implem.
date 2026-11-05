@@ -19,6 +19,7 @@ function formatBoardCategory(category) {
  */
 function formatBoardStatus(status) {
   const labels = {
+    triage: "in triage",
     todo: "to do",
     "in-progress": "in progress",
     feedback: "awaiting feedback",
@@ -243,8 +244,8 @@ function getBoardTaskViewData(task) {
  * @returns {Object[]} Prepared adjacent move targets.
  */
 function getBoardMoveTargets(currentStatus) {
-  const order = ["todo", "in-progress", "feedback", "done"];
-  const labels = { todo: "To-do", "in-progress": "In progress", feedback: "Review", done: "Done" };
+  const order = ["triage", "todo", "in-progress", "feedback", "done"];
+  const labels = { triage: "Triage", todo: "To-do", "in-progress": "In progress", feedback: "Review", done: "Done" };
   const currentIndex = order.indexOf(currentStatus);
   if (currentIndex < 0) return [];
   return [order[currentIndex - 1], order[currentIndex + 1]]

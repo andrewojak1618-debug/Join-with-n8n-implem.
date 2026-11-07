@@ -10,7 +10,7 @@ service cloud.firestore {
     // Fields:
     //   - title: string, required, 1-120 chars
     //   - description: string, optional, max 1000 chars
-    //   - dueDate: string, required, 10-40 chars
+    //   - dueDate: required on manual creation; imported tasks may have no deadline
     //   - priority: string, required, low|medium|urgent
     //   - status: string, required, triage|todo|in-progress|feedback|done
     //   - category: string, required, 1-80 chars
@@ -99,10 +99,10 @@ service cloud.firestore {
         'title', 'description', 'dueDate', 'priority', 'status',
         'category', 'assignedTo', 'subtasks', 'createdAt', 'updatedAt', 'creator'
       ]) &&
-      hasRequiredFields(['title', 'dueDate', 'priority', 'status', 'category', 'createdAt', 'updatedAt']) &&
+      hasRequiredFields(['title', 'priority', 'status', 'category', 'createdAt', 'updatedAt']) &&
       isValidString(data.title, 1, 120) &&
       (!('description' in data) || isValidString(data.description, 0, 1000)) &&
-      isValidString(data.dueDate, 10, 40) &&
+      (data.get('dueDate', null) == null || isValidString(data.dueDate, 10, 40)) &&
       data.priority in ['low', 'medium', 'urgent'] &&
       data.status in ['triage', 'todo', 'in-progress', 'feedback', 'done'] &&
       isValidString(data.category, 1, 80) &&
@@ -132,8 +132,9 @@ service cloud.firestore {
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && isValidTask(request.resource.data)
-        && request.resource.data.status == 'triage' && isManualTaskCreator(request.resource.data.creator);
+        && isValidString(request.resource.data.dueDate, 10, 40) && request.resource.data.status == 'triage' && isManualTaskCreator(request.resource.data.creator);
       allow update: if isAuthenticated() && isValidTask(request.resource.data) && createdAtUnchanged()
+        && (resource.data.get('dueDate', null) in [null, ''] || request.resource.data.get('dueDate', null) != null)
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['creator']);
       allow delete: if isAuthenticated();
     }

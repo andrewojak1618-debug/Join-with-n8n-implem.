@@ -135,7 +135,7 @@ function validateBoardEditField(fieldName) {
 function getBoardEditFieldError(fieldName) {
   const value = getTrimmedElementValue(getBoardEditField(fieldName));
   if (fieldName === "Title") return value ? "" : "Please enter a title.";
-  if (!value) return "Please enter a due date.";
+  if (!value) return getActiveBoardTask()?.dueDate ? "Please enter a due date." : "";
   return normalizeTaskDueDate(value) ? "" : "Please enter a valid due date.";
 }
 
@@ -192,7 +192,7 @@ function getBoardEditedTask(task) {
     ...task,
     title: getTrimmedElementValue(getBoardEditField("Title")),
     description: getTrimmedElementValue(getBoardEditField("Description")),
-    dueDate: normalizeTaskDueDate(getBoardEditField("DueDate").value),
+    dueDate: normalizeTaskDueDate(getBoardEditField("DueDate").value) || null,
     priority: getBoardEditPriority(),
     category: getBoardEditCategory(),
     assignedTo: getBoardEditedAssignees(),

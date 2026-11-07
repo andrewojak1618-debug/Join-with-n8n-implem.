@@ -27,6 +27,7 @@ const context = loadBrowserScripts(
   ],
   {
     document,
+    getActiveBoardTask: () => ({ dueDate: "2026-07-16" }),
     getBoardEditedAssigneesFromContacts: () => [],
     getBoardEditSubtaskItems: () => [],
   },
@@ -68,4 +69,19 @@ test("trims board edit strings before building the stored task", () => {
   assert.equal(task.dueDate, "2026-07-16");
   assert.equal(task.priority, "low");
   assert.equal(task.category, "user-story");
+});
+
+
+test("saves imported tickets without a deadline", () => {
+  const original = context.getActiveBoardTask;
+  try {
+    fields.boardTaskEditDueDate.value = "";
+    for (const task of [{}, { dueDate: null }, { dueDate: "" }]) {
+      context.getActiveBoardTask = () => task;
+      assert.equal(context.getBoardEditFieldError("DueDate"), "");
+      assert.equal(context.getBoardEditedTask(task).dueDate, null);
+    }
+  } finally {
+    context.getActiveBoardTask = original;
+  }
 });

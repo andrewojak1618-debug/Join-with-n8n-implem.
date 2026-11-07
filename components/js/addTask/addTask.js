@@ -161,12 +161,28 @@ function getAddTaskData() {
     description: getTrimmedInputValue("taskDescription"),
     dueDate: getAddTaskDueDate(),
     priority: getAddTaskPriority(),
+    creator: getManualTaskCreator(getStoredUser()),
     assignedTo: getAddTaskAssignee(),
     category: getAddTaskCategory(),
     subtasks: getAddTaskSubtasks(),
     status: "triage",
     createdAt: new Date().toISOString(),
   };
+}
+
+
+/**
+ * Captures the signed-in creator independently of the task's assignees.
+ * @param {Object|null} user - Current Join session.
+ * @returns {Object} Creator snapshot for a manually submitted task.
+ */
+function getManualTaskCreator(user) {
+  if (!user?.uid) throw new Error("Sign in to create a task.");
+  if (user.type === "firebase-guest") {
+    return { type: "extern", origin: "guest", uid: user.uid, name: "Gast" };
+  }
+  if (!user.email) throw new Error("The account email is missing.");
+  return { type: "intern", uid: user.uid, name: user.name || user.email, email: user.email };
 }
 
 

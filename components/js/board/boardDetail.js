@@ -2,6 +2,49 @@ let boardDetailContacts = [];
 
 
 /**
+ * Displays the creator and email source independently of assigned contacts.
+ * @param {Object} task - Ticket opened in the detail dialog.
+ */
+function renderBoardDetailCreator(task) {
+  const creator = task.creator;
+  const isGuest = creator?.origin === "guest";
+  const email = isGuest ? "" : creator?.email || "";
+  setElementText("boardTaskDetailCreator", isGuest ? "Gast" : creator?.name || email || "Ersteller unbekannt");
+  renderBoardDetailOrigin(isGuest ? "guest" : creator?.type);
+  renderBoardCreatorEmail(email);
+  getElement("boardTaskDetailAi").hidden = task.source !== "email";
+}
+
+
+/**
+ * Updates the badge for the creator of the selected ticket.
+ * @param {string|undefined} type - Stored origin or guest classification.
+ */
+function renderBoardDetailOrigin(type) {
+  const badge = getElement("boardTaskDetailOrigin");
+  const label = type === "intern" ? "Intern" : type === "extern" ? "Extern" : "";
+  badge.hidden = !label;
+  badge.textContent = label;
+  badge.dataset.type = type || "";
+}
+
+
+/**
+ * Updates the email link when the selected ticket changes.
+ * @param {string} email - Optional address of the ticket creator.
+ */
+function renderBoardCreatorEmail(email) {
+  const link = getElement("boardTaskDetailEmail");
+  link.hidden = !email;
+  link.removeAttribute("href");
+  link.removeAttribute("aria-label");
+  if (!email) return;
+  link.href = "mailto:" + encodeURIComponent(email).replace("%40", "@");
+  link.setAttribute("aria-label", "E-mail: " + email);
+}
+
+
+/**
  * Shows detail subtasks as checkable items.
  *
  * @param {Object} task - The task whose subtasks are displayed.

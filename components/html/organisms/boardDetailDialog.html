@@ -17,12 +17,21 @@
     </button>
 
     <div class="board-detail-view" id="boardTaskDetailView">
-      <span class="board-status-pill board-detail-category" id="boardTaskDetailCategory"
-        >Task</span
-      >
+      <div class="board-detail-labels">
+        <span class="board-status-pill board-detail-category" id="boardTaskDetailCategory">Task</span>
+        <span class="board-detail-ai" id="boardTaskDetailAi" hidden>AI-generated ticket</span>
+      </div>
       <h2 class="board-detail-title" id="boardTaskDetailTitle">Task title</h2>
       <p class="board-detail-description" id="boardTaskDetailDescription">Task description</p>
       <dl class="board-detail-list">
+        <div class="board-detail-row">
+          <dt>Creator:</dt>
+          <dd class="board-detail-creator">
+            <span class="board-detail-origin" id="boardTaskDetailOrigin" hidden></span>
+            <span id="boardTaskDetailCreator"></span>
+            <a id="boardTaskDetailEmail" hidden>E-mail</a>
+          </dd>
+        </div>
         <div class="board-detail-row">
           <dt>Due date:</dt>
           <dd id="boardTaskDetailDueDate">-</dd>

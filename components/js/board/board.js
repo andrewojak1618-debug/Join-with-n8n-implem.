@@ -299,6 +299,7 @@ function fillBoardTaskDetail(task) {
     task.description || "No description",
   );
   fillBoardDetailMetaFields(task);
+  renderBoardDetailCreator(task);
   renderBoardDetailSubtasks(task);
 }
 
@@ -310,7 +311,7 @@ function fillBoardTaskDetail(task) {
 function fillBoardDetailMetaFields(task) {
   setElementText(
     "boardTaskDetailDueDate",
-    formatTaskDueDate(task.dueDate) || "-",
+    formatTaskDueDate(task.dueDate) || "No deadline",
   );
   fillBoardDetailPriority(task.priority);
   renderBoardDetailAssignees(task.assignedTo);

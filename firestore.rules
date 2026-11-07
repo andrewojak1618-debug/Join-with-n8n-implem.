@@ -15,6 +15,7 @@ service cloud.firestore {
     //   - status: string, required, triage|todo|in-progress|feedback|done
     //   - category: string, required, 1-80 chars
     //   - assignedTo: list, optional, max 50 items
+    //   - creator: immutable identity snapshot on new tasks; absent on legacy tasks
     //   - subtasks: list, optional, max 50 items
     //   - createdAt: timestamp, required, immutable
     //   - updatedAt: timestamp, required
@@ -82,10 +83,21 @@ service cloud.firestore {
       return request.resource.data.createdAt == resource.data.createdAt;
     }
 
+    function isManualTaskCreator(creator) {
+      return creator is map && creator.uid == request.auth.uid &&
+        (request.auth.token.firebase.sign_in_provider == 'anonymous'
+          ? creator.keys().hasOnly(['type', 'origin', 'uid', 'name']) &&
+            creator.type == 'extern' && creator.origin == 'guest' && creator.name == 'Gast'
+          : creator.keys().hasOnly(['type', 'uid', 'name', 'email']) &&
+            creator.type == 'intern' && creator.email == request.auth.token.email &&
+            creator.name == request.auth.token.get('name', creator.email) &&
+            isValidString(creator.name, 1, 320));
+    }
+
     function isValidTask(data) {
       return hasOnlyFields([
         'title', 'description', 'dueDate', 'priority', 'status',
-        'category', 'assignedTo', 'subtasks', 'createdAt', 'updatedAt'
+        'category', 'assignedTo', 'subtasks', 'createdAt', 'updatedAt', 'creator'
       ]) &&
       hasRequiredFields(['title', 'dueDate', 'priority', 'status', 'category', 'createdAt', 'updatedAt']) &&
       isValidString(data.title, 1, 120) &&
@@ -120,8 +132,9 @@ service cloud.firestore {
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && isValidTask(request.resource.data)
-        && request.resource.data.status == 'triage';
-      allow update: if isAuthenticated() && isValidTask(request.resource.data) && createdAtUnchanged();
+        && request.resource.data.status == 'triage' && isManualTaskCreator(request.resource.data.creator);
+      allow update: if isAuthenticated() && isValidTask(request.resource.data) && createdAtUnchanged()
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['creator']);
       allow delete: if isAuthenticated();
     }
 

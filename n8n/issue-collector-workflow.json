@@ -20,7 +20,7 @@
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.4,
       "position": [
-        -432,
+        -632,
         48
       ],
       "id": "d199da0b-dfac-4feb-8feb-7110510bb3f1",
@@ -163,7 +163,7 @@
     },
     {
       "parameters": {
-        "jsCode": "/** Prüft, ob ein nicht leerer Text vorhanden ist. */\nfunction hasText(value) {\n  return typeof value === 'string' && value.trim().length > 0;\n}\n\n/** Akzeptiert null oder ein tatsächlich gültiges Kalenderdatum. */\nfunction isValidDeadline(value) {\n  if (value === null) return true;\n  if (typeof value !== 'string') return false;\n  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return false;\n  if (value.startsWith('0000')) return false;\n  const date = new Date(value + 'T00:00:00.000Z');\n  return !Number.isNaN(date.getTime()) &&\n    date.toISOString().slice(0, 10) === value;\n}\n\n/** Prüft die von der KI erzeugten Ticketfelder. */\nfunction checkTicket(ticket, errors) {\n  if (!hasText(ticket.title)) errors.push('Titel fehlt.');\n  if (!['user-story', 'technical-task'].includes(ticket.category)) {\n    errors.push('Kategorie ist ungültig.');\n  }\n  if (!['urgent', 'medium', 'low'].includes(ticket.priority)) {\n    errors.push('Priorität ist ungültig.');\n  }\n  if (!isValidDeadline(ticket.deadline)) {\n    errors.push('Deadline fehlt oder ist kein gültiges Datum.');\n  }\n}\n\n/** Prüft Pflichtangaben zur ursprünglichen E-Mail. */\nfunction checkEmail(data, errors) {\n  const fields = ['gmailMessageId', 'mailMessageId', 'emailBody'];\n  for (const field of fields) {\n    if (!hasText(data[field])) errors.push(field + ' fehlt.');\n  }\n  if (typeof data.senderEmail !== 'string' ||\n      !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(data.senderEmail)) {\n    errors.push('Absenderadresse fehlt oder hat ein ungültiges Format.');\n  }\n}\n\n/** Ergänzt das Prüfergebnis und erhält die Zuordnung zur Eingabe. */\nfunction validateItem(item, index) {\n  const data = item.json;\n  const errors = [];\n  checkTicket(data.ticket ?? {}, errors);\n  checkEmail(data, errors);\n  return {\n    json: {\n      ...data,\n      validation: { valid: errors.length === 0, errors }\n    },\n    pairedItem: { item: index }\n  };\n}\n\nreturn $input.all().map(validateItem);"
+        "jsCode": "/** Prüft, ob ein nicht leerer Text vorhanden ist. */\nfunction hasText(value) {\n  return typeof value === 'string' && value.trim().length > 0;\n}\n\n/** Akzeptiert null oder ein tatsächlich gültiges Kalenderdatum. */\nfunction isValidDeadline(value) {\n  if (value === null) return true;\n  if (typeof value !== 'string') return false;\n  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return false;\n  if (value.startsWith('0000')) return false;\n  const date = new Date(value + 'T00:00:00.000Z');\n  return !Number.isNaN(date.getTime()) &&\n    date.toISOString().slice(0, 10) === value;\n}\n\n/** Prüft die von der KI erzeugten Ticketfelder. */\nfunction checkTicket(ticket, errors) {\n  if (!hasText(ticket.title)) errors.push('Titel fehlt.');\n  if (!['user-story', 'technical-task'].includes(ticket.category)) {\n    errors.push('Kategorie ist ungültig.');\n  }\n  if (!['urgent', 'medium', 'low'].includes(ticket.priority)) {\n    errors.push('Priorität ist ungültig.');\n  }\n  if (!isValidDeadline(ticket.deadline)) {\n    errors.push('Die angegebene Deadline ist kein gültiges Kalenderdatum.');\n  }\n}\n\n/** Prüft Pflichtangaben zur ursprünglichen E-Mail. */\nfunction checkEmail(data, errors) {\n  if (!hasText(data.emailBody)) errors.push('Der Nachrichtentext der E-Mail fehlt.');\n  const fields = ['gmailMessageId', 'mailMessageId', 'deduplicationKey'];\n  for (const field of fields) {\n    if (!hasText(data[field])) errors.push(field + ' fehlt.');\n  }\n  for (const field of ['senderName', 'emailSubject']) {\n    if (data[field] != null && typeof data[field] !== 'string') {\n      errors.push(field + ' muss Text sein.');\n    }\n  }\n  if (typeof data.senderEmail !== 'string' ||\n      !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(data.senderEmail)) {\n    errors.push('Absenderadresse fehlt oder hat ein ungültiges Format.');\n  }\n}\n\n/** Ergänzt das Prüfergebnis und erhält die Zuordnung zur Eingabe. */\nfunction validateItem(item, index) {\n  const data = item.json;\n  const errors = [];\n  checkTicket(data.ticket ?? {}, errors);\n  checkEmail(data, errors);\n  return {\n    json: {\n      ...data,\n      validation: { valid: errors.length === 0, errors }\n    },\n    pairedItem: { item: index }\n  };\n}\n\nreturn $input.all().map(validateItem);"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -267,7 +267,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  fields: {\n    deduplicationKey: { stringValue: $json.deduplicationKey },\n    id: { stringValue: $json.id },\n    messageId: { stringValue: $json.messageId },\n    subject: { stringValue: $json.subject },\n    status: { stringValue: 'processing' },\n    executionId: { stringValue: String($execution.id) },\n    startedAt: { timestampValue: $now.toUTC().toISO() }\n  }\n} }}",
+        "jsonBody": "={{ {\n  fields: {\n    aiAttemptCount: { integerValue: '0' },\n    deduplicationKey: { stringValue: $json.deduplicationKey },\n    id: { stringValue: $json.id },\n    messageId: { stringValue: $json.messageId },\n    subject: { stringValue: $json.subject },\n    status: { stringValue: 'processing' },\n    executionId: { stringValue: String($execution.id) },\n    startedAt: { timestampValue: $now.toUTC().toISO() }\n  }\n} }}",
         "options": {
           "response": {
             "response": {
@@ -432,7 +432,7 @@
           "conditions": [
             {
               "id": "04fb2438-f275-4f6c-b430-e6d7f49d6782",
-              "leftValue": "={{ $json.fields?.status?.stringValue === 'failed' }}",
+              "leftValue": "={{ $json.fields?.status?.stringValue === 'failed' && Number($json.fields.aiAttemptCount?.integerValue ?? 1) < 3 }}",
               "rightValue": "",
               "operator": {
                 "type": "boolean",
@@ -465,6 +465,10 @@
           "parameters": [
             {
               "name": "updateMask.fieldPaths",
+              "value": "aiAttemptCount"
+            },
+            {
+              "name": "updateMask.fieldPaths",
               "value": "status"
             },
             {
@@ -483,7 +487,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  fields: {\n    status: { stringValue: 'processing' },\n    executionId: { stringValue: String($execution.id) },\n    startedAt: { timestampValue: $now.toUTC().toISO() }\n  }\n} }}",
+        "jsonBody": "={{ {\n  fields: {\n    aiAttemptCount: { integerValue: String($json.fields.aiAttemptCount?.integerValue ?? 1) },\n    status: { stringValue: 'processing' },\n    executionId: { stringValue: String($execution.id) },\n    startedAt: { timestampValue: $now.toUTC().toISO() }\n  }\n} }}",
         "options": {
           "queryParameterArrays": "repeat",
           "response": {
@@ -769,7 +773,7 @@
         "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  writes: [\n    {\n      update: {\n        name: $json.body.name,\n        fields: {\n          reservedCount: {\n            integerValue: String(\n              Number($json.body.fields.reservedCount.integerValue) + 1\n            )\n          }\n        }\n      },\n      updateMask: {\n        fieldPaths: ['reservedCount']\n      },\n      currentDocument: {\n        updateTime: $json.body.updateTime\n      }\n    },\n    {\n      update: {\n        name: $('Tageslimit vorbereiten').item.json.reservation.name,\n        fields: {\n          quotaDate: {\n            stringValue: $('Tageslimit vorbereiten').item.json.limitDate\n          },\n          quotaState: {\n            stringValue: 'reserved'\n          }\n        }\n      },\n      updateMask: {\n        fieldPaths: ['quotaDate', 'quotaState']\n      },\n      currentDocument: {\n        updateTime: $('Tageslimit vorbereiten').item.json.reservation.updateTime\n      }\n    }\n  ]\n} }}",
+        "jsonBody": "={{ {\n  writes: [\n    {\n      update: {\n        name: $json.body.name,\n        fields: {\n          reservedCount: {\n            integerValue: String(\n              Number($json.body.fields.reservedCount.integerValue) + 1\n            )\n          }\n        }\n      },\n      updateMask: {\n        fieldPaths: ['reservedCount']\n      },\n      currentDocument: {\n        updateTime: $json.body.updateTime\n      }\n    },\n    {\n      update: {\n        name: $('Tageslimit vorbereiten').item.json.reservation.name,\n        fields: {\n          quotaDate: {\n            stringValue: $('Tageslimit vorbereiten').item.json.limitDate\n          },\n          quotaState: {\n            stringValue: 'reserved'\n          }\n        }\n      },\n      updateMask: {\n        fieldPaths: ['quotaDate', 'quotaState']\n      },\n      updateTransforms: [{ fieldPath: 'aiAttemptCount', increment: { integerValue: '1' } }],\n      currentDocument: {\n        updateTime: $('Tageslimit vorbereiten').item.json.reservation.updateTime\n      }\n    }\n  ]\n} }}",
         "options": {
           "response": {
             "response": {
@@ -857,7 +861,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return $input.all().map((item, index) => {\n  const counter = item.json;\n  const failure = $('KI-Fehler vorbereiten').itemMatching(index).json;\n  const count = Number(counter.fields?.reservedCount?.integerValue);\n  if (!Number.isSafeInteger(count) || count < 1 || failure.quota?.state !== 'reserved') {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Reservierung oder Zähler ungültig.');\n  }\n  if (counter.name !== failure.quota.counterName || !counter.updateTime || !failure.reservationUpdateTime) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Dokumentversion fehlt.');\n  }\n  return { json: { ...failure, commit: { writes: [\n    { update: { name: counter.name, fields: { reservedCount: { integerValue: String(count - 1) } } },\n      updateMask: { fieldPaths: ['reservedCount'] }, currentDocument: { updateTime: counter.updateTime } },\n    { update: { name: failure.reservation.name, fields: {\n        status: { stringValue: 'failed' }, quotaState: { stringValue: 'released' },\n        failedAt: { timestampValue: failure.failedAt }, errorMessage: { stringValue: failure.errorMessage }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'failedAt', 'errorMessage'] },\n      currentDocument: { updateTime: failure.reservationUpdateTime } }\n  ] } }, pairedItem: { item: index } };\n});"
+        "jsCode": "/** Gibt genau einen reservierten Platz frei und aktualisiert die Mail im selben versionsgeschützten Commit. */\nreturn $input.all().map((item, index) => {\n  const counter = item.json;\n  const failure = $('KI-Fehler vorbereiten').itemMatching(index).json;\n  const count = Number(counter.fields?.reservedCount?.integerValue);\n  if (!Number.isSafeInteger(count) || count < 1 || failure.quota?.state !== 'reserved') {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Reservierung oder Zähler ungültig.');\n  }\n  if (counter.name !== failure.quota.counterName || !counter.updateTime || !failure.reservationUpdateTime) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Dokumentversion fehlt.');\n  }\n  return { json: { ...failure, commit: { writes: [\n    { update: { name: counter.name, fields: { reservedCount: { integerValue: String(count - 1) } } },\n      updateMask: { fieldPaths: ['reservedCount'] }, currentDocument: { updateTime: counter.updateTime } },\n    { update: { name: failure.reservation.name, fields: {\n        status: { stringValue: 'failed' }, quotaState: { stringValue: 'released' },\n        failedAt: { timestampValue: failure.failedAt }, errorMessage: { stringValue: failure.errorMessage }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'failedAt', 'errorMessage'] },\n      currentDocument: { updateTime: failure.reservationUpdateTime } }\n  ] } }, pairedItem: { item: index } };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -942,7 +946,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return $input.all().map((item, index) => {\n  const counter = item.json;\n  const data = $('Ticketdaten gültig?').itemMatching(index).json;\n  const reserved = Number(counter.fields?.reservedCount?.integerValue);\n  const completed = Number(counter.fields?.completedCount?.integerValue);\n  const limit = Number(counter.fields?.dailyLimit?.integerValue);\n  if (!Number.isSafeInteger(reserved) || reserved < 1 ||\n      !Number.isSafeInteger(completed) || completed < 0 ||\n      limit !== 10 || reserved + completed > limit ||\n      data.quota?.state !== 'reserved' || data.validation?.valid !== true) {\n    throw new Error('Ticketabschluss gestoppt: Tageszähler oder Ticket ungültig.');\n  }\n  if (counter.name !== data.quota.counterName || !counter.updateTime ||\n      !data.reservation?.updateTime || !/^[a-f0-9]{64}$/.test(data.reservationId)) {\n    throw new Error('Ticketabschluss gestoppt: Reservierung oder Dokumentversion fehlt.');\n  }\n  const now = $now.toUTC().toISO();\n  const taskId = 'mail-' + data.reservationId;\n  const taskName = 'projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents/tasks/' + taskId;\n  const string = value => ({ stringValue: value });\n  const taskFields = {\n    title: string(data.ticket.title), description: string(data.emailBody),\n    dueDate: data.ticket.deadline === null ? { nullValue: null } : string(data.ticket.deadline),\n    category: string(data.ticket.category), priority: string(data.ticket.priority),\n    status: string('todo'), assignedTo: { arrayValue: { values: [] } },\n    subtasks: { arrayValue: { values: [] } },\n    createdAt: string(now), updatedAt: string(now),\n    source: string('email'), senderEmail: string(data.senderEmail),\n    senderName: string(data.senderName || ''), mailMessageId: string(data.mailMessageId),\n    deduplicationKey: string(data.deduplicationKey),\n    emailSubject: string(data.emailSubject || ''),\n    gmailMessageId: string(data.gmailMessageId),\n    emailBody: string(data.emailBody)\n  };\n  return { json: { taskId, commit: { writes: [\n    { update: { name: taskName, fields: taskFields }, currentDocument: { exists: false } },\n    { update: { name: counter.name, fields: {\n        reservedCount: { integerValue: String(reserved - 1) },\n        completedCount: { integerValue: String(completed + 1) }\n      } }, updateMask: { fieldPaths: ['reservedCount', 'completedCount'] },\n      currentDocument: { updateTime: counter.updateTime } },\n    { update: { name: data.reservation.name, fields: {\n        status: string('completed'), quotaState: string('completed'), taskId: string(taskId),\n        completedAt: { timestampValue: now }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'taskId', 'completedAt'] },\n      currentDocument: { updateTime: data.reservation.updateTime } }\n  ] } }, pairedItem: { item: index } };\n});\n"
+        "jsCode": "/** Prüft das gelesene Kontingent und die Freigabe für dieses Ticket. */\nfunction readQuota(counter, data) {\n  const reserved = Number(counter.fields?.reservedCount?.integerValue);\n  const completed = Number(counter.fields?.completedCount?.integerValue);\n  const limit = Number(counter.fields?.dailyLimit?.integerValue);\n  if (!Number.isSafeInteger(reserved) || reserved < 1 ||\n      !Number.isSafeInteger(completed) || completed < 0 ||\n      limit !== 10 || reserved + completed > limit ||\n      data.quota?.state !== 'reserved' || data.validation?.valid !== true) {\n    throw new Error('Ticketabschluss gestoppt: Tageszähler oder Ticket ungültig.');\n  }\n  return { reserved, completed };\n}\n\n/** Verhindert Schreibvorgänge ohne zugehörige Reservierung und Dokumentversion. */\nfunction checkReservation(counter, data) {\n  if (counter.name !== data.quota.counterName || !counter.updateTime ||\n      !data.reservation?.updateTime || !/^[a-f0-9]{64}$/.test(data.reservationId)) {\n    throw new Error('Ticketabschluss gestoppt: Reservierung oder Dokumentversion fehlt.');\n  }\n}\n\n/** Verpackt Text im Werteformat der REST-Schnittstelle. */\nfunction string(value) { return { stringValue: value }; }\n\n/** Erstellt die im Board sichtbaren Ticketfelder. */\nfunction boardFields(data, now) {\n  return {\n    title: string(data.ticket.title), description: string(data.emailBody + '\\n\\nDieses Ticket wurde KI-generiert.'),\n    dueDate: data.ticket.deadline === null ? { nullValue: null } : string(data.ticket.deadline),\n    category: string(data.ticket.category), priority: string(data.ticket.priority),\n    status: string('triage'), assignedTo: { arrayValue: { values: [] } },\n    subtasks: { arrayValue: { values: [] } },\n    createdAt: string(now), updatedAt: string(now),\n  };\n}\n\n/** Erhält Absender und Originaldaten für Zuordnung und Nachbearbeitung. */\nfunction mailFields(data) {\n  return {\n    creator: { mapValue: { fields: {\n      type: string('extern'),\n      name: string(data.senderName?.trim() || data.senderEmail),\n      email: string(data.senderEmail)\n    } } },\n    source: string('email'), senderEmail: string(data.senderEmail),\n    senderName: string(data.senderName || ''), mailMessageId: string(data.mailMessageId),\n    deduplicationKey: string(data.deduplicationKey),\n    emailSubject: string(data.emailSubject || ''),\n    gmailMessageId: string(data.gmailMessageId),\n    emailBody: string(data.emailBody)\n  };\n}\n\n/** Erstellt das Ticket nur, falls seine stabile ID noch nicht existiert. */\nfunction ticketWrite(data, taskId, now) {\n  const taskName = 'projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents/tasks/' + taskId;\n  const fields = { ...boardFields(data, now), ...mailFields(data) };\n  return { update: { name: taskName, fields }, currentDocument: { exists: false } };\n}\n\n/** Wandelt einen reservierten Platz in ein abgeschlossenes Ticket um. */\nfunction counterWrite(counter, { reserved, completed }) {\n  return { update: { name: counter.name, fields: {\n        reservedCount: { integerValue: String(reserved - 1) },\n        completedCount: { integerValue: String(completed + 1) }\n      } }, updateMask: { fieldPaths: ['reservedCount', 'completedCount'] },\n      currentDocument: { updateTime: counter.updateTime } };\n}\n\n/** Markiert die unveränderte Mailreservierung als abgeschlossen. */\nfunction reservationWrite(data, taskId, now) {\n  return { update: { name: data.reservation.name, fields: {\n        status: string('completed'), quotaState: string('completed'), taskId: string(taskId),\n        completedAt: { timestampValue: now }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'taskId', 'completedAt'] },\n      currentDocument: { updateTime: data.reservation.updateTime } };\n}\n\n/** Bündelt alle drei Änderungen in einem Commit für genau eine Mail. */\nreturn $input.all().map((item, index) => {\n  const counter = item.json;\n  const data = $('Ticketdaten gültig?').itemMatching(index).json;\n  const quota = readQuota(counter, data);\n  checkReservation(counter, data);\n  const now = $now.toUTC().toISO();\n  const taskId = 'mail-' + data.reservationId;\n  const writes = [ticketWrite(data, taskId, now), counterWrite(counter, quota), reservationWrite(data, taskId, now)];\n  return { json: { taskId, commit: { writes } }, pairedItem: { item: index } };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1007,7 +1011,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return $input.all().map((item, index) => {\n  const counter = item.json;\n  const failure = $('Ungültige Ticketdaten vorbereiten').itemMatching(index).json;\n  const count = Number(counter.fields?.reservedCount?.integerValue);\n  if (!Number.isSafeInteger(count) || count < 1 || failure.quota?.state !== 'reserved') {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Reservierung oder Zähler ungültig.');\n  }\n  if (counter.name !== failure.quota.counterName || !counter.updateTime || !failure.reservationUpdateTime) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Dokumentversion fehlt.');\n  }\n  return { json: { ...failure, commit: { writes: [\n    { update: { name: counter.name, fields: { reservedCount: { integerValue: String(count - 1) } } },\n      updateMask: { fieldPaths: ['reservedCount'] }, currentDocument: { updateTime: counter.updateTime } },\n    { update: { name: failure.reservation.name, fields: {\n        status: { stringValue: 'manual_review' }, quotaState: { stringValue: 'released' },\n        failedAt: { timestampValue: failure.failedAt }, errorMessage: { stringValue: failure.errorMessage }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'failedAt', 'errorMessage'] },\n      currentDocument: { updateTime: failure.reservationUpdateTime } }\n  ] } }, pairedItem: { item: index } };\n});"
+        "jsCode": "/** Gibt genau einen reservierten Platz frei und aktualisiert die Mail im selben versionsgeschützten Commit. */\nreturn $input.all().map((item, index) => {\n  const counter = item.json;\n  const failure = $('Ungültige Ticketdaten vorbereiten').itemMatching(index).json;\n  const count = Number(counter.fields?.reservedCount?.integerValue);\n  if (!Number.isSafeInteger(count) || count < 1 || failure.quota?.state !== 'reserved') {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Reservierung oder Zähler ungültig.');\n  }\n  if (counter.name !== failure.quota.counterName || !counter.updateTime || !failure.reservationUpdateTime) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Dokumentversion fehlt.');\n  }\n  return { json: { ...failure, commit: { writes: [\n    { update: { name: counter.name, fields: { reservedCount: { integerValue: String(count - 1) } } },\n      updateMask: { fieldPaths: ['reservedCount'] }, currentDocument: { updateTime: counter.updateTime } },\n    { update: { name: failure.reservation.name, fields: {\n        status: { stringValue: 'manual_review' }, quotaState: { stringValue: 'released' },\n        failedAt: { timestampValue: failure.failedAt }, errorMessage: { stringValue: failure.errorMessage }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'failedAt', 'errorMessage'] },\n      currentDocument: { updateTime: failure.reservationUpdateTime } }\n  ] } }, pairedItem: { item: index } };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1067,6 +1071,229 @@
       ],
       "id": "7cdd25b3-6617-420e-b6f5-d4b9d3417151",
       "name": "Mail bei KI-Fehler markieren"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0ae18324-827f-4fb1-a4dc-3876ac81b524",
+              "name": "taskId",
+              "value": "={{ $('Ticketabschluss vorbereiten').item.json.taskId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        3536,
+        -512
+      ],
+      "id": "9099f627-e22d-4d56-ae86-c2c4921213df",
+      "name": "Ticket-ID zurückgeben"
+    },
+    {
+      "parameters": {
+        "jsCode": "/** Reads Gmail's case-insensitive headers, including mailparser's raw header lines. */\nfunction readHeader(mail, name) {\n  const entry = Object.entries(mail.headers ?? {}).find(([key]) => key.toLowerCase() === name);\n  return String(entry?.[1] ?? '').replace(new RegExp('^' + name + ':\\\\s*', 'i'), '').trim();\n}\n\n/** Detects vacation agents and delivery reports without rejecting human reply subjects. */\nfunction isAutomatic(mail) {\n  const auto = readHeader(mail, 'auto-submitted').split(';')[0].trim().toLowerCase();\n  const mime = readHeader(mail, 'content-type');\n  const sender = mail.from?.value?.[0]?.address ?? readHeader(mail, 'from');\n  return (auto !== '' && auto !== 'no')\n    || ['x-autoreply', 'x-autorespond'].some(key => /^(?!no$|false$|0$).+/i.test(readHeader(mail, key)))\n    || /report-type\\s*=\\s*\"?delivery-status\\b|^message\\/(?:global-)?delivery-status\\b/i.test(mime)\n    || readHeader(mail, 'return-path') === '<>'\n    || /(?:^|<)(?:mailer-daemon|postmaster)@/i.test(sender);\n}\n\nreturn $input.all().flatMap((item, index) =>\n  isAutomatic(item.json) ? [] : [{ ...item, pairedItem: { item: index } }]\n);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        48
+      ],
+      "id": "59153f10-0e83-40c7-b28d-6ef94ecab30d",
+      "name": "Automatische Mails ausfiltern"
+    },
+    {
+      "name": "Eingangsbestätigung vorbereiten",
+      "id": "cbe2fa94-d3e9-4c08-ac5a-9c4068a7a27c",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3766,
+        -512
+      ],
+      "parameters": {
+        "jsCode": "/** Builds one automatic acknowledgement for each successfully saved ticket. */\nreturn $input.all().map((item, index) => {\n  const recipient = $('Ticketdaten gültig?').itemMatching(index).json.senderEmail;\n  const taskId = item.json.taskId;\n  if (!/^[^\\s@<>,;:]+@[^\\s@<>,;:]+$/.test(recipient) || !/^mail-[a-f0-9]{64}$/.test(taskId)) {\n    throw new Error('Empfänger oder Ticket-ID der Bestätigung ungültig.');\n  }\n  const lines = [\n    'To: ' + recipient,\n    'Subject: Join - Eingang deiner Anfrage',\n    'Auto-Submitted: auto-replied',\n    'X-Auto-Response-Suppress: All',\n    'MIME-Version: 1.0',\n    'Content-Type: text/plain; charset=UTF-8',\n    '',\n    'Deine Anfrage wurde in Join aufgenommen. Ticket-ID: ' + taskId\n  ];\n  return {json: {raw: Buffer.from(lines.join('\\r\\n')).toString('base64url')}, pairedItem: {item: index}};\n});"
+      }
+    },
+    {
+      "name": "Eingangsbestätigung senden",
+      "id": "1fd499ad-24b0-41b3-8679-0d767224426b",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3996,
+        -512
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { raw: $json.raw } }}",
+        "options": {}
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "d9b96517-a995-4c0e-a677-393004ec7e3d",
+              "leftValue": "={{ ($json.statusCode === 409 && $json.body?.error?.status === 'ABORTED') || ($json.body?.error?.status === 'FAILED_PRECONDITION' && /stored version.*required base version/i.test($json.body.error.message)) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1856,
+        -212
+      ],
+      "id": "c393a45c-5387-4b41-a8fe-634bfc4d111d",
+      "name": "Versionskonflikt beim Tagesplatz?"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://firestore.googleapis.com/v1/projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents/issue-collector-daily-limits/' + $('Tageslimit vorbereiten').item.json.limitDate }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2096,
+        -212
+      ],
+      "id": "fb6ea636-ddac-4633-9221-42e983f6eeb8",
+      "name": "Tageszähler nach Konflikt lesen"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "2e4cc7ec-5ea2-44f6-8e51-b82d9aa7fa66",
+              "leftValue": "={{ (() => { const f = $json.body?.fields; const reserved = Number(f?.reservedCount?.integerValue); const completed = Number(f?.completedCount?.integerValue); const limit = Number(f?.dailyLimit?.integerValue); if (!Number.isSafeInteger(reserved) || reserved < 0 || !Number.isSafeInteger(completed) || completed < 0 || limit !== 10) { throw new Error('Ungültiger Tageszähler: Verarbeitung gestoppt.'); } return reserved + completed < limit; })() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        2336,
+        -212
+      ],
+      "id": "0438c1b4-b212-47dc-89f2-7e1cb4cc10d9",
+      "name": "Nach Konflikt Tageskontingent frei?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://firestore.googleapis.com/v1/projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents:commit",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  writes: [\n    {\n      update: {\n        name: $json.body.name,\n        fields: {\n          reservedCount: {\n            integerValue: String(\n              Number($json.body.fields.reservedCount.integerValue) + 1\n            )\n          }\n        }\n      },\n      updateMask: {\n        fieldPaths: ['reservedCount']\n      },\n      currentDocument: {\n        updateTime: $json.body.updateTime\n      }\n    },\n    {\n      update: {\n        name: $('Tageslimit vorbereiten').item.json.reservation.name,\n        fields: {\n          quotaDate: {\n            stringValue: $('Tageslimit vorbereiten').item.json.limitDate\n          },\n          quotaState: {\n            stringValue: 'reserved'\n          }\n        }\n      },\n      updateMask: {\n        fieldPaths: ['quotaDate', 'quotaState']\n      },\n      updateTransforms: [{ fieldPath: 'aiAttemptCount', increment: { integerValue: '1' } }],\n      currentDocument: {\n        updateTime: $('Tageslimit vorbereiten').item.json.reservation.updateTime\n      }\n    }\n  ]\n} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2576,
+        -212
+      ],
+      "id": "e29d58b1-718e-4fa7-9707-d68e28422cb8",
+      "name": "Tagesplatz erneut reservieren"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "d9b96517-a995-4c0e-a677-393004ec7e3d",
+              "leftValue": "={{ $json.statusCode === 200\n   && $json.body?.writeResults?.length === 2 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        2816,
+        -212
+      ],
+      "id": "3dca722f-d0e7-428f-9f07-e1fe24b3640f",
+      "name": "Erneuter Tagesplatz reserviert?"
     }
   ],
   "connections": {
@@ -1074,7 +1301,7 @@
       "main": [
         [
           {
-            "node": "Mail eindeutig kennzeichnen",
+            "node": "Automatische Mails ausfiltern",
             "type": "main",
             "index": 0
           }
@@ -1402,7 +1629,7 @@
         ],
         [
           {
-            "node": "Tagesplatz-Reservierung fehlgeschlagen",
+            "node": "Versionskonflikt beim Tagesplatz?",
             "type": "main",
             "index": 0
           }
@@ -1524,6 +1751,126 @@
         [
           {
             "node": "Mail bei KI-Fehler markieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticket und Tageszähler speichern": {
+      "main": [
+        [
+          {
+            "node": "Ticket-ID zurückgeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Automatische Mails ausfiltern": {
+      "main": [
+        [
+          {
+            "node": "Mail eindeutig kennzeichnen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticket-ID zurückgeben": {
+      "main": [
+        [
+          {
+            "node": "Eingangsbestätigung vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eingangsbestätigung vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Eingangsbestätigung senden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Versionskonflikt beim Tagesplatz?": {
+      "main": [
+        [
+          {
+            "node": "Tageszähler nach Konflikt lesen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tagesplatz-Reservierung fehlgeschlagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tageszähler nach Konflikt lesen": {
+      "main": [
+        [
+          {
+            "node": "Nach Konflikt Tageskontingent frei?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nach Konflikt Tageskontingent frei?": {
+      "main": [
+        [
+          {
+            "node": "Tagesplatz erneut reservieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tageslimit erreicht speichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tagesplatz erneut reservieren": {
+      "main": [
+        [
+          {
+            "node": "Erneuter Tagesplatz reserviert?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Erneuter Tagesplatz reserviert?": {
+      "main": [
+        [
+          {
+            "node": "Maildaten mit Tagesplatz bereitstellen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tagesplatz-Reservierung fehlgeschlagen",
             "type": "main",
             "index": 0
           }

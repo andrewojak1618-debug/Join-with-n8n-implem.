@@ -46,8 +46,9 @@ test('valid mail without a deadline passes; invalid calendar dates and enums fai
 function checkSavedMail(fields, mail) {
   for (const key of ['emailBody', 'emailSubject', 'gmailMessageId', 'senderEmail', 'mailMessageId'])
     assert.equal(fields[key].stringValue, mail[key]);
+  assert.equal(fields.description.stringValue, mail.emailBody + '\n\nDieses Ticket wurde KI-generiert.');
   assert.deepEqual(fields.dueDate, { nullValue: null });
-  assert.equal(fields.status.stringValue, 'todo');
+  assert.equal(fields.status.stringValue, 'triage');
   assert.deepEqual(fields.assignedTo.arrayValue.values, []);
 }
 
@@ -101,4 +102,64 @@ test('AI failure reaches the review label and ingestion is no longer test-only',
   for (const connection of Object.values(workflow.connections))
     for (const outputs of Object.values(connection))
       for (const branch of outputs) for (const edge of branch) assert.ok(names.has(edge.node));
+});
+
+test('invalid incoming fields route to review before the ticket commit', () => {
+  const route = node('Ticketdaten gültig?').parameters.conditions.conditions[0].leftValue;
+  const evaluate = new Function('$json', 'return ' + route.slice(3, -2));
+  for (const patch of [{ ticket: null }, { senderEmail: 'invalid' }, { senderName: {} },
+    { emailSubject: [] }, { deduplicationKey: ' ' }, { gmailMessageId: null }, { emailBody: '' }]) {
+    const invalid = runCode('Ticketdaten prüfen', [{ ...validMail(), ...patch }])[0].json;
+    assert.ok(invalid.validation.errors.length);
+    assert.equal(evaluate(invalid), false);
+  }
+  assert.equal(workflow.connections['Ticketdaten gültig?'].main[1][0].node, 'Ungültige Ticketdaten vorbereiten');
+});
+
+test('missing optional mail metadata and leap day remain valid', () => {
+  const mail = validMail();
+  delete mail.senderName;
+  delete mail.emailSubject;
+  mail.ticket.deadline = '2028-02-29';
+  assert.deepEqual(runCode('Ticketdaten prüfen', [mail])[0].json.validation, { valid: true, errors: [] });
+});
+
+test('mail tickets use the sender as external creator, with an address fallback', () => {
+  for (const senderName of ['  Ada Beispiel  ', undefined, '   ']) {
+    const mail = { ...validMail(), senderName };
+    mail.ticket.creator = { type: 'intern', name: 'Falscher Name' };
+    const [result] = runCode('Ticketabschluss vorbereiten', [counter()], { 'Ticketdaten gültig?': [mail] });
+    const fields = result.json.commit.writes[0].update.fields;
+    assert.deepEqual(fields.creator.mapValue.fields, {
+      type: { stringValue: 'extern' },
+      name: { stringValue: senderName?.trim() || mail.senderEmail },
+      email: { stringValue: mail.senderEmail }
+    });
+    assert.deepEqual(fields.assignedTo.arrayValue.values, []);
+  }
+});
+
+test('IC-08: only human replies reach the reservation path', () => {
+  const gate = 'Automatische Mails ausfiltern';
+  assert.deepEqual(workflow.connections['Gmail Trigger'].main[0].map(edge => edge.node), [gate]);
+  assert.deepEqual(workflow.connections[gate].main[0].map(edge => edge.node), ['Mail eindeutig kennzeichnen']);
+  const reply = { subject: 'Re: Abwesenheitsnotiz', headers: { 'In-Reply-To': '<abc>', 'Auto-Submitted': 'Auto-Submitted: no' } };
+  const vacation = { headers: { 'auto-submitted': 'Auto-Submitted: auto-replied; owner-email=x' } };
+  const bounce = { headers: { 'content-type': 'multipart/report; report-type="delivery-status"' } };
+  const nullSender = { headers: { 'return-path': 'Return-Path: <>' } };
+  const daemon = { from: { value: [{ address: 'MAILER-DAEMON@example.com' }] } };
+  const result = runCode(gate, [vacation, reply, bounce, nullSender, daemon]);
+  assert.deepEqual(result, [{ json: reply, pairedItem: { item: 1 } }]);
+});
+
+test('IC-08: confirmation marks itself as automatic and the collector filters it', () => {
+  const taskId = 'mail-' + 'a'.repeat(64);
+  const linked = { 'Ticketdaten gültig?': [validMail()] };
+  const [message] = runCode('Eingangsbestätigung vorbereiten', [{ taskId }], linked);
+  const mime = Buffer.from(message.json.raw, 'base64url').toString();
+  const [headers, body] = mime.split('\r\n\r\n');
+  assert.match(headers, /^To: sender@example.com$/m);
+  assert.match(body, new RegExp(taskId));
+  const mailHeaders = Object.fromEntries(headers.split('\r\n').map(line => line.split(': ')));
+  assert.deepEqual(runCode('Automatische Mails ausfiltern', [{ headers: mailHeaders }]), []);
 });

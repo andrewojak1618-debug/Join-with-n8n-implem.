@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="./components/assets/img/icons/favicon_white.png">
+  <title>Your Request | Join</title>
+  <link rel="stylesheet" href="./components/css/pages/email-mask.css">
+  <script src="./components/js/core/htmlIncludes.js" defer></script>
+  <script src="./components/js/email-mask.js" defer></script>
+</head>
+<body>
+  <header><img src="./components/assets/img/icons/join-request.svg" alt="Join" width="101" height="122"></header>
+  <main>
+    <section aria-labelledby="request-title">
+      <a class="back" href="./stakeholder.html" aria-label="Back to stakeholder page"><img src="./components/assets/img/icons/arrow_left_contact_detail.svg" width="32" height="32" alt=""></a>
+      <h1 id="request-title">Your Request</h1>
+      <form id="request-form">
+        <label><span>Name</span><input required name="name" autocomplete="name" placeholder="Name"></label>
+        <label><span>Email</span><input required name="email" type="email" autocomplete="email" placeholder="Email"></label>
+        <label><span>Subject</span><input required name="subject" placeholder="Subject"></label>
+        <label><span>Your request</span><textarea required name="message" rows="1" placeholder="Your Request..."></textarea></label>
+        <button type="submit">Send request</button>
+
+      </form>
+    </section>
+    <p class="delivery">Your email app opens a draft to ai.viralreelcreator@gmail.com. Send it there to submit your request.</p>
+  </main>
+  <div data-include="./components/html/molecules/authFooter.html"></div>
+</body>
+</html>
+

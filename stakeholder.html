@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="./components/assets/img/icons/favicon_white.png">
+  <title>Stakeholder requests | Join</title>
+  <link rel="stylesheet" href="./components/css/pages/stakeholder.css">
+  <script src="./components/js/core/htmlIncludes.js" defer></script>
+  <script src="./components/js/stakeholder.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <img class="logo" src="./components/assets/img/icons/Join logo vector.svg" alt="Join">
+    <div class="header-info"><span>Kanban Project Management Tool</span>
+    <a href="./help.html" aria-label="Help"><img src="./components/assets/img/icons/help.svg" alt=""></a></div>
+    <b class="guest" aria-label="Guest">G</b>
+  </header>
+  <main>
+    <nav class="toolbar" aria-label="Page navigation">
+      <a class="back" href="./index.html" aria-label="Back to Join"><img src="./components/assets/img/icons/arrow_left_contact_detail.svg" alt=""></a>
+      <span class="quota" role="status">Loading daily usage…</span>
+    </nav>
+    <section class="overview" aria-labelledby="welcome">
+      <h1 id="welcome"><span>Good morning</span><span>Welcome</span></h1>
+      <aside class="limit-note" hidden>
+        <img src="./components/assets/img/limit-megaphone.svg" alt="" width="52" height="50">
+        <span></span>
+      </aside>
+      <div class="request">
+        <p class="intro">Easily create a ticket by sending a request — no extra steps needed.</p>
+        <img class="illustration" src="./components/assets/img/stakeholder-request.svg" alt="" width="416" height="280">
+        <div class="description">
+          <p>On this platform, you can submit your feature requests via a request form. Our AI system will automatically generate a ticket with a deadline and priority level.</p>
+          <p class="limit-description" hidden>The daily limit of 10 requests has been reached.<br>No worries — you can still send requests, but our team will review them manually instead of using AI to create tickets.</p>
+          <p class="normal-description">A total of 10 requests can be created per day. After this limit, requests can still be sent, but they will be manually reviewed by our team instead of generating AI tickets.</p>
+        </div>
+        <a class="create" href="./email-mask.html"><span class="create-label">Create request</span><span class="send-label">Send request</span><img src="./components/assets/img/icons/check.svg" alt="" width="24" height="24"></a>
+      </div>
+    </section>
+  </main>
+  <div class="legal" data-include="./components/html/molecules/authFooter.html"></div>
+</body>
+</html>
+
+
+
+
+

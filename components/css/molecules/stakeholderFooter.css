@@ -1,0 +1,10 @@
+.auth-footer { gap: 16px; }
+.auth-footer a {
+  box-sizing: content-box;
+  padding: 8px;
+  font: 400 16px/19px "Join Open Sans", Arial, sans-serif;
+  text-align: center;
+  white-space: nowrap;
+}
+.auth-footer [data-page="privacy-policy"] { width: 100px; }
+.auth-footer [data-page="legal-notice"] { width: 92px; }

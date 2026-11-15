@@ -1,9 +1,43 @@
 hydrateHtmlIncludes(document.body);
-document.querySelector("#request-form").addEventListener("submit", openRequestDraft);
+const requestForm = document.querySelector("#request-form");
+const requiredMessages = {
+  name: "Please enter your name.",
+  email: "Please enter your email address.",
+  subject: "Please enter a subject.",
+  message: "Please describe your request."
+};
 
-/** Opens an addressed mail draft after the browser validates the request fields. */
+requestForm.addEventListener("submit", openRequestDraft);
+requestForm.addEventListener("input", (event) => {
+  if (event.target.hasAttribute("aria-invalid")) validateRequestField(event.target);
+});
+
+
+/** Shows a field-specific error and associates it with the input. */
+function validateRequestField(field) {
+  const error = document.getElementById(field.getAttribute("aria-describedby"));
+  const message = field.value.trim() ? "" : requiredMessages[field.name];
+  error.textContent = message || (field.validity.typeMismatch ? "Please enter a valid email address." : "");
+  error.hidden = !error.textContent;
+  if (error.hidden) field.removeAttribute("aria-invalid");
+  else field.setAttribute("aria-invalid", "true");
+  return error.hidden;
+}
+
+
+/** Validates every field and focuses the first one needing a correction. */
+function validateRequestForm(form) {
+  const fields = Array.from(form.querySelectorAll("[required]"));
+  const invalid = fields.filter((field) => !validateRequestField(field));
+  invalid[0]?.focus();
+  return invalid.length === 0;
+}
+
+
+/** Opens an addressed mail draft after validating the request fields. */
 function openRequestDraft(event) {
   event.preventDefault();
+  if (!validateRequestForm(event.currentTarget)) return;
   const fields = new FormData(event.currentTarget);
   const subject = fields.get("subject").trim();
   const body = [fields.get("message").trim(), "", fields.get("name").trim(), fields.get("email").trim()].join("\r\n");

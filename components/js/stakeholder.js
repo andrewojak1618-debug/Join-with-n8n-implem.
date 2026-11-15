@@ -11,6 +11,7 @@ if (localPreview) {
   document.addEventListener("visibilitychange", refreshQuota);
 }
 
+
 /** Aligns polling with full minutes, including midnight in Berlin. */
 function scheduleQuotaRefresh() {
   const minute = 60000;
@@ -20,25 +21,34 @@ function scheduleQuotaRefresh() {
   }, minute - Date.now() % minute);
 }
 
-/** Updates the usage for the collector's current Berlin calendar day. */
+
+/** Updates the page only if this is still the latest quota request. */
 async function refreshQuota() {
   if (document.hidden) return;
   const request = ++quotaRequest;
-  const day = berlinDate.format(new Date());
-  const endpoint = "https://firestore.googleapis.com/v1/projects/join-n8n-andre-2026/databases/(default)/documents/issue-collector-daily-limits/";
   try {
-    const response = await fetch(endpoint + day, { cache: "no-store", signal: AbortSignal.timeout(10000) });
-    if (request !== quotaRequest) return;
-    if (response.status === 404) return showQuota(0, 10);
-    if (!response.ok) throw new Error("Quota unavailable");
-    const { fields } = await response.json();
-    if (request !== quotaRequest) return;
-    showQuota(Number(fields.completedCount.integerValue) + Number(fields.reservedCount.integerValue), Number(fields.dailyLimit.integerValue));
+    const { used, limit } = await readDailyQuota();
+    if (request === quotaRequest) showQuota(used, limit);
   } catch {
+    if (request !== quotaRequest) return;
     updateLimitNote(false);
     document.querySelector(".quota").textContent = "Today's usage unavailable";
   }
 }
+
+
+/** Reads the occupied slots and limit for the current calendar day in Berlin. */
+async function readDailyQuota() {
+  const day = berlinDate.format(new Date());
+  const endpoint = "https://firestore.googleapis.com/v1/projects/join-n8n-andre-2026/databases/(default)/documents/issue-collector-daily-limits/";
+  const response = await fetch(endpoint + day, { cache: "no-store", signal: AbortSignal.timeout(10000) });
+  if (response.status === 404) return { used: 0, limit: 10 };
+  if (!response.ok) throw new Error("Quota unavailable");
+  const { fields } = await response.json();
+  const used = Number(fields.completedCount.integerValue) + Number(fields.reservedCount.integerValue);
+  return { used, limit: Number(fields.dailyLimit.integerValue) };
+}
+
 
 /** Displays the total number of occupied slots. */
 function showQuota(used, limit) {
@@ -50,6 +60,7 @@ function showQuota(used, limit) {
   count.textContent = used + " of " + limit;
   document.querySelector(".quota").replaceChildren(count, " requests used today");
 }
+
 
 /** Shows the limit notice and manual request action when all slots are used. */
 function updateLimitNote(full) {

@@ -15,11 +15,23 @@
     <section aria-labelledby="request-title">
       <a class="back" href="./stakeholder.html" aria-label="Back to stakeholder page"><img src="./components/assets/img/icons/arrow_left_contact_detail.svg" width="32" height="32" alt=""></a>
       <h1 id="request-title">Your Request</h1>
-      <form id="request-form">
-        <label><span>Name</span><input required name="name" autocomplete="name" placeholder="Name"></label>
-        <label><span>Email</span><input required name="email" type="email" autocomplete="email" placeholder="Email"></label>
-        <label><span>Subject</span><input required name="subject" placeholder="Subject"></label>
-        <label><span>Your request</span><textarea required name="message" rows="1" placeholder="Your Request..."></textarea></label>
+      <form id="request-form" novalidate>
+        <div>
+          <label><span>Name</span><input aria-describedby="name-error" required name="name" autocomplete="name" placeholder="Name"></label>
+          <small id="name-error" class="field-error" hidden></small>
+        </div>
+        <div>
+          <label><span>Email</span><input aria-describedby="email-error" required name="email" type="email" autocomplete="email" placeholder="Email"></label>
+          <small id="email-error" class="field-error" hidden></small>
+        </div>
+        <div>
+          <label><span>Subject</span><input aria-describedby="subject-error" required name="subject" placeholder="Subject"></label>
+          <small id="subject-error" class="field-error" hidden></small>
+        </div>
+        <div>
+          <label><span>Your request</span><textarea aria-describedby="message-error" required name="message" rows="1" placeholder="Your Request..."></textarea></label>
+          <small id="message-error" class="field-error" hidden></small>
+        </div>
         <button type="submit">Send request</button>
 
       </form>

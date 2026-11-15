@@ -70,3 +70,7 @@ body > [data-include], body > .auth-footer { margin-top: auto; margin-bottom: 42
   form { gap: 16px; }
   body > [data-include], body > .auth-footer { margin-bottom: 26px; }
 }
+
+.field-error { display: block; margin-top: 4px; color: #b42318; font-size: 14px; }
+.field-error[hidden] { display: none; }
+[aria-invalid="true"] { border-bottom-color: #b42318; }

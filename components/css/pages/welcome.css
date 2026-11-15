@@ -1,0 +1,44 @@
+@import url("../molecules/stakeholderFooter.css");
+
+@font-face {
+  font-family: "Join Open Sans";
+  src: url("../../assets/fonts/open-sans-latin-400.woff2") format("woff2");
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #1268ff; font: 19px/1.2 "Join Open Sans", Arial, sans-serif; }
+#intro { position: fixed; inset: 0; z-index: 1; display: grid; place-items: center; background: #1268ff; }
+#intro[hidden] { display: none; }
+#intro img, .brand { width: 101px; }
+.welcome-page { min-height: min(100vh, 1024px); display: grid; grid-template-rows: 1fr auto 1fr; }
+header { position: relative; padding: 80px; color: white; }
+header p { position: absolute; top: 32px; right: 64px; }
+header a, .auth-footer a { color: white; }
+header a { margin-left: 16px; }
+main { width: min(788px, calc(100% - 40px)); margin: auto; background: white; padding: 54px 72px; border-radius: 30px; color: #42526e; }
+h1 { display: table; font-size: 32px; margin: 0; padding-bottom: 12px; border-bottom: 3px solid #1268ff; }
+main > p { font-size: 23px; margin: 24px 0 48px; }
+nav { display: flex; justify-content: space-between; gap: 24px; }
+nav p { margin: 0 0 18px; color: #1268ff; }
+.role-label { display: flex; align-items: center; gap: 8px; font-size: 23px; }
+.role-label img { flex: none; }
+nav a { display: inline-block; border: 1px solid; border-radius: 8px; padding: 12px 18px; color: #42526e; text-decoration: none; }
+nav .primary { background: #1268ff; color: white; border-color: #1268ff; }
+.auth-footer { display: flex; justify-content: center; padding: 32px 12px 42.7px; }
+.welcome-page > :last-child { align-self: end; }
+.auth-footer a { font-size: 16px; text-decoration: none; }
+a:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+@media (max-width: 767px) {
+  .welcome-page { min-height: min(100vh, 926px); }
+  header { padding: 24px; min-height: 120px; }
+  .brand { width: 48px; }
+  header p { top: 60px; right: 20px; font-size: 16px; }
+  main { padding: 32px 24px; text-align: center; }
+  h1 { margin: auto; }
+  main > p { font-size: 19px; margin: 24px 0 36px; }
+  .role-label { justify-content: center; font-size: 19px; }
+  nav { flex-direction: column; gap: 42px; }
+  .auth-footer { padding-bottom: 21px; }
+}
+#intro img, .brand { filter: brightness(0) invert(1); }
+#intro img { display: block; width: min(277px, 36vw); transform-origin: top left; }

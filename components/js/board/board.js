@@ -114,7 +114,6 @@ function initBoardDetailControls() {
   if (overlay.dataset.eventsReady === "true") return;
   getElement("boardTaskDetailClose").addEventListener("click", closeBoardTaskDetail);
   overlay.addEventListener("click", handleBoardDetailBackdrop);
-  document.addEventListener("keydown", handleBoardDetailEscape);
   document.addEventListener("click", closeAllBoardCardMoveMenus);
   initBoardDetailActionControls();
   overlay.dataset.eventsReady = "true";
@@ -233,6 +232,8 @@ function openBoardTaskDetail(taskId, tasks) {
   if (!showBoardTaskDetail(taskId, tasks)) return;
   getElement("boardTaskDetailCard").scrollTop = 0;
   lockPageScroll();
+  const findCard = () => document.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
+  startDialogFocus(getElement("boardTaskDetail"), findCard, closeBoardTaskDetail);
 }
 
 
@@ -263,6 +264,7 @@ function closeBoardTaskDetail() {
   unlockPageScroll();
   activeBoardTaskId = "";
   showBoardDetailViewMode();
+  finishDialogFocus(getElement("boardTaskDetail"));
 }
 
 
@@ -272,15 +274,6 @@ function closeBoardTaskDetail() {
  */
 function handleBoardDetailBackdrop(event) {
   if (event.target === getElement("boardTaskDetail")) closeBoardTaskDetail();
-}
-
-
-/**
- * Closes the detail dialog when the Escape key is pressed.
- * @param {KeyboardEvent} event - The keydown event.
- */
-function handleBoardDetailEscape(event) {
-  if (event.key === "Escape") closeBoardTaskDetail();
 }
 
 

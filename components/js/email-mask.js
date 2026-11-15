@@ -13,7 +13,10 @@ requestForm.addEventListener("input", (event) => {
 });
 
 
-/** Shows a field-specific error and associates it with the input. */
+/**
+ * Shows a field-specific error and associates it with the input.
+ * @param {HTMLElement} field - Request input or textarea to validate.
+ */
 function validateRequestField(field) {
   const error = document.getElementById(field.getAttribute("aria-describedby"));
   const message = field.value.trim() ? "" : requiredMessages[field.name];
@@ -25,7 +28,10 @@ function validateRequestField(field) {
 }
 
 
-/** Validates every field and focuses the first one needing a correction. */
+/**
+ * Validates every field and focuses the first one needing a correction.
+ * @param {HTMLFormElement} form - Request form to validate.
+ */
 function validateRequestForm(form) {
   const fields = Array.from(form.querySelectorAll("[required]"));
   const invalid = fields.filter((field) => !validateRequestField(field));
@@ -34,7 +40,10 @@ function validateRequestForm(form) {
 }
 
 
-/** Opens an addressed mail draft after validating the request fields. */
+/**
+ * Opens an addressed mail draft after validating the request fields.
+ * @param {SubmitEvent} event - Submission of the request form.
+ */
 function openRequestDraft(event) {
   event.preventDefault();
   if (!validateRequestForm(event.currentTarget)) return;

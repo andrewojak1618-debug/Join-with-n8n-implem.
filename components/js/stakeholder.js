@@ -50,7 +50,11 @@ async function readDailyQuota() {
 }
 
 
-/** Displays the total number of occupied slots. */
+/**
+ * Displays the total number of occupied slots.
+ * @param {number} used - Number of occupied slots.
+ * @param {number} limit - Daily slot limit.
+ */
 function showQuota(used, limit) {
   if (!Number.isSafeInteger(used) || !Number.isSafeInteger(limit) || limit < 1 || used < 0 || used > limit) {
     throw new Error("Invalid daily quota");
@@ -62,7 +66,10 @@ function showQuota(used, limit) {
 }
 
 
-/** Shows the limit notice and manual request action when all slots are used. */
+/**
+ * Shows the limit notice and manual request action when all slots are used.
+ * @param {boolean} full - Whether all slots are occupied.
+ */
 function updateLimitNote(full) {
   const note = document.querySelector(".limit-note");
   document.body.classList.toggle("quota-full", full);

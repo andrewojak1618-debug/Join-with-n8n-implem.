@@ -201,23 +201,25 @@ function clearActiveBoardDragCard() {
 
 
 /**
- * Moves the task on the board immediately and saves it in the background.
- * Rolls the move back when saving fails and rethrows for the caller's toast.
+ * Shows the new column after the status and event have been saved.
+ * A failed save leaves the card in its original column.
  *
  * @param {Object} task - The task being moved.
  * @param {string} status - The status of the target column.
  */
 async function moveBoardTaskToStatus(task, status) {
   const previousStatus = task.status;
+  if (previousStatus === status) return;
+  const change = {
+    eventId: crypto.randomUUID(), ticketId: task.id, creator: task.creator ?? null,
+    oldStatus: previousStatus, newStatus: status,
+  };
+  await saveBoardStatusChange({ ...task, status }, change);
   task.status = status;
   renderBoardFromLocalTasks();
-  try {
-    await updateTaskInStore(task);
-  } catch (error) {
-    task.status = previousStatus;
-    renderBoardFromLocalTasks();
-    throw error;
-  }
+  document.dispatchEvent(new CustomEvent("join:task-status-changed", {
+    detail: change,
+  }));
 }
 
 

@@ -17,7 +17,7 @@ function runCode(name, input, linked = {}) {
 
 /** Supplies a valid classified mail without using personal test data. */
 function validMail() {
-  return { ticket: { title: 'Login blocked', category: 'technical-task', priority: 'urgent', deadline: null },
+  return { ticket: { title: 'Login blocked', description: 'Login unavailable', issueType: 'bug', category: 'technical-task', priority: 'urgent', deadline: null },
     gmailMessageId: 'gmail-test', mailMessageId: '<test@example.com>', senderEmail: 'sender@example.com',
     senderName: 'Sender', emailSubject: 'Original subject', emailBody: 'Original\nbody',
     deduplicationKey: 'mail-key', reservationId: 'a'.repeat(64),
@@ -46,7 +46,7 @@ test('valid mail without a deadline passes; invalid calendar dates and enums fai
 function checkSavedMail(fields, mail) {
   for (const key of ['emailBody', 'emailSubject', 'gmailMessageId', 'senderEmail', 'mailMessageId'])
     assert.equal(fields[key].stringValue, mail[key]);
-  assert.equal(fields.description.stringValue, mail.emailBody + '\n\nDieses Ticket wurde KI-generiert.');
+  assert.equal(fields.description.stringValue, mail.ticket.description + '\n\nDieses Ticket wurde KI-generiert.');
   assert.deepEqual(fields.dueDate, { nullValue: null });
   assert.equal(fields.status.stringValue, 'triage');
   assert.deepEqual(fields.assignedTo.arrayValue.values, []);
@@ -154,12 +154,26 @@ test('IC-08: only human replies reach the reservation path', () => {
 
 test('IC-08: confirmation marks itself as automatic and the collector filters it', () => {
   const taskId = 'mail-' + 'a'.repeat(64);
-  const linked = { 'Ticketdaten gültig?': [validMail()] };
-  const [message] = runCode('Eingangsbestätigung vorbereiten', [{ taskId }], linked);
+  const fields = {
+    confirmationRecipient: { stringValue: 'sender@example.com' },
+    taskId: { stringValue: taskId },
+  };
+  const [message] = runCode('Eingangsbestätigung vorbereiten', [{ fields }]);
   const mime = Buffer.from(message.json.raw, 'base64url').toString();
   const [headers, body] = mime.split('\r\n\r\n');
   assert.match(headers, /^To: sender@example.com$/m);
   assert.match(body, new RegExp(taskId));
   const mailHeaders = Object.fromEntries(headers.split('\r\n').map(line => line.split(': ')));
   assert.deepEqual(runCode('Automatische Mails ausfiltern', [{ headers: mailHeaders }]), []);
+});
+
+test('classification accepts all three supported mappings and rejects missing descriptions', () => {
+  for (const [issueType, category] of [['bug', 'technical-task'], ['feature', 'user-story'], ['technical-task', 'technical-task']]) {
+    const mail = validMail();
+    Object.assign(mail.ticket, { issueType, category });
+    assert.equal(runCode('Ticketdaten prüfen', [mail])[0].json.validation.valid, true);
+  }
+  const mail = validMail();
+  Object.assign(mail.ticket, { description: ' ', category: 'user-story' });
+  assert.equal(runCode('Ticketdaten prüfen', [mail])[0].json.validation.errors.length, 2);
 });

@@ -212,6 +212,21 @@ async function updateTaskInStore(task) {
 
 
 /**
+ * Saves a move using the active task store and invalidates the board cache.
+ * @param {Object} task - Ticket being moved.
+ * @param {Object} change - Status change to persist.
+ */
+async function saveBoardStatusChange(task, change) {
+  if (isTaskFirestoreReady()) {
+    await window.joinFirebaseTasks.saveStatusChange(change);
+  } else {
+    updateStoredTask(task);
+  }
+  clearTasksCache();
+}
+
+
+/**
  * Deletes one task from Firestore or localStorage.
  * @param {string} taskId - Id of the task to delete.
  * @returns {Promise<void>} Resolves after deletion completes.

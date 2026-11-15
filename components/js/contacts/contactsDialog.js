@@ -35,7 +35,8 @@ function openContactEditDialog() {
   document.getElementById("contactEditDelete").hidden =
     isOwnAccountContact(contact);
   document.getElementById("contactEditOverlay").hidden = false;
-  closeContactMenu();
+  startDialogFocus(document.getElementById("contactEditOverlay"),
+    () => document.getElementById("contactEditButton"), closeContactEditDialog);
 }
 
 
@@ -44,6 +45,7 @@ function openContactEditDialog() {
  */
 function closeContactEditDialog() {
   document.getElementById("contactEditOverlay").hidden = true;
+  finishDialogFocus(document.getElementById("contactEditOverlay"));
 }
 
 
@@ -190,11 +192,15 @@ function handleContactEditDelete() {
 
 /**
  * Opens the add dialog with cleared form fields.
+ * @param {Event} event - Event that opened the contact dialog.
  */
-function openContactAddDialog() {
+function openContactAddDialog(event) {
+  const openerId = event.currentTarget.id;
   document.getElementById("contactAddForm").reset();
   resetContactFormValidation("contactAdd");
   document.getElementById("contactAddOverlay").hidden = false;
+  startDialogFocus(document.getElementById("contactAddOverlay"),
+    () => document.getElementById(openerId), closeContactAddDialog);
 }
 
 
@@ -203,6 +209,7 @@ function openContactAddDialog() {
  */
 function closeContactAddDialog() {
   document.getElementById("contactAddOverlay").hidden = true;
+  finishDialogFocus(document.getElementById("contactAddOverlay"));
 }
 
 

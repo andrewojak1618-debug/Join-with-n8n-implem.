@@ -228,3 +228,6 @@
     height: auto;
   }
 }
+.auth-logo .auth-logo__signup,
+.auth-page--signup .auth-logo__login { display: none; }
+.auth-page--signup .auth-logo__signup { display: block; }

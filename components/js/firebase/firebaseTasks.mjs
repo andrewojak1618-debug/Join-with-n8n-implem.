@@ -7,6 +7,7 @@ import {
   getDocs,
   serverTimestamp,
   updateDoc,
+  writeBatch,
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const db = getFirestore();
@@ -48,10 +49,29 @@ async function createTask(task) {
  * @returns {Promise<void>} Resolves after Firestore saves the update.
  */
 async function updateTask(taskId, task) {
+  const { status, lastStatusEventId, ...editable } = getWritableTaskData(task);
   await updateDoc(doc(db, "tasks", taskId), {
-    ...getWritableTaskData(task),
+    ...editable,
     updatedAt: serverTimestamp(),
   });
+}
+
+
+/**
+ * Commits a board move and its immutable status event in one server write.
+ * @param {Object} change - Ticket status change and event data.
+ */
+async function saveStatusChange(change) {
+  const task = doc(db, "tasks", change.ticketId);
+  const event = doc(collection(task, "statusEvents"), change.eventId);
+  const batch = writeBatch(db);
+  batch.update(task, {
+    status: change.newStatus,
+    lastStatusEventId: event.id,
+    updatedAt: serverTimestamp(),
+  });
+  batch.set(event, { ...change, createdAt: serverTimestamp() });
+  await batch.commit();
 }
 
 
@@ -103,6 +123,7 @@ function normalizeTaskAssignees(assignedTo) {
 }
 
 window.joinFirebaseTasks = {
+  saveStatusChange,
   loadTasks,
   createTask,
   updateTask,

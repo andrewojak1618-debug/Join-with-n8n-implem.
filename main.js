@@ -1,7 +1,7 @@
 const routes = {
   login: {
     title: "Join | Log in",
-    file: "./index.html",
+    file: "./login.html",
     template: "./components/html/pages/login.html",
   },
   signup: {

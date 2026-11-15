@@ -54,13 +54,20 @@ test("renders one column's tasks ordered by creation time, oldest first", () => 
 
 
 test("renders a moved task immediately and persists its new status", async () => {
-  const task = { id: "task-1", status: "todo" };
+  const creator = { type: "extern", name: "Kim", email: "kim@example.test" };
+  const task = { id: "task-1", status: "todo", creator };
+  const events = [];
   const state = { renders: 0, savedStatus: "" };
   const context = loadBrowserScripts(["components/js/board/boardDnd.js"], {
+    document: { dispatchEvent: (event) => events.push(event) },
+    CustomEvent,
+    crypto: require("node:crypto").webcrypto,
     activeBoardTasks: [task],
+    getStoredUser: () => ({ type: "intern", uid: "team-user", name: "Alex" }),
     renderBoardColumns: () => { state.renders += 1; },
     initBoardTaskDetails() {},
-    updateTaskInStore: async (updatedTask) => {
+    saveBoardStatusChange: async (updatedTask, change) => {
+      assert.deepEqual(change.creator, creator);
       state.savedStatus = updatedTask.status;
     },
   });
@@ -70,4 +77,13 @@ test("renders a moved task immediately and persists its new status", async () =>
   assert.equal(task.status, "done");
   assert.equal(state.renders, 1);
   assert.equal(state.savedStatus, "done");
+  await context.moveBoardTaskToStatus(task, "done");
+  context.saveBoardStatusChange = async () => { throw Error("offline"); };
+  await assert.rejects(context.moveBoardTaskToStatus(task, "feedback"), /offline/);
+  assert.equal(task.status, "done");
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, "join:task-status-changed");
+  const { eventId, ...transition } = events[0].detail;
+  assert.match(eventId, /^[a-f0-9-]{36}$/);
+  assert.deepEqual(transition, { ticketId: "task-1", oldStatus: "todo", newStatus: "done", creator });
 });

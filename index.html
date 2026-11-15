@@ -1,20 +1,30 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Join | Log in</title>
-    <link rel="icon" type="image/png" href="./components/assets/img/icons/favicon_white.png" />
-    <link rel="stylesheet" href="./base.css" />
-    <script src="./components/js/core/shared.js" defer></script>
-    <script src="./components/js/firebase/firebaseLoader.js" defer></script>
-    <script src="./components/js/auth/auth.js" defer></script>
-    <script src="./components/js/auth/login.js" defer></script>
-    <script src="./components/js/core/htmlIncludes.js" defer></script>
-    <script src="./components/js/core/pageTransition.js" defer></script>
-    <script src="./main.js" defer></script>
-  </head>
-  <body data-page="login">
-    <div id="app"></div>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome | Join</title>
+  <link rel="icon" href="./components/assets/img/icons/favicon_white.png">
+  <link rel="stylesheet" href="./components/css/pages/welcome.css">
+  <script src="./components/js/core/htmlIncludes.js" defer></script>
+  <script src="./components/js/welcome.js" defer></script>
+</head>
+<body>
+  <div id="intro" aria-hidden="true"><img src="./components/assets/img/icons/Join logo vector.svg" alt=""></div>
+  <div class="welcome-page" id="welcome-page" inert>
+    <header>
+      <img class="brand" src="./components/assets/img/icons/Join logo vector.svg" alt="Join">
+      <p>Not a Join user? <a href="./signup.html">Sign up</a></p>
+    </header>
+    <main>
+      <h1>Welcome</h1>
+      <p>Pick the option that suits your role: create a request as a stakeholder or log in if you're part of the team.</p>
+      <nav aria-label="Choose your role">
+        <div><p class="role-label"><img src="./components/assets/img/icons/stakeholder-work.svg" width="24" height="24" alt="">Are you a stakeholder?</p><a class="primary" href="./stakeholder.html">Create request</a></div>
+        <div><p class="role-label"><img src="./components/assets/img/icons/team-members.svg" width="25" height="20" alt="">Are you a team member?</p><a href="./login.html">Member log in</a></div>
+      </nav>
+    </main>
+    <div data-include="./components/html/molecules/authFooter.html"></div>
+  </div>
+</body>
 </html>

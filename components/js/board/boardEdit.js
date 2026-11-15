@@ -12,6 +12,7 @@ async function showBoardEditMode() {
   await fillBoardTaskEditForm(task);
   getElement("boardTaskDetailView").hidden = true;
   getElement("boardTaskEditForm").hidden = false;
+  getBoardEditField("Title").focus();
 }
 
 

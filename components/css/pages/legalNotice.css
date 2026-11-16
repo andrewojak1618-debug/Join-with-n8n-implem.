@@ -21,7 +21,7 @@
     gap: 35px;
   }
 
-  body[data-page="legal-notice"] .legal-view--internal .summary-topbar,
+  
   body[data-page="legal-notice"] .privacy-public-topbar {
     padding-right: 96px;
     padding-left: 96px;

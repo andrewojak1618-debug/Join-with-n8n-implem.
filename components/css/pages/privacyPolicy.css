@@ -142,12 +142,7 @@ body[data-page="legal-notice"]
     gap: 35px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .summary-topbar {
-    padding-right: 96px;
-    padding-left: 96px;
-  }
+  
 
   body[data-page="privacy-policy"] .privacy-public-topbar {
     padding-right: 96px;

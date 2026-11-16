@@ -1,7 +1,3 @@
-body[data-page="add-task"] .summary-topbar {
-  padding-left: 116px;
-}
-
 .add-task-field textarea {
   height: 120px;
 }

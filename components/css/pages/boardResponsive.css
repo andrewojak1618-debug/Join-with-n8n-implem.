@@ -94,14 +94,6 @@
     margin: 0;
   }
 
-  body[data-page="board"] .summary-topbar {
-    background: var(--board-mobile-blue);
-  }
-
-  body[data-page="board"] .summary-topbar__logo {
-    filter: brightness(0) invert(1);
-  }
-
   body[data-page="board"] .summary-sidebar,
   body[data-page="board"] .summary-nav {
     background: var(--color-white);

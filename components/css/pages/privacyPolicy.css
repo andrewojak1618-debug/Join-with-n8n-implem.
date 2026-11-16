@@ -144,10 +144,7 @@ body[data-page="legal-notice"]
 
   
 
-  body[data-page="privacy-policy"] .privacy-public-topbar {
-    padding-right: 96px;
-    padding-left: 96px;
-  }
+
 
   body[data-page="privacy-policy"]
     .privacy-view--internal
@@ -386,4 +383,41 @@ body[data-page="legal-notice"]
     width: 32px;
     height: 39px;
   }
+}
+
+@media (max-width: 1279px) {
+  .privacy-public-topbar .app-brand { display: none; }
+}
+
+@media (min-width: 1280px) {
+  .privacy-public-shell { grid-template-rows: var(--app-topbar-height) 1fr; }
+  .privacy-public-shell > .summary-main { display: contents; }
+  .privacy-public-topbar {
+    grid-area: 1 / 1 / 2 / -1;
+    position: sticky;
+    top: 0;
+    z-index: 16;
+    padding-inline: 40px;
+    background: #1268ff;
+    color: white;
+  }
+  .privacy-public-sidebar {
+    grid-area: 2 / 1;
+    top: var(--app-topbar-height);
+    height: calc(100vh - var(--app-topbar-height));
+    padding-top: 40px;
+    background: white;
+  }
+  .privacy-public-sidebar .summary-nav__item,
+  .privacy-public-sidebar .summary-sidebar__footer a { color: #42526e; }
+  .privacy-public-sidebar .summary-sidebar__footer { justify-items: start; padding-left: 48px; }
+  .privacy-public-sidebar .summary-sidebar__footer a { min-height: 36px; padding-inline: 10px; }
+  .privacy-public-sidebar .summary-sidebar__footer .summary-nav__item--active {
+    background: #1268ff;
+    color: white;
+    min-height: 36px;
+    padding-inline: 10px;
+    border-radius: 8px;
+  }
+  .privacy-public-content { grid-area: 2 / 2; }
 }

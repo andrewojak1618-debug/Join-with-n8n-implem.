@@ -155,7 +155,7 @@
   min-width: 170px;
   padding: 10px;
   border-radius: 16px 0 16px 16px;
-  background: var(--color-primary);
+  background: var(--color-white);
   box-shadow: var(--shadow-topbar);
 }
 
@@ -171,9 +171,9 @@
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: var(--color-white);
+  color: #42526e;
   font: inherit;
-  text-align: left;
+  text-align: right;
   text-decoration: none;
 }
 
@@ -181,7 +181,7 @@
 .summary-user-menu a:focus-visible,
 .summary-user-menu button:hover,
 .summary-user-menu button:focus-visible {
-  background: var(--color-hover-overlay-light);
+  background: #e8f1ff;
   outline: none;
 }
 
@@ -196,6 +196,34 @@ body[data-page="legal-notice"] .summary-help {
 }
 
 @media (max-width: 1279px) {
+  .summary-topbar + .summary-sidebar {
+    background: white;
+    box-shadow: 0 -1px 4px rgb(0 0 0 / 8%);
+  }
+
+  .summary-topbar + .summary-sidebar .summary-nav__item {
+    color: #42526e;
+  }
+
+  .summary-topbar + .summary-sidebar .summary-nav__item--active {
+    background: white;
+    color: #1268ff;
+  }
+
+  .summary-nav__item[data-page="summary"] { --nav-icon: url("../../assets/img/icons/summary_icons.svg"); }
+  .summary-nav__item[data-page="add-task"] { --nav-icon: url("../../assets/img/icons/add_task_icons.svg"); }
+  .summary-nav__item[data-page="board"] { --nav-icon: url("../../assets/img/icons/board_icons.svg"); }
+  .summary-nav__item[data-page="contacts"] { --nav-icon: url("../../assets/img/icons/contacts_icons.svg"); }
+
+  .summary-topbar + .summary-sidebar .summary-nav__icon {
+    width: 24px;
+    height: 24px;
+    background: currentColor;
+    mask: var(--nav-icon) center / contain no-repeat;
+  }
+
+  .summary-topbar + .summary-sidebar .summary-nav__icon img { display: none; }
+
   .summary-shell {
     --app-topbar-height: 80px;
 
@@ -303,14 +331,16 @@ body[data-page="legal-notice"] .summary-help {
     box-sizing: border-box;
   }
 
-  .summary-topbar + .summary-sidebar .summary-nav { margin-inline: 16px; }
+  .summary-topbar + .summary-sidebar .summary-nav { width: 186px; margin-inline: auto; }
   .summary-topbar + .summary-sidebar .summary-nav__item {
     color: #42526e;
     border-radius: 8px;
-    padding-inline: 24px;
+    min-height: 40px;
+    padding-inline: 30px;
+    gap: 8px;
   }
 
   .summary-topbar + .summary-sidebar .summary-nav__icon img { filter: brightness(0) saturate(100%) invert(30%) sepia(16%) saturate(852%) hue-rotate(180deg); }
   .summary-topbar + .summary-sidebar .summary-nav__item--active { background: #d2e3ff; color: #42526e; }
-  .summary-topbar + .summary-sidebar .summary-nav__item:hover { background: #e8f1ff; }
+  .summary-topbar + .summary-sidebar .summary-nav__item:not(.summary-nav__item--active):hover { background: #e8f1ff; }
 }

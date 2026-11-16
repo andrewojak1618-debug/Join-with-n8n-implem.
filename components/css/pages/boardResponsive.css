@@ -94,22 +94,4 @@
     margin: 0;
   }
 
-  body[data-page="board"] .summary-sidebar,
-  body[data-page="board"] .summary-nav {
-    background: var(--color-white);
-  }
-
-  body[data-page="board"] .summary-nav__item {
-    color: var(--color-text-main);
-    background: var(--color-white);
-  }
-
-  body[data-page="board"] .summary-nav__icon img {
-    filter: brightness(.45);
-  }
-
-  body[data-page="board"] .summary-nav__item--active {
-    color: var(--board-mobile-blue);
-  }
-
 }

@@ -190,7 +190,7 @@ function getAddTaskTitleError() {
  */
 function getAddTaskDueDateError() {
   const input = getTrimmedInputValue("taskDueDate");
-  if (!input) return "Please select a due date.";
+  if (!input) return "This field is required";
   return getValidatedAddTaskDueDateError(getAddTaskDueDate());
 }
 

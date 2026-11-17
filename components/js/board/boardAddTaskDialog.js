@@ -25,7 +25,6 @@ function initAddTaskDialogControls() {
   if (dialog.dataset.eventsReady === "true") return;
   getElement("addTaskDialogClose").addEventListener("click", closeAddTaskDialog);
   dialog.addEventListener("click", handleAddTaskDialogBackdrop);
-  document.addEventListener("keydown", handleAddTaskDialogEscape);
   window.addEventListener("resize", handleAddTaskDialogResize);
   bindAddTaskDialogTriggers();
   dialog.dataset.eventsReady = "true";
@@ -50,18 +49,20 @@ function bindAddTaskDialogTriggers() {
 function handleAddTaskTriggerClick(event) {
   if (!isDesktopAddTaskDialogViewport()) return;
   event.preventDefault();
-  openAddTaskDialog();
+  openAddTaskDialog(event.currentTarget);
 }
 
 
 /**
  * Opens the add task dialog for a new Triage task.
+ * @param {HTMLElement} opener - Control that opened the dialog.
  */
-function openAddTaskDialog() {
+function openAddTaskDialog(opener) {
   resetAddTaskDialogForm();
   getElement("addTaskDialog").hidden = false;
   getElement("addTaskDialogCard").scrollTop = 0;
   lockPageScroll();
+  startDialogFocus(getElement("addTaskDialog"), () => opener, dismissAddTaskDialog);
 }
 
 
@@ -71,6 +72,7 @@ function openAddTaskDialog() {
 function closeAddTaskDialog() {
   getElement("addTaskDialog").hidden = true;
   unlockPageScroll();
+  finishDialogFocus(getElement("addTaskDialog"));
 }
 
 
@@ -98,14 +100,16 @@ function handleAddTaskDialogBackdrop(event) {
 
 
 /**
- * Closes the dialog on Escape, unless the due date calendar is open.
- * @param {KeyboardEvent} event - Document keydown event.
+ * Dismisses the calendar first, otherwise closes the floating dialog.
  */
-function handleAddTaskDialogEscape(event) {
-  if (event.key !== "Escape") return;
+function dismissAddTaskDialog() {
   const calendar = document.getElementById("taskDueDateCalendar");
-  if (calendar && !calendar.hidden) return;
-  if (!getElement("addTaskDialog").hidden) closeAddTaskDialog();
+  if (calendar && !calendar.hidden) {
+    setAddTaskDatePickerOpen(false);
+    getElement("taskDueDate").focus();
+    return;
+  }
+  closeAddTaskDialog();
 }
 
 
@@ -123,8 +127,8 @@ function handleAddTaskDialogResize() {
  * Closes the dialog and refreshes the board after a task was created in it.
  */
 async function completeAddTaskDialogSubmit() {
+  hideAddTaskSuccessMessage();
   closeAddTaskDialog();
   activeBoardTasks = await loadTasksFromStore();
   renderBoardFromLocalTasks();
-  showTimedFeedback("boardToast", "Task added to board.");
 }

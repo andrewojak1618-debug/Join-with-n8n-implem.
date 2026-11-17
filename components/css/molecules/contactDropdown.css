@@ -120,6 +120,7 @@
 }
 
 .contact-dropdown__avatar {
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
   display: grid;
@@ -212,4 +213,10 @@
 #taskCategoryPanel .contact-dropdown__option {
   min-height: 48px;
   padding-inline: 16px;
+}
+
+.contact-dropdown__name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }

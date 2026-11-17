@@ -113,9 +113,7 @@
 
 @media (max-width: 767px) {
   .date-picker__popover {
-    position: static;
     width: 100%;
-    margin-top: 8px;
     padding: 10px;
     box-shadow: var(--shadow-card);
   }
@@ -157,4 +155,25 @@
     padding: 6px 2px;
     font-size: 16px;
   }
+}
+
+.date-picker__scroll-fields option {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: white;
+  color: var(--color-text-main);
+  cursor: pointer;
+  transition: border-color 100ms ease, color 100ms ease;
+}
+
+.date-picker__scroll-fields option:hover,
+.date-picker__scroll-fields option:checked {
+  border-color: #1268FF;
+  color: #1268FF;
+  -webkit-text-fill-color: #1268FF;
+  background: white linear-gradient(white, white);
+}
+
+.date-picker__scroll-fields option:hover {
+  box-shadow: 0 2px 4px rgb(0 0 0 / 16%);
 }

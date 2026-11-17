@@ -3,12 +3,12 @@
     <h1 id="boardTitle">Board</h1>
     <div class="board-header__right">
       <div class="board-search">
-        <input type="text" id="boardSearchInput" placeholder="Find Task" />
+        <input type="text" id="boardSearchInput" placeholder="Find Task" aria-label="Find Task" />
         <button type="button" class="board-search__btn" aria-label="Search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <span class="board-search__icon" aria-hidden="true">
+            <img class="board-search__icon-default" src="./components/assets/img/icons/search-default.svg" alt="" />
+            <img class="board-search__icon-click" src="./components/assets/img/icons/search-click.svg" alt="" />
+          </span>
         </button>
       </div>
       <a class="board-add-task" href="./addTask.html?from=board" data-page="add-task" data-from="board"
@@ -61,7 +61,7 @@
       <div class="board-task-list" data-board-status="done"></div>
     </section>
   </div>
-  <p class="board-search-no-results" id="boardSearchNoResults" hidden>
+  <p class="board-search-no-results" id="boardSearchNoResults" role="status" aria-live="polite" hidden>
     No matching tasks found.
   </p>
   <div data-include="./components/html/organisms/boardDetailDialog.html"></div>

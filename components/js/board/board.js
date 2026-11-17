@@ -176,6 +176,7 @@ function toggleBoardCardMoveMenu(event, card) {
   const shouldOpen = menu.hidden;
   closeAllBoardCardMoveMenus();
   menu.hidden = !shouldOpen;
+  if (shouldOpen) positionBoardMoveMenu(menu, card);
   card.querySelector(".board-card-move__toggle").setAttribute("aria-expanded", String(shouldOpen));
 }
 
@@ -282,10 +283,7 @@ function handleBoardDetailBackdrop(event) {
  * @param {Object} task - The task shown in the detail view.
  */
 function fillBoardTaskDetail(task) {
-  setElementText(
-    "boardTaskDetailCategory",
-    formatBoardCategory(task.category),
-  );
+  fillBoardDetailCategory(task.category);
   setElementText("boardTaskDetailTitle", task.title);
   setElementText(
     "boardTaskDetailDescription",

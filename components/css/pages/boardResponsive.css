@@ -1,6 +1,10 @@
-@media (max-width: 1279px) {
+@media (max-width: 1439px) {
   .board-content {
     padding: 72px 24px 48px;
+  }
+
+  .board-header {
+    margin-inline: 0;
   }
 
   .board-columns {
@@ -9,7 +13,12 @@
   }
 
   .board-task-list {
-    width: 100%;
+    width: calc(100% + 32px);
+    padding: 16px;
+    margin: -16px;
+    box-sizing: border-box;
+    border-radius: 0;
+    scroll-padding-inline: 16px;
     min-width: 0;
     display: flex;
     align-items: flex-start;
@@ -84,14 +93,6 @@
   .board-task-list .board-card {
     flex-basis: min(248px, 100%);
     min-height: 216px;
-  }
-
-  .board-empty-state {
-    display: grid;
-    place-items: center;
-    min-height: 48px;
-    padding: 8px;
-    margin: 0;
   }
 
 }

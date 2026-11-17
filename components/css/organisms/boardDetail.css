@@ -58,7 +58,11 @@
 }
 
 .board-detail-category {
-  background: var(--color-accent);
+  background: var(--color-category-user-story);
+}
+
+.board-detail-category[data-category="technical"] {
+  background: var(--color-category-technical);
 }
 
 .board-detail-labels,

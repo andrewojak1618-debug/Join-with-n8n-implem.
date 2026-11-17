@@ -104,6 +104,8 @@ function getBoardDropTarget(event) {
  */
 async function handleBoardDragPointerUp(event) {
   if (!boardDragActive) return endBoardCardDrag();
+  document.addEventListener("click", stopBoardDragClick, { capture: true, once: true });
+  setTimeout(() => document.removeEventListener("click", stopBoardDragClick, true), 0);
   const taskList = getBoardDropTarget(event);
   const task = getDraggedBoardTask();
   endBoardCardDrag();

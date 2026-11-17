@@ -1,32 +1,36 @@
 .board-card-move {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 13px;
   display: none;
 }
 
 .board-card-move__toggle {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--color-transparent);
+  width: 24px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: #f4f4f4;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
 }
 
 .board-card-move__menu {
   position: absolute;
-  top: 36px;
-  right: 0;
+  top: 0;
+  left: 0;
   z-index: 10;
   display: grid;
-  gap: 2px;
-  min-width: 126px;
-  padding: 12px;
+  gap: 16px;
+  width: 106px;
+  box-sizing: border-box;
+  padding: 6px 8px 16px;
   border-radius: 0 20px 20px 20px;
-  background: var(--color-primary-auth);
+  background: #4589ff;
   color: var(--color-white);
-  box-shadow: var(--shadow-soft);
 }
 
 .board-card-move__menu[hidden] {
@@ -34,41 +38,47 @@
 }
 
 .board-card-move__title {
-  font-weight: 700;
-  padding: 0 8px 2px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19px;
+  padding: 0 8px;
+}
+
+.board-card-move__options {
+  display: grid;
+  gap: 8px;
 }
 
 .board-card-move__option {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px;
+  min-height: 24px;
+  padding: 0 8px;
   border-radius: 8px;
   background: var(--color-transparent);
   color: var(--color-white);
+  font-size: 14px;
   text-align: left;
+  cursor: pointer;
   transition: background 100ms ease;
 }
 
 .board-card-move__option:hover {
-  background: var(--color-primary-auth-hover);
+  background: #e3eeff;
+  color: #4589ff;
+}
+
+.board-card-move__option:hover img {
+  filter: brightness(0) saturate(100%) invert(49%) sepia(99%) saturate(2782%) hue-rotate(204deg) brightness(103%) contrast(101%);
+}
+
+.board-card:has(.board-card-move__menu:not([hidden])) {
+  z-index: 2;
 }
 
 @media (max-width: 1279px), (any-pointer: coarse) {
   .board-card-move {
     display: block;
-  }
-
-  .board-card-move__toggle {
-    width: 44px;
-    height: 44px;
-  }
-
-  .board-card-move__menu {
-    top: 48px;
-  }
-
-  .board-card-move__option {
-    min-height: 44px;
   }
 }

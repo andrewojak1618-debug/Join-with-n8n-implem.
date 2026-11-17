@@ -245,3 +245,14 @@ function getBoardEditAssigneeOverflowTemplate(overflowCount) {
   if (!overflowCount) return "";
   return `<span class="board-detail-assignee__avatar board-detail-assignee__avatar--overflow">+${overflowCount}</span>`;
 }
+
+
+/**
+ * Applies the shared category label and color to the ticket dialog.
+ * @param {string} category - Stored task category.
+ */
+function fillBoardDetailCategory(category) {
+  const badge = getElement("boardTaskDetailCategory");
+  badge.textContent = formatBoardCategory(category);
+  badge.dataset.category = getBoardCategoryClass(category);
+}

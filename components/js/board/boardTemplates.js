@@ -130,11 +130,11 @@ function getBoardCardMoveTemplate(targets) {
   return `
     <div class="board-card-move">
       <button type="button" class="board-card-move__toggle" aria-haspopup="true" aria-expanded="false" aria-label="Move task to another column">
-        <img src="./components/assets/img/icons/change_task_mobile.svg" alt="" aria-hidden="true" />
+        <img src="./components/assets/img/icons/move-task-toggle.svg" alt="" aria-hidden="true" />
       </button>
       <div class="board-card-move__menu" hidden>
         <span class="board-card-move__title">Move to</span>
-        ${options}
+        <div class="board-card-move__options">${options}</div>
       </div>
     </div>`;
 }

@@ -296,3 +296,16 @@ function getBoardDetailSubtaskViewData(subtask, index) {
     checkedAttribute: subtask.done ? "checked" : "",
   };
 }
+
+
+/**
+ * Keeps the anchored move menu inside its horizontal scroll container.
+ * @param {HTMLElement} menu - Open destination menu.
+ * @param {HTMLElement} card - Card containing the menu.
+ */
+function positionBoardMoveMenu(menu, card) {
+  menu.style.left = "0px";
+  const list = card.closest(".board-task-list").getBoundingClientRect();
+  const bounds = menu.getBoundingClientRect();
+  menu.style.left = `${Math.min(0, list.right - 16 - bounds.right)}px`;
+}

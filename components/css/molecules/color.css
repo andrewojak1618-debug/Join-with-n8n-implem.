@@ -45,8 +45,8 @@
   --color-priority-medium: #FFA800;
   --color-priority-urgent: #ff3d00;
   --color-priority-low: #7ae229;
-  --color-category-user-story: #3f42ff;
-  --color-category-technical: #6fd0c1;
+  --color-category-user-story: #FF7A00;
+  --color-category-technical: #0038FF;
   --color-progress: #6b83ff;
 
   --shadow-soft: 0 0 14px rgba(0, 0, 0, 0.12);

@@ -20,6 +20,8 @@ async function initAddTaskAssignees() {
  */
 function bindAssigneeDropdown() {
   getElement("taskAssigneesButton").addEventListener("click", toggleAssigneeDropdown);
+  getElement("taskAssigneesSearch").addEventListener("input", filterAssigneeOptions);
+  getElement("taskAssigneesDropdown").addEventListener("keydown", handleAssigneeSearchKey);
   if (assigneeOutsideClickReady) return;
   document.addEventListener("click", closeAssigneeDropdownOnOutsideClick);
   assigneeOutsideClickReady = true;
@@ -37,6 +39,7 @@ function renderAssigneeOptions() {
         .map(getAssigneeOptionTemplate)
         .join("")
     : '<p class="contact-dropdown__empty">No contacts available.</p>';
+  panel.insertAdjacentHTML("beforeend", '<p class="contact-dropdown__empty" data-no-matches hidden>No matching contacts.</p>');
   panel.querySelectorAll("input").forEach((input) => {
     input.addEventListener("change", handleAssigneeChange);
   });
@@ -150,9 +153,40 @@ function closeAssigneeDropdownOnOutsideClick(event) {
  * @param {boolean} isOpen - True to open, false to close the dropdown.
  */
 function setAssigneeDropdownOpen(isOpen) {
+  const search = getElement("taskAssigneesSearch");
+  if (search.hidden === !isOpen) return;
+  search.value = "";
+  search.hidden = !isOpen;
+  filterAssigneeOptions();
+  if (isOpen) search.focus();
   getElement("taskAssigneesDropdown").classList.toggle("is-open", isOpen);
   getElement("taskAssigneesPanel").hidden = !isOpen;
   getElement("taskAssigneesButton").setAttribute("aria-expanded", String(isOpen));
+}
+
+
+/** Filters the visible names without removing selected checkboxes. */
+function filterAssigneeOptions() {
+  const panel = getElement("taskAssigneesPanel");
+  const query = getElement("taskAssigneesSearch").value.trim().toLowerCase();
+  const options = panel.querySelectorAll(".contact-dropdown__option");
+  options.forEach((option) => {
+    const name = option.querySelector("span:not(.contact-dropdown__avatar)").textContent;
+    option.hidden = !name.toLowerCase().includes(query);
+  });
+  panel.querySelector("[data-no-matches]").hidden =
+    !options.length || !!panel.querySelector(".contact-dropdown__option:not([hidden])");
+}
+
+
+/** Prevents submitting a search and returns focus to the trigger on Escape. */
+function handleAssigneeSearchKey(event) {
+  if (getElement("taskAssigneesSearch").hidden) return;
+  if (event.key === "Enter" && event.target.id === "taskAssigneesSearch") event.preventDefault();
+  if (event.key !== "Escape") return;
+  event.stopPropagation();
+  setAssigneeDropdownOpen(false);
+  getElement("taskAssigneesButton").focus();
 }
 
 

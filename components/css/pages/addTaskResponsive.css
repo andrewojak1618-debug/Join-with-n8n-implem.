@@ -1,3 +1,41 @@
+@media (min-width: 768px) {
+  body[data-page="add-task"] .add-task-form__fields {
+    width: min(100%, 440px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+
+  body[data-page="add-task"] .add-task-form__divider {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  body[data-page="add-task"] .add-task-content {
+    max-width: none;
+    padding-right: 40px;
+  }
+
+  body[data-page="add-task"] .add-task-form {
+    grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  body[data-page="add-task"] .add-task-form__footer {
+    position: fixed;
+    right: 40px;
+    bottom: 56px;
+  }
+
+  body[data-page="add-task"] .add-task-form__footer p {
+    display: none;
+  }
+
+  body[data-page="add-task"] .add-task-form__actions {
+    gap: 28px;
+  }
+}
+
 .add-task-field textarea {
   height: 120px;
 }
@@ -41,6 +79,10 @@
 }
 
 @media (max-width: 767px) {
+  .add-task-feedback.add-task-feedback--success {
+    top: 64.2%;
+  }
+
   .add-task-form__fields {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -178,5 +220,60 @@
     min-height: 56px;
     padding: 12px 16px;
     font-size: 16px;
+  }
+}
+
+.add-task-optional {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  html:has(body[data-page="add-task"]) {
+    scrollbar-width: none;
+  }
+
+  body[data-page="add-task"] {
+    & .add-task-content {
+      padding: 60px 16px calc(var(--app-bottom-nav-height) + 100px);
+    }
+
+    & .add-task-optional {
+      display: inline;
+      font-weight: 400;
+    }
+
+    & .add-task-form__fields,
+    & .add-task-form__column {
+      gap: 16px;
+    }
+
+    & .date-picker input,
+    & .contact-dropdown__button {
+      min-height: 48px;
+      border: 0;
+      border-bottom: 1px solid var(--color-border-dark);
+      border-radius: 0;
+    }
+
+    & .date-picker__toggle img,
+    & .contact-dropdown__button::after {
+      filter: brightness(0) saturate(100%) invert(30%) sepia(100%) saturate(3150%) hue-rotate(215deg);
+    }
+
+    & .add-task-form__footer {
+      justify-content: center;
+    }
+
+    & .add-task-form__actions {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      gap: 24px;
+    }
+
+    & .add-task-form__actions button {
+      min-height: 48px;
+      padding-inline: 16px;
+    }
   }
 }

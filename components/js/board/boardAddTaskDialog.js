@@ -28,7 +28,6 @@ function initAddTaskDialogControls() {
   document.addEventListener("keydown", handleAddTaskDialogEscape);
   window.addEventListener("resize", handleAddTaskDialogResize);
   bindAddTaskDialogTriggers();
-  bindAddTaskDialogCancelButton();
   dialog.dataset.eventsReady = "true";
 }
 
@@ -52,20 +51,6 @@ function handleAddTaskTriggerClick(event) {
   if (!isDesktopAddTaskDialogViewport()) return;
   event.preventDefault();
   openAddTaskDialog();
-}
-
-
-/**
- * Relabels the reused "Clear" reset button to a dialog "Cancel" action.
- */
-function bindAddTaskDialogCancelButton() {
-  const cancelButton = document.querySelector(
-    "#addTaskDialog .add-task-button--secondary",
-  );
-  if (!cancelButton) return;
-  cancelButton.type = "button";
-  cancelButton.querySelector("span").textContent = "Cancel";
-  cancelButton.addEventListener("click", closeAddTaskDialog);
 }
 
 

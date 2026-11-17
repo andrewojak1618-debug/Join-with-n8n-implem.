@@ -164,3 +164,52 @@
   color: var(--color-text-main);
   font-size: 16px;
 }
+
+#taskAssigneesDropdown .contact-dropdown__search {
+  position: absolute;
+  inset: 0 44px auto 0;
+  z-index: 1;
+  width: calc(100% - 44px);
+  height: 48px;
+  padding-inline: 16px;
+  border: 0;
+  border-bottom: 1px solid #1268ff;
+  border-radius: 0;
+  background: white;
+}
+
+#taskAssigneesDropdown [hidden] {
+  display: none;
+}
+
+#taskAssigneesDropdown.is-open .contact-dropdown__button {
+  color: transparent;
+  border: 0;
+  border-bottom: 1px solid #1268ff;
+  border-radius: 0;
+}
+
+#taskAssigneesDropdown .contact-dropdown__option:has(input:checked),
+#taskAssigneesDropdown input[type="checkbox"]:checked {
+  background-color: #1268ff;
+}
+
+#taskCategoryDropdown.is-open .contact-dropdown__button {
+  border: 0;
+  border-bottom: 1px solid var(--color-border-dark);
+  border-radius: 0;
+}
+
+#taskCategoryPanel,
+#taskAssigneesPanel {
+  top: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0 0 8px 8px;
+  box-shadow: none;
+}
+
+#taskCategoryPanel .contact-dropdown__option {
+  min-height: 48px;
+  padding-inline: 16px;
+}

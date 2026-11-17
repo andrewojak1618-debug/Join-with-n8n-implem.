@@ -29,6 +29,7 @@
 @import url("./components/css/pages/boardSearch.css");
 @import url("./components/css/pages/contacts.css");
 @import url("./components/css/pages/help.css");
+@import url("./components/css/molecules/primaryCheck.css");
 
 :root {
   --font-body: Arial, Helvetica, sans-serif;

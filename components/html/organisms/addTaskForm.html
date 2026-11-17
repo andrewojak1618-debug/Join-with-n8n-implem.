@@ -14,6 +14,7 @@
           name="taskTitle"
           type="text"
           placeholder="Enter a title"
+          required
           aria-describedby="taskTitleError"
         />
         <span
@@ -24,7 +25,7 @@
       </label>
 
       <label class="add-task-field" for="taskDescription">
-        <span>Description</span>
+        <span>Description <span class="add-task-optional">(optional)</span></span>
         <textarea
           id="taskDescription"
           name="taskDescription"
@@ -95,7 +96,7 @@
 
       <div class="add-task-field">
         <label class="add-task-field__control-label" for="taskAssigneesButton">
-          Assigned to
+          Assigned to <span class="add-task-optional">(optional)</span>
         </label>
         <div
           class="contact-dropdown"
@@ -111,6 +112,9 @@
           >
             Select contacts to assign
           </button>
+          <input id="taskAssigneesSearch" class="contact-dropdown__search"
+            type="text" aria-label="Search contacts" aria-controls="taskAssigneesPanel"
+            autocomplete="off" hidden />
           <div
             class="contact-dropdown__panel"
             id="taskAssigneesPanel"
@@ -184,7 +188,7 @@
           id="taskSubtasksLabel"
           for="taskSubtasks"
         >
-          Subtasks
+          Subtasks <span class="add-task-optional">(optional)</span>
         </label>
         <div class="add-task-subtask-input" id="taskSubtasksInputWrapper">
           <input
@@ -256,16 +260,12 @@
         />
       </button>
       <button
-        class="add-task-button add-task-button--primary button-hover button-hover--primary"
+        class="primary-check primary-check--task"
         id="createTaskButton"
         type="submit"
       >
         <span>Create Task</span>
-        <img
-          src="./components/assets/img/icons/check_icon.svg"
-          alt=""
-          aria-hidden="true"
-        />
+        <span class="primary-check-icon" aria-hidden="true"></span>
       </button>
     </div>
   </div>

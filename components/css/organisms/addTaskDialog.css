@@ -14,8 +14,9 @@
 
 .add-task-dialog-card {
   position: relative;
-  width: min(100%, 1000px);
-  max-height: 90vh;
+  width: min(100%, 518px);
+  max-height: calc(100dvh - 48px);
+  overscroll-behavior: contain;
   overflow-y: auto;
   padding: 40px;
   border-radius: 30px;
@@ -51,4 +52,27 @@
 
 .add-task-dialog-card .add-task-form {
   gap: 32px;
+}
+
+.add-task-dialog-card .add-task-form__fields {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 30px;
+}
+
+.add-task-dialog-card .add-task-form__divider {
+  display: none;
+}
+
+.add-task-dialog-card .add-task-optional {
+  display: inline;
+  font-weight: 400;
+}
+
+.add-task-dialog-card .add-task-form__footer {
+  justify-content: flex-end;
+}
+
+.add-task-dialog-card .add-task-form__footer p,
+.add-task-dialog-card .add-task-button--secondary {
+  display: none;
 }

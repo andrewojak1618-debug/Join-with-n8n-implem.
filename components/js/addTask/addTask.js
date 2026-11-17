@@ -1,4 +1,4 @@
-const addTaskRedirectDelay = 900;
+const addTaskRedirectDelay = 800;
 let addTaskRedirectTimer;
 
 

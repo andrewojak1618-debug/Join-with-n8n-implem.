@@ -11,7 +11,7 @@ function renderBoardDetailCreator(task) {
   const email = isGuest ? "" : creator?.email || "";
   setElementText("boardTaskDetailCreator", isGuest ? "Gast" : creator?.name || email || "Ersteller unbekannt");
   renderBoardDetailOrigin(isGuest ? "guest" : creator?.type);
-  renderBoardCreatorEmail(email);
+  renderBoardCreatorAction(isGuest ? null : creator);
   getElement("boardTaskDetailAi").hidden = task.source !== "email";
 }
 
@@ -22,7 +22,7 @@ function renderBoardDetailCreator(task) {
  */
 function renderBoardDetailOrigin(type) {
   const badge = getElement("boardTaskDetailOrigin");
-  const label = type === "intern" ? "Intern" : type === "extern" ? "Extern" : "";
+  const label = type === "intern" ? "Member" : type === "extern" ? "Extern" : "";
   badge.hidden = !label;
   badge.textContent = label;
   badge.dataset.type = type || "";
@@ -30,17 +30,21 @@ function renderBoardDetailOrigin(type) {
 
 
 /**
- * Updates the email link when the selected ticket changes.
- * @param {string} email - Optional address of the ticket creator.
+ * Selects the creator action without confusing creators and assignees.
+ * @param {Object|null} creator - Stored ticket creator.
  */
-function renderBoardCreatorEmail(email) {
+function renderBoardCreatorAction(creator) {
   const link = getElement("boardTaskDetailEmail");
+  const internal = creator?.type === "intern";
+  const email = creator?.email || "";
   link.hidden = !email;
+  link.dataset.action = internal ? "profile" : "email";
+  link.textContent = internal ? "Profil" : "E-mail";
   link.removeAttribute("href");
   link.removeAttribute("aria-label");
   if (!email) return;
-  link.href = "mailto:" + encodeURIComponent(email).replace("%40", "@");
-  link.setAttribute("aria-label", "E-mail: " + email);
+  link.href = internal ? "./contacts.html?creator=" + encodeURIComponent(email) : "mailto:" + encodeURIComponent(email).replace("%40", "@");
+  link.setAttribute("aria-label", `${internal ? "Profil" : "E-mail"}: ${creator.name || email}`);
 }
 
 
@@ -124,10 +128,7 @@ async function renderBoardEditAssignees(assignedTo) {
   boardDetailContacts = await loadSortedContactsSafely();
   container.innerHTML = boardDetailContacts.length
     ? boardDetailContacts
-        .map((contact) => getAssigneeOptionViewData(
-          contact,
-          isBoardAssigneeSelected(contact, assignedTo),
-        ))
+        .map((contact) => getBoardAssigneeOption(contact, assignedTo))
         .map(getBoardEditAssigneeTemplate)
         .join("")
     : '<span class="board-detail-empty">No contacts available.</span>';
@@ -255,4 +256,15 @@ function fillBoardDetailCategory(category) {
   const badge = getElement("boardTaskDetailCategory");
   badge.textContent = formatBoardCategory(category);
   badge.dataset.category = getBoardCategoryClass(category);
+}
+
+
+/**
+ * Creates an assignee option while preserving its selected state.
+ * @param {Object} contact - Available contact.
+ * @param {Array|string} assignedTo - Current task assignments.
+ * @returns {Object} Option view data.
+ */
+function getBoardAssigneeOption(contact, assignedTo) {
+  return getAssigneeOptionViewData(contact, isBoardAssigneeSelected(contact, assignedTo));
 }

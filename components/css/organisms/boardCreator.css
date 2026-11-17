@@ -1,0 +1,53 @@
+/* Creator-specific styles share the existing dialog layout. */
+.board-detail-creator .board-detail-origin {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 4px;
+  color: #0b3681;
+  font: 400 16px/1.2 "Join Open Sans", Arial, sans-serif;
+}
+.board-detail-creator .board-detail-origin[hidden] { display: none; }
+.board-detail-creator .board-detail-origin[data-type="intern"] { background: #9eebbc; }
+.board-detail-origin[data-type="intern"]::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  background: #0b3681;
+  mask: url("../../assets/img/icons/team-members.svg") center / contain no-repeat;
+}
+#boardTaskDetailEmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  margin-left: auto;
+  color: #42526e;
+  font: 400 16px/1.2 "Join Open Sans", Arial, sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 100ms ease, border-color 100ms ease;
+}
+#boardTaskDetailEmail[hidden] { display: none; }
+#boardTaskDetailEmail::before {
+  content: "";
+  width: 18px;
+  height: 16px;
+  flex: none;
+  background: url("../../assets/img/icons/send-email.svg") center no-repeat;
+}
+#boardTaskDetailEmail[data-action="profile"]::before {
+  width: 24px;
+  height: 24px;
+  background: #4589ff;
+  mask: url("../../assets/img/icons/person.svg") center no-repeat;
+}
+#boardTaskDetailEmail:hover { background-color: #e3eeff; }
+#boardTaskDetailEmail:active { background-color: transparent; border-color: #d2e3ff; }
+#boardTaskDetailEmail:focus-visible { outline: 2px solid #4589ff; outline-offset: 2px; }
+#boardTaskDetailCreator { min-width: 0; overflow-wrap: anywhere; }

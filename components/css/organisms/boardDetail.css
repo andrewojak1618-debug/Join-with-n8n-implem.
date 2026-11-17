@@ -1,3 +1,6 @@
+@import url("./boardCreator.css");
+@import url("./boardAiNote.css");
+
 .board-detail-overlay {
   position: fixed;
   inset: 0;
@@ -14,11 +17,11 @@
 
 .board-detail-card {
   width: min(100%, 528px);
-  max-height: min(90vh, 720px);
+  max-height: calc(100dvh - 48px);
   overflow-y: auto;
   position: relative;
   display: grid;
-  gap: 18px;
+  gap: 24px;
   padding: 48px 40px;
   border-radius: 30px;
   background: var(--color-white);
@@ -79,12 +82,6 @@
   padding-right: 28px;
 }
 
-.board-detail-ai {
-  color: #6554ac;
-  font-size: 16px;
-}
-
-.board-detail-ai::before,
 .board-detail-origin[data-type="extern"]::before {
   content: "";
   display: inline-block;
@@ -92,11 +89,6 @@
   margin-inline-end: 4px;
 }
 
-.board-detail-ai::before {
-  width: 22px;
-  height: 22px;
-  background: url("../../assets/img/icons/magic_wand.svg") center / contain no-repeat;
-}
 
 .board-detail-origin[data-type="extern"]::before {
   width: 14px;
@@ -224,7 +216,7 @@
 .board-detail-edit-form {
   min-width: 0;
   display: grid;
-  gap: 18px;
+  gap: 24px;
 }
 
 .board-detail-view[hidden],
@@ -368,6 +360,7 @@
   }
 
   .board-detail-card {
+    max-height: calc(100dvh - 32px);
     padding: 24px;
   }
 

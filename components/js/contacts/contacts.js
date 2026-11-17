@@ -14,12 +14,9 @@ async function initContacts() {
     showAccountContactError,
     () => showTimedFeedback("contactToast", "Contacts could not be loaded."),
   );
-  const groups = groupContactsByLetter(sortContactsByName(activeContacts));
-  contactsList.innerHTML = Object.keys(groups)
-    .map((letter) => getContactGroupViewData(letter, groups[letter]))
-    .map(getContactGroupTemplate)
-    .join("");
+  renderContactGroups(contactsList);
   initContactDetails(activeContacts);
+  openRequestedCreator();
 }
 
 
@@ -334,4 +331,29 @@ function toggleContactMenu() {
 function closeContactMenu() {
   const actions = document.querySelector(".contacts-detail-actions");
   actions.classList.remove("contacts-detail-actions--open");
+}
+
+
+/**
+ * Opens the original creator's contact after following a ticket profile link.
+ */
+function openRequestedCreator() {
+  const email = new URLSearchParams(window.location.search).get("creator");
+  if (!email) return;
+  const contact = activeContacts.find((item) => item.email?.toLowerCase() === email.toLowerCase());
+  if (contact) return openContactDetail(contact.id);
+  showTimedFeedback("contactToast", "No contact profile found for this creator.");
+}
+
+
+/**
+ * Renders the grouped contacts into the existing list.
+ * @param {HTMLElement} contactsList - Contact list container.
+ */
+function renderContactGroups(contactsList) {
+  const groups = groupContactsByLetter(sortContactsByName(activeContacts));
+  contactsList.innerHTML = Object.keys(groups)
+    .map((letter) => getContactGroupViewData(letter, groups[letter]))
+    .map(getContactGroupTemplate)
+    .join("");
 }

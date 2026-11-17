@@ -1,0 +1,41 @@
+@font-face {
+  font-family: "Join Inter";
+  src: url("../../assets/fonts/inter-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.board-detail-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 400 14px/1.2 "Join Inter", Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.board-detail-ai[hidden] {
+  display: none;
+}
+
+.board-detail-ai span {
+  color: #9327ff;
+  background: linear-gradient(90deg, #9327ff, #2ea1dc);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.board-detail-ai::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  flex: none;
+  background: url("../../assets/img/icons/magic_wand.svg") center no-repeat;
+}
+
+@media (max-width: 767px) {
+  .board-detail-ai {
+    font: 400 16px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+}

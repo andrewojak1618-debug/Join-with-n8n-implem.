@@ -177,7 +177,8 @@ function showEditedContactFeedback(accountNameSynced) {
   const message = accountNameSynced
     ? "Contact successfully edited"
     : "Contact edited, but the account name could not be synchronized.";
-  showTimedFeedback("contactToast", message);
+  if (accountNameSynced) showContactSuccess(message);
+  else showTimedFeedback("contactToast", message);
 }
 
 
@@ -250,7 +251,7 @@ async function createContactRecord(values) {
   await initContacts();
   openContactDetail(newContact.id);
   closeContactAddDialog();
-  showTimedFeedback("contactToast", "Contact successfully created");
+  showContactSuccess("Contact successfully created");
 }
 
 
@@ -270,4 +271,22 @@ function getRandomContactColor() {
  */
 function setSubmitButtonDisabled(form, isDisabled) {
   form.querySelector('button[type="submit"]').disabled = isDisabled;
+}
+
+
+/**
+ * Presents successful contact saves with the Figma overlay timing.
+ * @param {string} message - The completed contact operation.
+ */
+function showContactSuccess(message) {
+  const element = getElement("contactSuccessToast");
+  if (!element) return;
+  element.textContent = message;
+  element.hidden = false;
+  element.getAnimations().forEach((animation) => animation.cancel());
+  element.animate([{ transform: "translate(-50%, 50vh)"},
+    { transform: "translate(-50%, -50%)"}],
+    { delay: 100, duration: 200, easing: "ease-in", fill: "backwards"});
+  clearTimeout(element.hideTimer);
+  element.hideTimer = setTimeout(() => (element.hidden = true), 1100);
 }

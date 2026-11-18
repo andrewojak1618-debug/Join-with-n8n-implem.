@@ -6,7 +6,7 @@
   aria-labelledby="contactEditTitle"
   hidden
 >
-  <article class="contacts-dialog">
+  <article class="contacts-dialog contacts-dialog--edit contacts-dialog--vertical">
     <button
       class="contacts-dialog-close"
       type="button"
@@ -18,6 +18,7 @@
     <div class="contacts-dialog-side">
       <img src="./components/assets/img/icons/Join logo vector.svg" alt="" />
       <h2 id="contactEditTitle" class="contacts-dialog-accent">Edit contact</h2>
+      <p class="contacts-dialog-subtitle contacts-edit-mobile-subtitle">Tasks are better with a team!</p>
     </div>
     <div class="contacts-dialog-body">
       <span class="contacts-dialog-avatar" id="contactEditAvatar"></span>
@@ -76,9 +77,9 @@
           >
             Delete
           </button>
-          <button class="contacts-dialog-primary" type="submit">
+          <button class="primary-check" type="submit">
             Save
-            <img src="./components/assets/img/icons/check_icon.svg" alt="" />
+            <span class="primary-check-icon" aria-hidden="true"></span>
           </button>
         </div>
       </form>

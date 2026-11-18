@@ -1,3 +1,5 @@
+@import url("./contactVerticalDialog.css");
+
 .contacts-dialog {
   position: relative;
   display: flex;
@@ -114,16 +116,6 @@
   gap: 16px;
 }
 
-.contacts-dialog-primary {
-  min-height: 50px;
-  padding: 0 24px;
-  border-radius: 10px;
-  background: var(--color-primary-auth);
-  color: var(--color-white);
-  font-size: 21px;
-  font-weight: 700;
-  transition: background-color 100ms ease;
-}
 
 .contacts-dialog-secondary {
   min-height: 50px;
@@ -156,7 +148,6 @@
   margin: 0 0 80px;
 }
 
-.contacts-dialog-primary,
 .contacts-dialog-secondary {
   display: flex;
   align-items: center;
@@ -192,9 +183,6 @@
 }
 
 @media (hover: hover) {
-  .contacts-dialog-primary:hover {
-    background: var(--color-primary-hover);
-  }
 
   .contacts-dialog-secondary:hover {
     color: var(--color-primary-hover);
@@ -202,19 +190,12 @@
   }
 }
 
-.contacts-dialog-primary:active {
-  background: var(--color-primary-hover);
-}
 
 .contacts-dialog-secondary:active {
   color: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
 }
 
-.contacts-dialog-primary:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
 
 @media (max-width: 1023px) {
   .contacts-dialog {

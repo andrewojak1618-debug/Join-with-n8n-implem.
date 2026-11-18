@@ -1,0 +1,208 @@
+@media (max-width: 1279px) {
+  #contactAddFab {
+    width: 64px;
+    height: 64px;
+    right: 24px;
+    bottom: calc(var(--app-bottom-nav-height) + 20px);
+    border: 1px solid #1268ff;
+    border-radius: 10px;
+    background: #1268ff;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
+  }
+
+  #contactAddFab img {
+    width: 32px;
+    height: 32px;
+  }
+
+  #contactAddFab:hover {
+    background: #005dff;
+  }
+
+  #contactAddFab:active {
+    background: #005dff;
+    transform: none;
+  }
+
+  .contacts-list .contacts-item-info {
+    flex: 1;
+  }
+
+  .contacts-list .contacts-item-name {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 1279px) {
+  .contacts-content > .contacts-detail {
+    padding: 64px 16px 32px;
+    background: #fff;
+    color: #000;
+    font: 400 16px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+
+  .contacts-detail > .contacts-heading {
+    display: none;
+  }
+
+  #contactDetail:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    gap: 21px;
+  }
+
+  .contacts-detail .contacts-detail-subheading {
+    order: -1;
+    margin: 0;
+    padding-right: 40px;
+    font: 700 20px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+
+  .contacts-detail .contacts-detail-header {
+    margin: 0;
+    gap: 20px;
+  }
+
+  .contacts-detail .contacts-detail-avatar {
+    --avatar-size: 80px;
+  }
+
+  .contacts-detail .contacts-detail-title {
+    min-width: 0;
+  }
+
+  .contacts-detail .contacts-detail-name {
+    overflow-wrap: anywhere;
+    font: 400 33px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+
+  .contacts-detail .contacts-detail-info {
+    display: grid;
+    gap: 15px;
+  }
+
+  .contacts-detail-info > p {
+    margin: 0;
+  }
+
+  #contactBackButton {
+    top: 64px;
+    right: 16px;
+  }
+
+  #contactMenuFab {
+    width: 64px;
+    height: 64px;
+    right: 23px;
+    bottom: calc(var(--app-bottom-nav-height) + 20px);
+    border: 1px solid #1268ff;
+    border-radius: 10px;
+    background: #1268ff;
+    box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+  }
+
+  #contactMenuFab img {
+    width: 32px;
+    height: 32px;
+  }
+
+  #contactMenuFab:hover,
+  #contactMenuFab:active {
+    background: #005dff;
+    transform: none;
+  }
+
+  .contacts-detail .contacts-detail-actions--open {
+    animation: contactOptionsEnter 100ms ease-out;
+  }
+}
+
+@keyframes contactOptionsEnter {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contacts-detail .contacts-detail-actions--open {
+    animation: none;
+  }
+}
+
+@media (max-width: 1279px) {
+  .contacts-detail .contacts-detail-actions--open {
+    width: 116px;
+    height: 100px;
+    padding: 10px;
+    gap: 0;
+    box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+  }
+
+  .contacts-detail .contacts-detail-action {
+    width: 96px;
+    height: 40px;
+    flex-shrink: 0;
+    padding: 8px;
+    gap: 8px;
+    border-radius: 8px;
+    color: #2a3647;
+    font: 400 16px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+
+  .contacts-detail-action img {
+    display: none;
+  }
+
+  .contacts-detail-action::before {
+    content: "";
+    flex: 0 0 24px;
+    height: 24px;
+    background: var(--contact-action-icon-color);
+    mask: var(--contact-action-icon) center / 24px 24px no-repeat;
+  }
+
+  #contactEditButton {
+    --contact-action-icon-color: #4589ff;
+    --contact-action-icon: url("../../assets/img/icons/edit.svg");
+  }
+
+  #contactDeleteButton {
+    --contact-action-icon-color: #1268ff;
+    --contact-action-icon: url("../../assets/img/icons/delete.svg");
+  }
+
+  .contacts-detail :is(#contactEditButton, #contactDeleteButton):is(:hover, :active, :focus-visible) {
+    --contact-action-icon-color: #005dff;
+    background: #e3eeff;
+    color: #005dff;
+    font-weight: 700;
+  }
+}
+
+
+@media (max-width: 1279px) {
+  #contactBackButton {
+    width: 32px;
+    height: 32px;
+    border-radius: 42px;
+    color: #005dff;
+  }
+
+  #contactBackButton img {
+    display: none;
+  }
+
+  #contactBackButton::before {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 32px;
+    background: currentColor;
+    mask: url("../../assets/img/icons/arrow_left_contact_detail.svg") center / contain no-repeat;
+  }
+
+  #contactBackButton:is(:hover, :active, :focus-visible) {
+    opacity: 1;
+    background: #e3eeff;
+  }
+}

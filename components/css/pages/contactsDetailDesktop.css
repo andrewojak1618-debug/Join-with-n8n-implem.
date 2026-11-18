@@ -1,0 +1,109 @@
+@font-face {
+  font-family: "Join Inter";
+  src: url("../../assets/fonts/inter-medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Join Open Sans";
+  src: url("../../assets/fonts/open-sans-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@media (min-width: 1280px) {
+  .contacts-content > .contacts-detail {
+    padding: 72px 55px;
+    overflow-y: auto;
+    background: var(--color-white);
+    color: var(--color-black);
+    font: 400 16px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+
+  .contacts-detail .contacts-heading {
+    display: none;
+  }
+
+  #contactDetail:not([hidden]) {
+    display: grid;
+    gap: 21px;
+  }
+
+  .contacts-detail .contacts-detail-header {
+    margin: 0;
+    gap: 54px;
+  }
+
+  .contacts-detail .contacts-detail-title {
+    min-width: 0;
+  }
+
+  .contacts-detail .contacts-detail-avatar,
+  .contacts-detail .contacts-detail-name {
+    font: 500 47px/1.2 "Join Inter", Arial, sans-serif;
+    overflow-wrap: anywhere;
+  }
+
+  .contacts-detail .contacts-detail-subheading {
+    margin: 0;
+    font: 700 23px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+
+  .contacts-detail .contacts-detail-info {
+    display: grid;
+    gap: 15px;
+  }
+
+  .contacts-detail .contacts-detail-info p {
+    margin: 0;
+  }
+
+  .contacts-detail .contacts-detail-action {
+    color: var(--color-text-auth);
+  }
+
+  .contacts-detail .contacts-detail-action:hover {
+    color: #1268ff;
+  }
+}
+
+@media (min-width: 1280px) {
+  .contacts-detail .contacts-detail-action {
+    height: 24px;
+    gap: 8px;
+    font: 400 16px/1.2 "Join Open Sans", Arial, sans-serif;
+  }
+
+  .contacts-detail-action img {
+    display: none;
+  }
+
+  .contacts-detail-action::before {
+    content: "";
+    flex: 0 0 24px;
+    height: 24px;
+    background: var(--contact-action-icon-color);
+    mask: var(--contact-action-icon) center / 24px 24px no-repeat;
+  }
+
+  #contactEditButton {
+    --contact-action-icon-color: #4589ff;
+    --contact-action-icon: url("../../assets/img/icons/edit.svg");
+    min-width: 63px;
+  }
+
+  #contactDeleteButton {
+    --contact-action-icon-color: #1268ff;
+    --contact-action-icon: url("../../assets/img/icons/delete.svg");
+    min-width: 81px;
+  }
+
+  .contacts-detail :is(#contactEditButton, #contactDeleteButton):is(:hover, :active, :focus-visible) {
+    --contact-action-icon-color: #005dff;
+    color: #005dff;
+    font-weight: 700;
+  }
+}

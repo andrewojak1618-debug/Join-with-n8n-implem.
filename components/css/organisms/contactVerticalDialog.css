@@ -1,0 +1,198 @@
+.contacts-dialog.contacts-dialog--vertical {
+  flex-direction: column;
+  width: min(584px, calc(100vw - 32px));
+  height: min(1024px, calc(100dvh - 32px));
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  font-family: "Join Open Sans", Arial, sans-serif;
+}
+
+.contacts-dialog--vertical .contacts-dialog-side {
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: var(--contact-header-padding, 91px) 46px;
+  border-radius: 30px 30px 0 0;
+  background: #005dff;
+  text-align: center;
+}
+
+.contacts-dialog--vertical .contacts-dialog-side img {
+  display: block;
+  width: 55px;
+  filter: brightness(0) invert(1);
+}
+
+.contacts-dialog--vertical .contacts-dialog-side h2 {
+  font: 700 48px/1.2 "Join Open Sans", Arial, sans-serif;
+  white-space: normal;
+}
+
+.contacts-dialog--vertical .contacts-dialog-subtitle {
+  font: 400 27px/1.2 "Join Open Sans", Arial, sans-serif;
+  white-space: normal;
+}
+
+.contacts-dialog--vertical .contacts-dialog-accent::after {
+  display: none;
+}
+
+.contacts-dialog--vertical .contacts-dialog-close {
+  top: 24px;
+  right: 24px;
+  color: var(--color-white);
+}
+
+.contacts-dialog--vertical .contacts-dialog-body {
+  flex: none;
+  flex-direction: column;
+  gap: 32px;
+  padding: 72px 16px;
+  border-radius: 0 0 30px 30px;
+}
+
+.contacts-dialog--vertical .contacts-dialog-avatar {
+  --avatar-size: 120px;
+  margin: 0;
+}
+
+.contacts-dialog--vertical .contacts-dialog-form {
+  flex: none;
+  width: 100%;
+  max-width: 422px;
+  gap: 24px;
+}
+
+.contacts-dialog--vertical .contacts-dialog-field {
+  margin: 0;
+}
+
+.contacts-dialog--vertical .contacts-dialog-field input {
+  height: 48px;
+  border: 0;
+  border-bottom: 1px solid #d1d1d1;
+  border-radius: 0;
+  font: 400 19px/1.2 "Join Open Sans", Arial, sans-serif;
+}
+
+.contacts-dialog--vertical .contacts-dialog-field input:focus {
+  outline: none;
+  border-bottom-color: #4589ff;
+}
+
+.contacts-dialog--vertical .contacts-dialog-field input[aria-invalid="true"] {
+  border-bottom-color: var(--color-error);
+}
+
+.contacts-dialog--vertical .contacts-dialog-field-error {
+  top: 48px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.contacts-dialog--vertical .contacts-dialog-error:empty {
+  display: none;
+}
+
+.contacts-dialog--vertical .contacts-dialog-actions {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .contacts-dialog--vertical .contacts-dialog-side {
+    padding: 56px 20px;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-side h2 {
+    font-size: 40px;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-subtitle {
+    font-size: 20px;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-body {
+    padding: 40px 16px;
+  }
+}
+
+.contacts-dialog--edit {
+  --contact-header-padding: 108px;
+}
+
+.contacts-success-toast {
+  position: fixed;
+  z-index: 30;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: min(326px, calc(100vw - 32px));
+  min-height: 74px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 20px;
+  background: #1268ff;
+  color: white;
+  font: 400 23px/1.2 "Join Open Sans", Arial, sans-serif;
+  text-align: center;
+  box-shadow: 0 0 4px rgb(0 0 0 / 15%), 0 0 4px rgb(0 0 0 / 10%);
+  pointer-events: none;
+}
+
+.contacts-success-toast[hidden] {
+  display: none;
+}
+.contacts-edit-mobile-subtitle {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .contacts-dialog.contacts-dialog--vertical {
+    height: min(760px, calc(100dvh - 32px));
+    box-shadow: 0 0 4px rgb(0 0 0 / 31%);
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-side {
+    height: 328px;
+    padding: 66px 20px;
+    justify-content: center;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-side img {
+    display: none;
+  }
+
+  .contacts-dialog--edit .contacts-edit-mobile-subtitle {
+    display: block;
+    margin: 0;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-body {
+    padding: 0 16px 58px;
+    gap: 32px;
+    overflow: visible;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-avatar {
+    position: relative;
+    margin-top: -60px;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-form {
+    gap: 8px;
+  }
+
+  .contacts-dialog--vertical .contacts-dialog-actions {
+    margin-top: 64px;
+  }
+}
+
+@media (max-width: 600px) {
+  .contacts-dialog--vertical .contacts-dialog-field:has(input[aria-invalid="true"]) {
+    margin-bottom: 16px;
+  }
+}

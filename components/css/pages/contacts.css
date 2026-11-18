@@ -1,3 +1,6 @@
+@import url("./contactsMobile.css");
+@import url("./contactsDetailDesktop.css");
+
 .contacts-shell {
   height: 100vh;
 }
@@ -22,28 +25,24 @@
   overflow-y: auto;
 }
 
-.contacts-add-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+.contacts-add-button.primary-check {
+  flex: none;
+  align-self: center;
+  width: 357px;
+  max-width: 100%;
+  height: 56px;
   min-height: 56px;
-  padding: 0 16px;
-  color: var(--color-white);
-  background: var(--color-primary-auth);
-  border-radius: 10px;
-  font-size: 21px;
-  font-weight: 700;
-  transition: background-color 100ms ease;
+  padding: 0 10px;
+  gap: 10px;
+  line-height: 1.2;
 }
 
-.contacts-add-button:hover {
-  background: var(--color-primary-hover);
-}
-
-.contacts-add-button img {
-  width: 24px;
-  filter: brightness(0) invert(1);
+.contacts-add-icon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  background-color: currentColor;
+  mask: url("../../assets/img/icons/person_add_detail_view.svg") center / contain no-repeat;
 }
 
 .contacts-detail {
@@ -101,6 +100,7 @@
 }
 
 .contacts-item {
+  background: var(--color-white);
   display: flex;
   align-items: center;
   gap: 35px;
@@ -111,15 +111,15 @@
 }
 
 .contacts-item:hover {
-  background: var(--color-background-soft);
+  background: #d2e3ff;
 }
 
 .contacts-item--active,
 .contacts-item--active:hover {
-  background: var(--color-primary-auth);
+  background: #1268ff;
 }
 
-.contacts-item--active .contacts-item-name {
+.contacts-item--active :is(.contacts-item-name, .contacts-item-email) {
   color: var(--color-white);
 }
 
@@ -384,17 +384,17 @@
     z-index: 5;
   }
 
-  .contacts-add-button {
+  .contacts-add-button.primary-check {
     display: none;
   }
 }
 
 @media (max-width: 479px) {
   .contacts-item-name__full {
-    display: none;
+    display: inline;
   }
 
   .contacts-item-name__short {
-    display: inline;
+    display: none;
   }
 }

@@ -1,8 +1,8 @@
 <section class="contacts-content">
   <aside class="contacts-list-panel">
-    <button class="contacts-add-button" type="button" id="contactAddButton">
+    <button class="contacts-add-button primary-check" type="button" id="contactAddButton">
       Add new contact
-      <img src="./components/assets/img/icons/person.svg" alt="" />
+      <span class="contacts-add-icon" aria-hidden="true"></span>
     </button>
     <ul class="contacts-list" id="contactsList"></ul>
     <button class="contacts-fab" type="button" id="contactAddFab" aria-label="Add new contact">
@@ -52,3 +52,4 @@
 <div data-include="./components/html/organisms/contactEditDialog.html"></div>
 <div data-include="./components/html/organisms/contactAddDialog.html"></div>
 <p class="contacts-toast" id="contactToast" role="status" aria-live="polite" hidden></p>
+<p class="contacts-success-toast" id="contactSuccessToast" role="status" aria-live="polite" hidden></p>

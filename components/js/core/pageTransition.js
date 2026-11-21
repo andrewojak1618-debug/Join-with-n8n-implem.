@@ -16,18 +16,19 @@ async function renderSignupWithTransition() {
     await renderCurrentPage({ animate: true });
     await wait(signupTransition.exitDelay);
   } finally {
-    finishSignupTransition(loader);
+    await finishSignupTransition(loader);
   }
 }
 
 
 /**
- * Removes the loader, cleans the URL and unlocks navigation again.
+ * Removes the loader before unlocking navigation and announcing completion.
  * @param {HTMLElement} loader - The active transition loader element.
  */
-function finishSignupTransition(loader) {
-  removeTransitionLoader(loader);
+async function finishSignupTransition(loader) {
+  await removeTransitionLoader(loader);
   pageTransitionRunning = false;
+  document.dispatchEvent(new Event("join:login-transition-end"));
 }
 
 
@@ -46,12 +47,11 @@ function showTransitionLoader(loader) {
  * Fades the loader out and unlocks scrolling after the exit animation.
  * @param {HTMLElement} loader - The transition loader element to remove.
  */
-function removeTransitionLoader(loader) {
+async function removeTransitionLoader(loader) {
   loader.classList.add("is-leaving");
-  setTimeout(() => {
-    loader.remove();
-    setTransitionOverflow(false);
-  }, 180);
+  await Promise.allSettled(loader.getAnimations().map((animation) => animation.finished));
+  loader.remove();
+  setTransitionOverflow(false);
 }
 
 

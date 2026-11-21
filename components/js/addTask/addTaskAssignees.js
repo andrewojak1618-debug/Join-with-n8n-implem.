@@ -179,7 +179,10 @@ function filterAssigneeOptions() {
 }
 
 
-/** Prevents submitting a search and returns focus to the trigger on Escape. */
+/**
+ * Prevents submitting a search and returns focus to the trigger on Escape.
+ * @param {KeyboardEvent} event - Keyboard interaction within the assignee dropdown.
+ */
 function handleAssigneeSearchKey(event) {
   if (getElement("taskAssigneesSearch").hidden) return;
   if (event.key === "Enter" && event.target.id === "taskAssigneesSearch") event.preventDefault();

@@ -862,7 +862,7 @@
     },
     {
       "parameters": {
-        "jsCode": "/** Gibt genau einen reservierten Platz frei und aktualisiert die Mail im selben versionsgeschützten Commit. */\nreturn $input.all().map((item, index) => {\n  const counter = item.json;\n  const failure = $('KI-Fehler vorbereiten').itemMatching(index).json;\n  const count = Number(counter.fields?.reservedCount?.integerValue);\n  if (!Number.isSafeInteger(count) || count < 1 || failure.quota?.state !== 'reserved') {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Reservierung oder Zähler ungültig.');\n  }\n  if (counter.name !== failure.quota.counterName || !counter.updateTime || !failure.reservationUpdateTime) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Dokumentversion fehlt.');\n  }\n  return { json: { ...failure, commit: { writes: [\n    { update: { name: counter.name, fields: { reservedCount: { integerValue: String(count - 1) } } },\n      updateMask: { fieldPaths: ['reservedCount'] }, currentDocument: { updateTime: counter.updateTime } },\n    { update: { name: failure.reservation.name, fields: {\n        status: { stringValue: 'failed' }, quotaState: { stringValue: 'released' },\n        failedAt: { timestampValue: failure.failedAt }, errorMessage: { stringValue: failure.errorMessage }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'failedAt', 'errorMessage'] },\n      currentDocument: { updateTime: failure.reservationUpdateTime } }\n  ] } }, pairedItem: { item: index } };\n});"
+        "jsCode": "/** Builds one version-protected release per linked mail. */\nreturn $input.all().map((item, index) => prepareRelease(item.json, index));\n\n\n/**\n * Preserves item linking and the failure-specific mail status.\n * @param {Object} counter - Current daily counter document.\n * @param {number} index - Input item index.\n * @returns {Object} Linked failure with its atomic release commit.\n */\nfunction prepareRelease(counter, index) {\n  const failure = $('Freigabedaten bereitstellen').itemMatching(index).json;\n  const count = Number(counter.fields?.reservedCount?.integerValue);\n  validateRelease(counter, failure, count);\n  const writes = [counterWrite(counter, count), reservationWrite(failure)];\n  return { json: { ...failure, commit: { writes } }, pairedItem: { item: index } };\n}\n\n\n/**\n * Rejects invalid or already released reservations before creating writes.\n * @param {Object} counter - Current daily counter document.\n * @param {Object} failure - Linked failure context.\n * @param {number} count - Reserved slot count.\n */\nfunction validateRelease(counter, failure, count) {\n  if (!Number.isSafeInteger(count) || count < 1 || failure.quota?.state !== 'reserved') {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Reservierung oder Zähler ungültig.');\n  }\n  if (counter.name !== failure.quota.counterName || !counter.updateTime || !failure.reservationUpdateTime) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Dokumentversion fehlt.');\n  }\n  if (!failure.reservation?.name || !['failed', 'manual_review'].includes(failure.status)) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Mailreservierung oder Fehlerstatus ungültig.');\n  }\n}\n\n\n/**\n * Decrements only the reserved count at the version that was read.\n * @param {Object} counter - Current daily counter document.\n * @param {number} count - Reserved slot count.\n * @returns {Object} Version-protected counter update.\n */\nfunction counterWrite(counter, count) {\n  return {\n    update: { name: counter.name, fields: { reservedCount: { integerValue: String(count - 1) } } },\n    updateMask: { fieldPaths: ['reservedCount'] },\n    currentDocument: { updateTime: counter.updateTime }\n  };\n}\n\n\n/**\n * Marks the same mail reservation released in the atomic commit.\n * @param {Object} failure - Linked failure context and target status.\n * @returns {Object} Version-protected reservation update.\n */\nfunction reservationWrite(failure) {\n  const fields = {\n    status: { stringValue: failure.status }, quotaState: { stringValue: 'released' },\n    failedAt: { timestampValue: failure.failedAt }, errorMessage: { stringValue: failure.errorMessage }\n  };\n  return { update: { name: failure.reservation.name, fields },\n    updateMask: { fieldPaths: Object.keys(fields) },\n    currentDocument: { updateTime: failure.reservationUpdateTime } };\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -983,7 +983,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={{ {\n  ...$json,\n  reservationUpdateTime: $json.reservation.updateTime,\n  failedAt: $now.toUTC().toISO(),\n  errorMessage: $json.validation.errors.join('; ')\n} }}",
+        "jsonOutput": "={{ {\n  ...$json,\n  status: 'manual_review',\n  reservationUpdateTime: $json.reservation.updateTime,\n  failedAt: $now.toUTC().toISO(),\n  errorMessage: $json.validation.errors.join('; ')\n} }}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -994,36 +994,6 @@
       ],
       "id": "a15c131d-256c-48b4-ba98-fa106f1fb5fa",
       "name": "Ungültige Ticketdaten vorbereiten"
-    },
-    {
-      "parameters": {
-        "method": "=GET",
-        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json.quota.counterName }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.5,
-      "position": [
-        3088,
-        -288
-      ],
-      "id": "82330ef5-ac29-433c-a76c-ca3297a80e7b",
-      "name": "Tageszähler für ungültige Daten lesen"
-    },
-    {
-      "parameters": {
-        "jsCode": "/** Gibt genau einen reservierten Platz frei und aktualisiert die Mail im selben versionsgeschützten Commit. */\nreturn $input.all().map((item, index) => {\n  const counter = item.json;\n  const failure = $('Ungültige Ticketdaten vorbereiten').itemMatching(index).json;\n  const count = Number(counter.fields?.reservedCount?.integerValue);\n  if (!Number.isSafeInteger(count) || count < 1 || failure.quota?.state !== 'reserved') {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Reservierung oder Zähler ungültig.');\n  }\n  if (counter.name !== failure.quota.counterName || !counter.updateTime || !failure.reservationUpdateTime) {\n    throw new Error('Tagesplatz kann nicht freigegeben werden: Dokumentversion fehlt.');\n  }\n  return { json: { ...failure, commit: { writes: [\n    { update: { name: counter.name, fields: { reservedCount: { integerValue: String(count - 1) } } },\n      updateMask: { fieldPaths: ['reservedCount'] }, currentDocument: { updateTime: counter.updateTime } },\n    { update: { name: failure.reservation.name, fields: {\n        status: { stringValue: 'manual_review' }, quotaState: { stringValue: 'released' },\n        failedAt: { timestampValue: failure.failedAt }, errorMessage: { stringValue: failure.errorMessage }\n      } }, updateMask: { fieldPaths: ['status', 'quotaState', 'failedAt', 'errorMessage'] },\n      currentDocument: { updateTime: failure.reservationUpdateTime } }\n  ] } }, pairedItem: { item: index } };\n});"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3312,
-        -288
-      ],
-      "id": "0dcbf2f5-2b6d-44bf-a85f-73974eff4597",
-      "name": "Ungültige Daten freigeben vorbereiten"
     },
     {
       "parameters": {
@@ -2103,6 +2073,55 @@
       ],
       "id": "f028c87b-733b-415e-8dfc-dcb40e62ae53",
       "name": "Mail bei KI-Fehler markieren – Fehler speichern"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2192,
+        -16
+      ],
+      "id": "73cd323f-d568-4802-a8f4-a44b60960984",
+      "name": "Freigabedaten bereitstellen"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "2a45f433-ab53-4a7a-b349-6329b3a4b87d",
+              "leftValue": "={{ $json.status === 'failed' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        2640,
+        -16
+      ],
+      "id": "dbe7c07a-e31d-415e-b373-c2cfa6b788fa",
+      "name": "Freigabe für KI-Fehler?"
     }
   ],
   "connections": {
@@ -2270,7 +2289,7 @@
       "main": [
         [
           {
-            "node": "Tageszähler für Freigabe lesen",
+            "node": "Freigabedaten bereitstellen",
             "type": "main",
             "index": 0
           }
@@ -2477,7 +2496,7 @@
       "main": [
         [
           {
-            "node": "Tagesplatz freigeben und KI-Fehler speichern",
+            "node": "Freigabe für KI-Fehler?",
             "type": "main",
             "index": 0
           }
@@ -2521,29 +2540,7 @@
       "main": [
         [
           {
-            "node": "Tageszähler für ungültige Daten lesen",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tageszähler für ungültige Daten lesen": {
-      "main": [
-        [
-          {
-            "node": "Ungültige Daten freigeben vorbereiten",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ungültige Daten freigeben vorbereiten": {
-      "main": [
-        [
-          {
-            "node": "Tagesplatz bei ungültigen Daten freigeben",
+            "node": "Freigabedaten bereitstellen",
             "type": "main",
             "index": 0
           }
@@ -3101,6 +3098,35 @@
         [
           {
             "node": "Fehler der manuellen Rückmeldung speichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Freigabedaten bereitstellen": {
+      "main": [
+        [
+          {
+            "node": "Tageszähler für Freigabe lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Freigabe für KI-Fehler?": {
+      "main": [
+        [
+          {
+            "node": "Tagesplatz freigeben und KI-Fehler speichern",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tagesplatz bei ungültigen Daten freigeben",
             "type": "main",
             "index": 0
           }

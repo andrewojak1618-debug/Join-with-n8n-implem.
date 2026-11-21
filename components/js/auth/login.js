@@ -53,8 +53,8 @@ function showSignupSuccessMessage() {
  */
 function showSignupSuccessAfterTransition(feedback) {
   if (!isSignupTransitionRunning()) return revealSignupSuccessMessage(feedback);
-  const delay = signupTransition.exitDelay + 180;
-  setTimeout(() => revealSignupSuccessMessage(feedback), delay);
+  document.addEventListener("join:login-transition-end",
+    () => revealSignupSuccessMessage(feedback), { once: true });
 }
 
 

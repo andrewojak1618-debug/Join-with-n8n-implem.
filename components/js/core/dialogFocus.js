@@ -1,6 +1,7 @@
 /** Tracks keyboard focus while a Join dialog is open. */
 let activeDialogFocus = null;
 
+
 /**
  * Returns enabled tab stops in their current display order.
  * @param {HTMLElement} dialog - Dialog containing the controls.
@@ -12,6 +13,7 @@ function dialogTabStops(dialog) {
     control.getClientRects().length && getComputedStyle(control).visibility === "visible"
   );
 }
+
 
 /**
  * Moves focus into the dialog and remembers how to find its opener after a render.
@@ -25,6 +27,7 @@ function startDialogFocus(dialog, findOpener, close) {
   dialogTabStops(dialog)[0]?.focus();
 }
 
+
 /**
  * Restores focus after the matching dialog has closed.
  * @param {HTMLElement} dialog - Dialog being closed.
@@ -36,6 +39,7 @@ function finishDialogFocus(dialog) {
   document.removeEventListener("keydown", handleDialogFocusKey, true);
   findOpener()?.focus();
 }
+
 
 /**
  * Handles modal dismissal and wraps forward or backward keyboard navigation.

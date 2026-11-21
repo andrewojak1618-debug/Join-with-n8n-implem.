@@ -50,7 +50,7 @@ test("recognizes past, current and future Add Task due dates", () => {
 
 test("rejects an empty Add Task due date", () => {
   dueDateField.value = "";
-  assert.equal(context.getAddTaskDueDateError(), "Please select a due date.");
+  assert.equal(context.getAddTaskDueDateError(), "This field is required");
 });
 
 

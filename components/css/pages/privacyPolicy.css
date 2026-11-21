@@ -47,20 +47,14 @@
   margin: 12px 0 0;
 }
 
-.privacy-copy--en {
-  display: none;
-}
-
-.legal-page--english .privacy-copy--de {
+.privacy-copy--en,
+.legal-page--english .privacy-copy--de,
+.privacy-view[hidden] {
   display: none;
 }
 
 .legal-page--english .privacy-copy--en {
   display: grid;
-}
-
-.privacy-view[hidden] {
-  display: none;
 }
 
 .privacy-public-nav .summary-nav__icon svg {
@@ -75,42 +69,18 @@
   color: #e7e7e7;
 }
 
-.privacy-public-sidebar .summary-sidebar__footer {
+.privacy-public-sidebar .summary-sidebar__footer,
+body[data-page="privacy-policy"] .privacy-view--internal .summary-sidebar__footer,
+body[data-page="legal-notice"] .legal-view--internal .summary-sidebar__footer {
   gap: 0;
   padding-right: 0;
   padding-left: 0;
 }
 
 .privacy-public-sidebar .summary-sidebar__footer a,
-.privacy-public-sidebar
-  .summary-sidebar__footer
-  .summary-nav__item--active {
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0 48px;
-}
-
-body[data-page="privacy-policy"]
-  .privacy-view--internal
-  .summary-sidebar__footer,
-body[data-page="legal-notice"]
-  .legal-view--internal
-  .summary-sidebar__footer {
-  gap: 0;
-  padding-right: 0;
-  padding-left: 0;
-}
-
-body[data-page="privacy-policy"]
-  .privacy-view--internal
-  .summary-sidebar__footer
-  a,
-body[data-page="legal-notice"]
-  .legal-view--internal
-  .summary-sidebar__footer
-  a {
+.privacy-public-sidebar .summary-sidebar__footer .summary-nav__item--active,
+body[data-page="privacy-policy"] .privacy-view--internal .summary-sidebar__footer a,
+body[data-page="legal-notice"] .legal-view--internal .summary-sidebar__footer a {
   min-height: 48px;
   display: flex;
   align-items: center;
@@ -142,13 +112,7 @@ body[data-page="legal-notice"]
     gap: 35px;
   }
 
-  
-
-
-
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .summary-avatar {
+  body[data-page="privacy-policy"] .privacy-view--internal .summary-avatar {
     width: 56px;
     height: 56px;
     border-width: 3px;
@@ -170,17 +134,14 @@ body[data-page="legal-notice"]
   gap: 24px;
 }
 
-.privacy-mobile-back {
+.privacy-mobile-back,
+.privacy-internal-content .privacy-copy h2 {
   display: none;
 }
 
 .privacy-internal-content .privacy-copy {
   max-width: 1040px;
   gap: 36px;
-}
-
-.privacy-internal-content .privacy-copy h2 {
-  display: none;
 }
 
 .privacy-internal-content .privacy-copy article {
@@ -234,9 +195,7 @@ body[data-page="legal-notice"]
   }
 
   .privacy-public-sidebar .summary-sidebar__footer a,
-  .privacy-public-sidebar
-    .summary-sidebar__footer
-    .summary-nav__item--active {
+  .privacy-public-sidebar .summary-sidebar__footer .summary-nav__item--active {
     width: auto;
     min-height: 76px;
     height: 76px;
@@ -248,16 +207,15 @@ body[data-page="legal-notice"]
     white-space: nowrap;
   }
 
-  .privacy-public-sidebar
-    .summary-sidebar__footer
-    .summary-nav__item--active {
+  .privacy-public-sidebar .summary-sidebar__footer .summary-nav__item--active {
     border-radius: 16px;
     background-color: #091931;
   }
 }
 
 @media (max-width: 767px) {
-  .legal-page__header {
+  .legal-page__header,
+  .privacy-internal-header {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -274,51 +232,35 @@ body[data-page="legal-notice"]
     font-size: 47px;
   }
 
-  .privacy-internal-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .privacy-internal-content .privacy-copy h3 {
     font-size: 24px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .privacy-internal-content {
+  body[data-page="privacy-policy"] .privacy-view--internal .privacy-internal-content,
+  body[data-page="privacy-policy"] .privacy-view--external .privacy-internal-content {
     padding-top: 48px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .privacy-internal-content
-    h1 {
+  body[data-page="privacy-policy"] .privacy-view--internal .privacy-internal-content h1 {
     margin-bottom: 32px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .privacy-copy {
+  body[data-page="privacy-policy"] .privacy-view--internal .privacy-copy {
     gap: 24px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .privacy-copy
-    h3 {
+  body[data-page="privacy-policy"] .privacy-view--internal .privacy-copy h3,
+  body[data-page="privacy-policy"] .privacy-view--external .privacy-copy h3 {
     font-size: 27px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .summary-topbar__logo {
+  body[data-page="privacy-policy"] .privacy-view--internal .summary-topbar__logo,
+  body[data-page="privacy-policy"] .privacy-view--external .summary-topbar__logo {
     width: 32px;
     height: 39px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--internal
-    .summary-avatar {
+  body[data-page="privacy-policy"] .privacy-view--internal .summary-avatar {
     width: 40px;
     height: 40px;
     border-width: 3px;
@@ -343,55 +285,35 @@ body[data-page="legal-notice"]
     display: block;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--external
-    .privacy-internal-content {
-    padding-top: 48px;
-  }
-
-  body[data-page="privacy-policy"]
-    .privacy-view--external
-    .privacy-internal-content
-    h1 {
+  body[data-page="privacy-policy"] .privacy-view--external .privacy-internal-content h1 {
     margin-bottom: 32px;
     font-size: 47px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--external
-    .privacy-copy {
+  body[data-page="privacy-policy"] .privacy-view--external .privacy-copy {
     gap: 35px;
   }
 
-  body[data-page="privacy-policy"]
-    .privacy-view--external
-    .privacy-copy
-    h3 {
-    font-size: 27px;
-  }
-
-  body[data-page="privacy-policy"]
-    .privacy-view--external
-    .privacy-copy
-    p {
+  body[data-page="privacy-policy"] .privacy-view--external .privacy-copy p {
     font-size: 16px;
-  }
-
-  body[data-page="privacy-policy"]
-    .privacy-view--external
-    .summary-topbar__logo {
-    width: 32px;
-    height: 39px;
   }
 }
 
 @media (max-width: 1279px) {
-  .privacy-public-topbar .app-brand { display: none; }
+  .privacy-public-topbar .app-brand {
+    display: none;
+  }
 }
 
 @media (min-width: 1280px) {
-  .privacy-public-shell { grid-template-rows: var(--app-topbar-height) 1fr; }
-  .privacy-public-shell > .summary-main { display: contents; }
+  .privacy-public-shell {
+    grid-template-rows: var(--app-topbar-height) 1fr;
+  }
+
+  .privacy-public-shell > .summary-main {
+    display: contents;
+  }
+
   .privacy-public-topbar {
     grid-area: 1 / 1 / 2 / -1;
     position: sticky;
@@ -401,6 +323,7 @@ body[data-page="legal-notice"]
     background: #1268ff;
     color: white;
   }
+
   .privacy-public-sidebar {
     grid-area: 2 / 1;
     top: var(--app-topbar-height);
@@ -408,10 +331,22 @@ body[data-page="legal-notice"]
     padding-top: 40px;
     background: white;
   }
+
   .privacy-public-sidebar .summary-nav__item,
-  .privacy-public-sidebar .summary-sidebar__footer a { color: #42526e; }
-  .privacy-public-sidebar .summary-sidebar__footer { justify-items: start; padding-left: 48px; }
-  .privacy-public-sidebar .summary-sidebar__footer a { min-height: 36px; padding-inline: 10px; }
+  .privacy-public-sidebar .summary-sidebar__footer a {
+    color: #42526e;
+  }
+
+  .privacy-public-sidebar .summary-sidebar__footer {
+    justify-items: start;
+    padding-left: 48px;
+  }
+
+  .privacy-public-sidebar .summary-sidebar__footer a {
+    min-height: 36px;
+    padding-inline: 10px;
+  }
+
   .privacy-public-sidebar .summary-sidebar__footer .summary-nav__item--active {
     background: #1268ff;
     color: white;
@@ -419,5 +354,8 @@ body[data-page="legal-notice"]
     padding-inline: 10px;
     border-radius: 8px;
   }
-  .privacy-public-content { grid-area: 2 / 2; }
+
+  .privacy-public-content {
+    grid-area: 2 / 2;
+  }
 }

@@ -47,3 +47,62 @@ function createSuccessWindow(onReplace) {
     history: { replaceState: (_state, _title, url) => onReplace(url) },
   };
 }
+
+for (const exit of ["finished", "cancelled", "none"]) {
+  test(`signup feedback waits for logo and loader exit: ${exit}`, async () => {
+    const feedback = { hidden: true };
+    const document = new EventTarget();
+    const delays = [];
+    let finishLogo;
+    let finishExit;
+    let removed = false;
+    const logoFinished = new Promise(resolve => { finishLogo = resolve; });
+    const exitFinished = new Promise((resolve, reject) => {
+      finishExit = exit === "cancelled" ? reject : resolve;
+    });
+    const loader = {
+      classList: { add() {} },
+      getAnimations: () => exit === "none" ? [] : [{ finished: exitFinished }],
+      remove: () => { removed = true; },
+    };
+    document.getElementById = () => feedback;
+    const context = loadBrowserScripts([
+      "components/js/core/shared.js",
+      "components/js/core/pageTransition.js",
+      "components/js/auth/login.js",
+    ], {
+      document, Event, URL, URLSearchParams, pageTransitionRunning: false,
+      window: createSuccessWindow(() => {}),
+      setTimeout: (callback, delay) => { delays.push({ callback, delay }); },
+    });
+    context.createSignupTransitionLoader = async () => loader;
+    context.showTransitionLoader = () => {};
+    context.setTransitionOverflow = () => {};
+    context.wait = async () => {};
+    context.renderCurrentPage = async () => {
+      context.showSignupSuccessMessage();
+      await logoFinished;
+    };
+    const running = context.renderSignupWithTransition();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(feedback.hidden, true);
+    assert.equal(delays.length, 0);
+    finishLogo();
+    await new Promise(resolve => setImmediate(resolve));
+    if (exit !== "none") {
+      assert.equal(feedback.hidden, true);
+      assert.equal(removed, false);
+      finishExit();
+    }
+    await running;
+    assert.equal(removed, true);
+    assert.equal(context.pageTransitionRunning, false);
+    assert.equal(feedback.hidden, false);
+    assert.equal(delays.length, 1);
+    assert.equal(delays[0].delay, 3000);
+    document.dispatchEvent(new Event("join:login-transition-end"));
+    assert.equal(delays.length, 1);
+    delays[0].callback();
+    assert.equal(feedback.hidden, true);
+  });
+}

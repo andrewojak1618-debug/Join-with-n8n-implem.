@@ -83,8 +83,8 @@ test('no slot or an exhausted counter cannot create another ticket', () => {
 });
 
 test('AI failure frees exactly one reserved slot and records failure atomically', () => {
-  const failure = { ...validMail(), reservationUpdateTime: 'mail-version', failedAt: stamp, errorMessage: 'fetch failed' };
-  const output = runCode('Tagesplatz-Freigabe vorbereiten', [counter(2, 0)], { 'KI-Fehler vorbereiten': [failure] });
+  const failure = { ...validMail(), status: 'failed', reservationUpdateTime: 'mail-version', failedAt: stamp, errorMessage: 'fetch failed' };
+  const output = runCode('Tagesplatz-Freigabe vorbereiten', [counter(2, 0)], { 'Freigabedaten bereitstellen': [failure] });
   const writes = output[0].json.commit.writes;
   assert.equal(writes[0].update.fields.reservedCount.integerValue, '1');
   assert.equal(writes[1].update.fields.status.stringValue, 'failed');

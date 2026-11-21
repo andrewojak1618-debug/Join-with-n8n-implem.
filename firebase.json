@@ -9,5 +9,28 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json",
     "location": "europe-west3"
+  },
+  "hosting": {
+    "public": "hosting-dist",
+    "predeploy": [
+      "node scripts/prepare-hosting.mjs"
+    ],
+    "ignore": [
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.map",
+      "**/*.json",
+      "**/*.md",
+      "**/*.pem",
+      "**/*.p12",
+      "**/*.key",
+      "**/*.log",
+      "**/tests/**",
+      "**/n8n/**",
+      "**/docs/**",
+      "**/scripts/**",
+      "**/*Config.example.js"
+    ],
+    "cleanUrls": false
   }
 }

@@ -17,3 +17,7 @@ serviceAccount*.json
 client_secret*.json
 n8n/local/
 tests/local/
+
+/hosting-dist/
+/.firebase/
+/firebase-debug.log*

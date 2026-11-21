@@ -294,7 +294,8 @@ Before starting containers, run `docker version` and `docker compose version`.
 The Docker server must respond, and Compose must support `docker compose` commands.
 Check that ports 5500 (frontend), 5678 (n8n) and 11434 (Ollama) are available,
 or identify the existing service using them. Do not start a competing n8n listener.
-There is no `package.json` or frontend build step; `npm install` is not required.
+There is no frontend compilation or npm install step. Hosting uses the Node.js
+packaging command described under Deployment.
 
 ### Setup order and remaining installation gaps
 
@@ -311,8 +312,6 @@ The following are still required before claiming a complete, reproducible instal
 
 - A sanitized export of the status-notification workflow, including its event trigger,
   credential mapping and retry configuration. Only the collector export is tracked today.
-- A reviewed Hosting configuration with the public directory and explicit exclusions
-  for tests, workflow exports, local data and credentials. `firebase.json` has no Hosting section.
 - A recorded fresh-install run with commit, service versions, model identity and results
   for intake, confirmation, filing, duplicate prevention and status delivery after restart.
 
@@ -369,11 +368,10 @@ npx -y firebase-tools@latest use join-n8n-andre-2026
 An authorized maintainer can deploy the reviewed rules/indexes with
 `npx -y firebase-tools@latest deploy --only firestore --project join-n8n-andre-2026`.
 This changes the shared backend; it is not required for every frontend checkout.
-The committed `firebase.json` does not currently include Hosting configuration;
-do not assume a fresh clone can deploy Hosting without the separate C-18 setup.
-Use [Firebase Hosting configuration](https://firebase.google.com/docs/hosting/full-config)
-to prepare that configuration. Preserve the existing Firestore section and the
-multi-page routes; do not add a blanket rewrite of every route to `index.html`.
+The Hosting section in `firebase.json` publishes only `hosting-dist`, generated
+from an explicit file list. Follow Deployment below after preparing the local Web
+configuration. The existing Firestore section and multi-page routes are preserved;
+there is no blanket rewrite to `index.html`.
 
 The landing-page endpoint in `components/js/stakeholder.js` also contains the
 project ID. Change it along with `.firebaserc` and the Web config for another
@@ -659,3 +657,48 @@ https://join-n8n-andre-2026.web.app/
 
 Before a deployment, verify the working tree, run the automated tests and test
 the main user stories on desktop and mobile resolutions.
+
+### Hosting package and exclusions
+
+`node scripts/prepare-hosting.mjs` validates every path in
+`scripts/hosting-files.json`, recreates only the checked generated directory
+`hosting-dist`, and copies the approved application files while preserving URLs.
+The same command runs as the Hosting predeploy hook, preventing stale output from
+being reused. New application files must be added to the list explicitly.
+Missing source files stop preparation before the previous output is removed.
+
+The package contains entry HTML pages, main.js/base.css, component HTML/CSS/JS,
+images/icons, fonts and their licenses. It includes the local Firebase **Web SDK**
+configuration needed by the browser; these public application identifiers are not
+OAuth credentials. Never put passwords, OAuth tokens or service-account keys in
+that file. The configuration template is excluded.
+
+Repository metadata, README, tests, documentation, workflow JSON exports, scripts,
+logs, environment files and the README/Collector screenshots are not in the
+allowlist. Additional Hosting ignore patterns exclude hidden files, JSON, Markdown,
+source maps, key files and internal directories. No app compilation is required.
+
+```powershell
+node scripts/prepare-hosting.mjs
+npx -y firebase-tools@latest emulators:start --only hosting --project join-n8n-andre-2026
+```
+
+Open `http://127.0.0.1:5000`. Stop the emulator with Ctrl+C when finished.
+After reviewing and approving a release, deploy only Hosting:
+
+```powershell
+npx -y firebase-tools@latest deploy --only hosting --project join-n8n-andre-2026
+```
+
+Local verification on 2026-11-21: all 193 approved files returned HTTP 200;
+the output contained exactly the manifest entries. Sixteen excluded paths returned
+HTTP 404, including README, firebase.json, Firestore rules/indexes, .git/config,
+.env, both workflow exports, the Web configuration template and repository
+screenshots. No Hosting deployment was performed during this verification.
+
+Live verification on 2026-11-21: Hosting deployment completed successfully. All
+193 approved paths returned HTTP 200 and the same 16 excluded paths returned
+HTTP 404. Browser checks passed for Welcome, the stakeholder page and daily
+usage, request-form validation, guest login, Summary, Board navigation and
+opening/closing an existing ticket. No tickets were changed and no mail was sent.
+This is a Hosting smoke test, not a complete Collector or fresh-install acceptance.

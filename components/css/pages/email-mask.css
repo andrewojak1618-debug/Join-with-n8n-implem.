@@ -70,11 +70,13 @@ body > [data-include], body > .auth-footer { margin-top: auto; margin-bottom: 42
   main { padding-top: 92px; }
   section { max-width: 396px; min-height: 512px; padding: 32px 16px; }
   h1 { font-size: clamp(28px, 9vw, 40px); }
-  h1::after { margin-bottom: 32px; }
+  h1::after { width: 90px; margin-bottom: 16px; }
   .back { top: 32px; left: 16px; }
-  form { gap: 16px; }
-  button {
+  form { gap: 32px; }
+  input, textarea { min-height: 48px; }
+  #request-form .primary-plain {
     width: 180px;
+    margin-top: 0;
     padding: 4px 0;
     font-size: 19px;
     text-transform: lowercase;

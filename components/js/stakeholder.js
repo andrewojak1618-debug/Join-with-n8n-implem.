@@ -62,7 +62,10 @@ function showQuota(used, limit) {
   updateLimitNote(used === limit);
   const count = document.createElement("strong");
   count.textContent = used + " of " + limit;
-  document.querySelector(".quota").replaceChildren(count, " requests used today");
+  const today = document.createElement("span");
+  today.className = "quota-today";
+  today.textContent = " today";
+  document.querySelector(".quota").replaceChildren(count, " requests used", today);
 }
 
 
@@ -80,7 +83,6 @@ function updateLimitNote(full) {
   document.querySelector(".intro").textContent = full
     ? "Send your request for manual review by our team."
     : "Easily create a ticket by sending a request — no extra steps needed.";
-  document.querySelector(".description p:first-child").hidden = full;
   note.hidden = !full;
   note.querySelector("span").textContent = "Automatic ticket creation resumes tomorrow. You can still send a request today.";
 }

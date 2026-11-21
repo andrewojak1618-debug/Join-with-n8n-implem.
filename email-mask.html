@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="./components/css/pages/email-mask.css">
   <script src="./components/js/core/htmlIncludes.js" defer></script>
   <script src="./components/js/email-mask.js" defer></script>
+  <link rel="stylesheet" href="./components/css/molecules/primaryCheck.css">
+  <script src="./components/js/core/primaryCheck.js" defer></script>
 </head>
 <body>
   <header><img src="./components/assets/img/icons/join-request.svg" alt="Join" width="101" height="122"></header>
@@ -32,7 +34,7 @@
           <label><span>Your request</span><textarea aria-describedby="message-error" required name="message" rows="1" placeholder="Your Request..."></textarea></label>
           <small id="message-error" class="field-error" hidden></small>
         </div>
-        <button type="submit">Send request</button>
+        <button class="primary-plain" type="submit">Send request</button>
 
       </form>
     </section>

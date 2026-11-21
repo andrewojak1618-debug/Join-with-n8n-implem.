@@ -22,8 +22,19 @@ nav { display: flex; justify-content: space-between; gap: 24px; }
 nav p { margin: 0 0 18px; color: #1268ff; }
 .role-label { display: flex; align-items: center; gap: 8px; font-size: 23px; }
 .role-label img { flex: none; }
-nav a { display: inline-block; border: 1px solid; border-radius: 8px; padding: 12px 18px; color: #42526e; text-decoration: none; }
-nav .primary { background: #1268ff; color: white; border-color: #1268ff; }
+nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 165px;
+  height: 48px;
+  border: 1px solid;
+  border-radius: 8px;
+  color: #42526e;
+  text-decoration: none;
+}
+nav .primary-plain { width: 196px; }
+
 .auth-footer { display: flex; justify-content: center; padding: 32px 12px 42.7px; }
 .welcome-page > :last-child { align-self: end; }
 .auth-footer a { font-size: 16px; text-decoration: none; }

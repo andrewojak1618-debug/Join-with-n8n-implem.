@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./components/assets/img/icons/Join%20logo%20vector.svg" height="96" alt="Join logo" />
+<img src="./components/assets/img/icons/join-request.svg" height="96" alt="Join logo" />
 
 # Join – Issue Collector
 
@@ -8,8 +8,8 @@
 
 <div align="center">
 
-![Learning project](https://img.shields.io/badge/Learning_Project-Frontend-29ABE2?style=for-the-badge)
-![Project status](https://img.shields.io/badge/Status-ready_for_review-2A3647?style=for-the-badge)
+![Learning project](https://img.shields.io/badge/Learning_Project-Frontend-4589FF?style=for-the-badge)
+![Project status](https://img.shields.io/badge/Status-ready_for_review-1268FF?style=for-the-badge)
 ![Backend](https://img.shields.io/badge/Backend-Firebase-FFCA28?style=for-the-badge)
 
 </div>
@@ -44,7 +44,7 @@ that turns incoming emails into validated, AI-assisted tickets in Triage.
 
 ## Preview
 
-![Join Summary preview](./components/assets/img/icons/preview.png)
+![Current Join Summary with blue header, white sidebar and Email Requests tile](./components/assets/img/join-summary-preview.jpg)
 
 ## Table of Contents
 

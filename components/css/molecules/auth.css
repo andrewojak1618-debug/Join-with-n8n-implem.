@@ -106,6 +106,42 @@
   background-image: url("../../assets/img/icons/lock.svg");
 }
 
+.auth-form .password-toggle {
+  position: absolute;
+  top: 4px;
+  right: 13px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 100ms ease-in-out;
+}
+
+.password-toggle img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.password-toggle:hover {
+  background-color: #4589ff33;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid #1268ff;
+  outline-offset: 2px;
+}
+
+.form-field__input:placeholder-shown ~ .password-toggle,
+.form-field__input:not(:placeholder-shown) ~ .form-field__icon--lock {
+  display: none;
+}
+
 .form-field__error {
   position: absolute;
   top: calc(100% + 3px);

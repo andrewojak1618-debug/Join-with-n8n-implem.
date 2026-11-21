@@ -1,6 +1,6 @@
 const signupTransition = {
-  renderDelay: 240,
-  exitDelay: 600,
+  holdDuration: 200,
+  travelDuration: 500,
   template: "./components/html/molecules/signupTransitionLoader.html",
 };
 
@@ -12,9 +12,8 @@ async function renderSignupWithTransition() {
   const loader = await createSignupTransitionLoader();
   showTransitionLoader(loader);
   try {
-    await wait(signupTransition.renderDelay);
-    await renderCurrentPage({ animate: true });
-    await wait(signupTransition.exitDelay);
+    await renderCurrentPage();
+    await moveLoginLogo(loader);
   } finally {
     await finishSignupTransition(loader);
   }
@@ -82,4 +81,38 @@ async function createSignupTransitionLoader() {
  */
 function wait(duration) {
   return new Promise((resolve) => setTimeout(resolve, duration));
+}
+
+
+/**
+ * Waits for both logos before moving to the rendered login logo.
+ * @param {HTMLElement} loader - The visible loading screen.
+ */
+async function moveLoginLogo(loader) {
+  const logo = loader.querySelector("img");
+  const target = document.querySelector(".auth-logo__login");
+  if (!logo || !target) return;
+  const assets = await Promise.allSettled([logo.decode(), target.decode(), document.fonts.ready]);
+  if (assets.some((asset) => asset.status === "rejected")) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  await wait(signupTransition.holdDuration);
+  await animateLoginLogo(logo, target);
+}
+
+
+/**
+ * Keeps the loader until the logo reaches the actual responsive destination.
+ * @param {HTMLImageElement} logo - The centered loading logo.
+ * @param {HTMLImageElement} target - The final login logo.
+ */
+async function animateLoginLogo(logo, target) {
+  const start = logo.getBoundingClientRect();
+  const end = target.getBoundingClientRect();
+  const transform = `translate(${end.x - start.x}px, ${end.y - start.y}px) scale(${end.width / start.width}, ${end.height / start.height})`;
+  const animation = logo.animate([{ transform: "none" }, { transform }], {
+    duration: signupTransition.travelDuration,
+    easing: "ease-in-out",
+    fill: "forwards",
+  });
+  await Promise.allSettled([animation.finished]);
 }

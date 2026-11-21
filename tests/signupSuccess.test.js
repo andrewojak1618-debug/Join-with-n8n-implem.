@@ -78,11 +78,8 @@ for (const exit of ["finished", "cancelled", "none"]) {
     context.createSignupTransitionLoader = async () => loader;
     context.showTransitionLoader = () => {};
     context.setTransitionOverflow = () => {};
-    context.wait = async () => {};
-    context.renderCurrentPage = async () => {
-      context.showSignupSuccessMessage();
-      await logoFinished;
-    };
+    context.renderCurrentPage = async () => context.showSignupSuccessMessage();
+    context.moveLoginLogo = () => logoFinished;
     const running = context.renderSignupWithTransition();
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(feedback.hidden, true);

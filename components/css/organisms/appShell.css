@@ -210,6 +210,14 @@ body[data-page="legal-notice"] .summary-help {
     color: #1268ff;
   }
 
+  .summary-topbar + .summary-sidebar .summary-nav__item:not(.summary-nav__item--active):hover {
+    background: transparent;
+    color: #1268ff;
+  }
+
+  .summary-topbar + .summary-sidebar .summary-nav__item:hover .summary-nav__icon {
+    background: #1268ff;
+  }
   .summary-nav__item[data-page="summary"] { --nav-icon: url("../../assets/img/icons/summary_icons.svg"); }
   .summary-nav__item[data-page="add-task"] { --nav-icon: url("../../assets/img/icons/add_task_icons.svg"); }
   .summary-nav__item[data-page="board"] { --nav-icon: url("../../assets/img/icons/board_icons.svg"); }

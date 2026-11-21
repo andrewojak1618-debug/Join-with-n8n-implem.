@@ -34,8 +34,8 @@
     <span class="form-field__error" id="signupEmailError" aria-live="polite"></span>
   </label>
 
-  <label class="form-field" data-component="auth-form-field" for="signupPassword">
-    <span class="form-field__label">Password</span>
+  <div class="form-field" data-component="auth-form-field">
+    <label class="form-field__label" for="signupPassword">Password</label>
     <input
       class="form-field__input"
       id="signupPassword"
@@ -46,15 +46,15 @@
       aria-describedby="signupPasswordError"
     />
     <span class="form-field__icon form-field__icon--lock" aria-hidden="true"></span>
+    <button class="password-toggle" type="button" aria-controls="signupPassword"
+      aria-label="Show password" aria-pressed="false">
+      <img src="./components/assets/img/icons/visibility_off.svg" alt="" />
+    </button>
     <span class="form-field__error" id="signupPasswordError" aria-live="polite"></span>
-  </label>
+  </div>
 
-  <label
-    class="form-field"
-    data-component="auth-form-field"
-    for="signupConfirmPassword"
-  >
-    <span class="form-field__label">Confirm Password</span>
+  <div class="form-field" data-component="auth-form-field">
+    <label class="form-field__label" for="signupConfirmPassword">Confirm Password</label>
     <input
       class="form-field__input"
       id="signupConfirmPassword"
@@ -65,8 +65,12 @@
       aria-describedby="signupConfirmPasswordError"
     />
     <span class="form-field__icon form-field__icon--lock" aria-hidden="true"></span>
+    <button class="password-toggle" type="button" aria-controls="signupConfirmPassword"
+      aria-label="Show password" aria-pressed="false">
+      <img src="./components/assets/img/icons/visibility_off.svg" alt="" />
+    </button>
     <span class="form-field__error" id="signupConfirmPasswordError" aria-live="polite"></span>
-  </label>
+  </div>
 
   <div data-include="./components/html/molecules/privacyConsent.html"></div>
 

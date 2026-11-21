@@ -107,3 +107,73 @@ test("shows the mobile greeting after user data was rendered", () => {
   animationHandler({ currentTarget: greeting });
   assert.equal(classes.has("summary-greeting--visible"), false);
 });
+
+
+/**
+ * Provides rendered text cells for summary behavior tests.
+ * @param {Object|null} user - Current session used by the greeting.
+ * @returns {Object} Script context and captured text cells.
+ */
+function createRenderedSummary(user = null) {
+  const cells = {};
+  const document = {
+    getElementById: (id) => cells[id] ||= { textContent: "" },
+    querySelector: () => null,
+  };
+  const context = loadBrowserScripts([
+    "components/js/core/shared.js", "components/js/summary/summary.js",
+  ], { document, parseTaskDueDate: () => null });
+  context.getStoredUser = () => user;
+  return { context, cells };
+}
+
+
+for (const type of ["guest", "firebase-guest"]) {
+  test(`greets ${type} without name or comma`, () => {
+    const { context, cells } = createRenderedSummary({ type, name: "Guest" });
+    context.initSummaryUser();
+    assert.equal(cells.summaryTitleName.textContent, "");
+    assert.equal(cells.summaryTitleTime.textContent, context.getTimeGreeting());
+    assert.equal(cells.summaryGreeting.textContent, "");
+    assert.equal(cells.summaryGreetingTime.textContent.endsWith(","), false);
+  });
+}
+
+
+test("greets a member with trimmed name and one comma", () => {
+  const { context, cells } = createRenderedSummary({ type: "member", name: "  Andre  " });
+  context.initSummaryUser();
+  assert.equal(cells.summaryTitleName.textContent, "Andre");
+  assert.equal(cells.summaryTitleTime.textContent, `${context.getTimeGreeting()},`);
+  assert.equal(cells.summaryGreeting.textContent, "Andre");
+  assert.equal(cells.summaryGreetingTime.textContent, cells.summaryTitleTime.textContent);
+});
+
+
+test("omits the comma when a member has no display name", () => {
+  const { context, cells } = createRenderedSummary({ type: "member", name: "   " });
+  context.initSummaryUser();
+  assert.equal(cells.summaryTitleName.textContent, "");
+  assert.equal(cells.summaryTitleTime.textContent.endsWith(","), false);
+});
+
+
+test("counts email requests across all statuses and excludes other sources", () => {
+  const { context, cells } = createRenderedSummary();
+  const statuses = ["triage", "todo", "in-progress", "feedback", "done"];
+  const tasks = statuses.map(status => ({ status, source: "email" }));
+  context.renderSummaryMetrics([...tasks, { source: "manual" }, {}, { source: "Email" }]);
+  assert.equal(cells.summaryEmailCount.textContent, 5);
+  assert.equal(cells.summaryBoardCount.textContent, 8);
+  context.renderSummaryMetrics([]);
+  assert.equal(cells.summaryEmailCount.textContent, 0);
+});
+
+
+test("shows a placeholder for email requests while no counts are available", () => {
+  const { context, cells } = createRenderedSummary();
+  context.blankSummaryMetricValues();
+  assert.equal(cells.summaryEmailCount.textContent, "–");
+  context.renderSummaryMetrics([{ source: "email", status: "done" }]);
+  assert.equal(cells.summaryEmailCount.textContent, 1);
+});

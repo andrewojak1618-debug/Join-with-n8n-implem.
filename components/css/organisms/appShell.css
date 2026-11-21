@@ -1,6 +1,6 @@
 .summary-shell {
   --app-topbar-height: 96px;
-  --app-bottom-nav-height: 80px;
+  --app-bottom-nav-height: 0px;
 
   min-height: 100vh;
   display: grid;
@@ -195,7 +195,7 @@ body[data-page="legal-notice"] .summary-help {
   display: none;
 }
 
-@media (max-width: 1279px) {
+@media (max-width: 1023px) {
   .summary-topbar + .summary-sidebar {
     background: white;
     box-shadow: 0 -1px 4px rgb(0 0 0 / 8%);
@@ -226,6 +226,7 @@ body[data-page="legal-notice"] .summary-help {
 
   .summary-shell {
     --app-topbar-height: 80px;
+    --app-bottom-nav-height: 80px;
 
     grid-template-columns: 1fr;
   }
@@ -311,11 +312,11 @@ body[data-page="legal-notice"] .summary-help {
 @media (max-width: 767px) {
   .summary-shell > .summary-topbar { gap: 8px; padding-inline: 16px; }
   .app-brand img { width: 32px; }
-  .app-brand + p { font-size: 14px; }
+  .app-brand + p { display: none; }
   .summary-user-actions { gap: 8px; }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   .summary-shell > .summary-topbar {
     position: sticky;
     top: 0;

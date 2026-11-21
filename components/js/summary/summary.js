@@ -5,9 +5,13 @@ function initSummaryUser() {
   const user = getStoredUser();
   if (!user) return;
 
-  setElementText("summaryGreeting", getSummaryDisplayName(user));
-  setElementText("summaryUserType", getSummaryUserTypeText(user));
-  setElementText("summaryGreetingTime", getTimeGreeting());
+  const guest = user.type === "firebase-guest" || user.type === "guest";
+  const name = guest ? "" : user.name?.trim() || "";
+  const greeting = getTimeGreeting() + (name ? "," : "");
+  setElementText("summaryTitleTime", greeting);
+  setElementText("summaryTitleName", name);
+  setElementText("summaryGreetingTime", greeting);
+  setElementText("summaryGreeting", name);
   showMobileSummaryGreeting();
 }
 
@@ -33,42 +37,18 @@ function hideMobileSummaryGreeting(event) {
 
 
 /**
- * Returns the display name for the summary greeting.
- * @param {Object} user - Stored user shown on the summary page.
- * @returns {string} User name or the guest fallback.
- */
-function getSummaryDisplayName(user) {
-  return user.name || "Guest";
-}
-
-
-/**
  * Returns greeting appropriate to the time of day.
  * @returns {string} Time-dependent greeting text.
  */
 function getTimeGreeting() {
   const hour = new Date().getHours();
-  let greeting = "Good night,";
+  let greeting = "Good night";
 
-  if (hour >= 5 && hour < 12) greeting = "Good morning,";
-  else if (hour >= 12 && hour < 18) greeting = "Good afternoon,";
-  else if (hour >= 18 && hour < 22) greeting = "Good evening,";
+  if (hour >= 5 && hour < 12) greeting = "Good morning";
+  else if (hour >= 12 && hour < 18) greeting = "Good afternoon";
+  else if (hour >= 18 && hour < 22) greeting = "Good evening";
 
   return greeting;
-}
-
-
-/**
- * Explains whether the current session belongs to a guest or regular user.
- * @param {Object} user - Stored user whose session type is described.
- * @returns {string} User-facing account type explanation.
- */
-function getSummaryUserTypeText(user) {
-  if (user.type === "firebase-guest" || user.type === "guest") {
-    return "You are signed in as a guest.";
-  }
-
-  return "You are signed in with your account.";
 }
 
 
@@ -101,6 +81,7 @@ function renderSummaryMetrics(tasks) {
   setElementText("summaryFeedbackCount", countTasksByStatus(tasks, "feedback"));
   setElementText("summaryDoneCount", countTasksByStatus(tasks, "done"));
   setElementText("summaryBoardCount", tasks.length);
+  setElementText("summaryEmailCount", tasks.filter(task => task.source === "email").length);
   setElementText("summaryUrgentCount", countTasksByPriority(tasks, "urgent"));
   setElementText("summaryDeadlineDate", getUpcomingDeadlineText(tasks));
 }
@@ -123,7 +104,7 @@ function setSummaryMetricsLoading(isLoading) {
 function blankSummaryMetricValues() {
   const metricIds = [
     "summaryTodoCount", "summaryDoneCount", "summaryUrgentCount",
-    "summaryBoardCount", "summaryProgressCount", "summaryFeedbackCount",
+    "summaryBoardCount", "summaryProgressCount", "summaryFeedbackCount", "summaryEmailCount",
   ];
   metricIds.forEach((id) => setElementText(id, "–"));
   setElementText("summaryDeadlineDate", "–");

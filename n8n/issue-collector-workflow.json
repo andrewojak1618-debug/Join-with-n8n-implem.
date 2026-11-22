@@ -2263,6 +2263,147 @@
         "specifyBody": "json",
         "jsonBody": "={{ {fields:$json.fields} }}"
       }
+    },
+    {
+      "id": "Label ausstehend?",
+      "name": "Label ausstehend?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3200,
+        -850
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "04fb2438-f275-4f6c-b430-e6d7f49d6782",
+              "leftValue": "={{ $json.fields.manualLabelStatus?.stringValue === 'failed' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "Label-Nachholung vorbereiten",
+      "name": "Label-Nachholung vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3480,
+        -850
+      ],
+      "parameters": {
+        "jsCode": "return $input.all().flatMap((item,index)=>{\n const d=item.json,f=d.fields||{},attempt=Number(f.manualLabelRetryCount?.integerValue||0);\n if(f.manualLabelStatus?.stringValue!=='failed'||!['failed','manual_review','limit_reached'].includes(f.status?.stringValue))return [];\n if(!Number.isSafeInteger(attempt)||attempt<0||attempt>=3)return [];\n const id=f.labelErrorMailId?.stringValue;\n if(!id||!d.name||!d.updateTime)throw Error('Label-Nachholdaten fehlen');\n return [{json:{name:d.name,version:d.updateTime,id,attempt:attempt+1},pairedItem:{item:index}}];\n});"
+      }
+    },
+    {
+      "id": "Label-Nachholung übernehmen",
+      "name": "Label-Nachholung übernehmen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        3760,
+        -850
+      ],
+      "parameters": {
+        "url": "={{ 'https://firestore.googleapis.com/v1/'+$json.name+'?updateMask.fieldPaths=manualLabelStatus&updateMask.fieldPaths=manualLabelRetryCount&currentDocument.updateTime='+encodeURIComponent($json.version) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "method": "PATCH",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ fields: { manualLabelStatus: { stringValue: 'pending' }, manualLabelRetryCount: { integerValue: String($json.attempt) } } }) }}"
+      }
+    },
+    {
+      "id": "Nachbearbeitungslabel nachholen",
+      "name": "Nachbearbeitungslabel nachholen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4040,
+        -850
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://gmail.googleapis.com/gmail/v1/users/me/messages/'+$('Label-Nachholung vorbereiten').item.json.id+'/modify' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"addLabelIds\":[\"YOUR_REVIEW_LABEL_ID\"]}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "Label-Nachholung Ergebnis",
+      "name": "Label-Nachholung Ergebnis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4320,
+        -850
+      ],
+      "parameters": {
+        "jsCode": "return $input.all().map((item,index)=>{\n const data=$('Label-Nachholung vorbereiten').itemMatching(index).json;\n const response=item.json,ok=response.statusCode===200&&response.body?.labelIds?.includes('YOUR_REVIEW_LABEL_ID');\n const fields={manualLabelStatus:{stringValue:ok?'applied':'failed'}};\n if(!ok)Object.assign(fields,{labelErrorMailId:{stringValue:data.id},labelErrorStep:{stringValue:'Nachbearbeitungslabel nachholen'},labelErrorMessage:{stringValue:String(response.body?.error?.message||response.error?.message||response.error||'Label nicht bestätigt').slice(0,2000)}});\n return {json:{name:data.name,version:$('Label-Nachholung übernehmen').itemMatching(index).json.updateTime,fields},pairedItem:{item:index}};\n});"
+      }
+    },
+    {
+      "id": "Label-Nachholung speichern",
+      "name": "Label-Nachholung speichern",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4600,
+        -850
+      ],
+      "parameters": {
+        "url": "={{ 'https://firestore.googleapis.com/v1/'+$json.name+'?currentDocument.updateTime='+encodeURIComponent($json.version)+'&'+Object.keys($json.fields).map(k=>'updateMask.fieldPaths='+k).join('&') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "method": "PATCH",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {fields:$json.fields} }}"
+      }
     }
   ],
   "connections": {
@@ -2441,7 +2582,7 @@
       "main": [
         [
           {
-            "node": "Antwortstatus vorhanden?",
+            "node": "Label ausstehend?",
             "type": "main",
             "index": 0
           }
@@ -3337,6 +3478,75 @@
         [
           {
             "node": "Antwort-Nachversand speichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label ausstehend?": {
+      "main": [
+        [
+          {
+            "node": "Label-Nachholung vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Antwortstatus vorhanden?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label-Nachholung vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Label-Nachholung übernehmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label-Nachholung übernehmen": {
+      "main": [
+        [
+          {
+            "node": "Nachbearbeitungslabel nachholen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nachbearbeitungslabel nachholen": {
+      "main": [
+        [
+          {
+            "node": "Label-Nachholung Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label-Nachholung Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label-Nachholung Ergebnis": {
+      "main": [
+        [
+          {
+            "node": "Label-Nachholung speichern",
             "type": "main",
             "index": 0
           }

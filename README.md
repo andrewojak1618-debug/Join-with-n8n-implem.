@@ -114,7 +114,10 @@ that turns incoming emails into validated, AI-assisted tickets in Triage.
 The hosted frontend does not run n8n or Ollama. Automatic ticket creation and
 notifications require the configured workflows and services to be running.
 The existing collector export is in `n8n/issue-collector-workflow.json`.
-The setup instructions below are documented; the status-workflow import and isolated delivery checks below have passed. A complete fresh-install run remains open under C-18; this README is not yet a verified end-to-end install guide.
+The structural workflow imports, isolated status delivery checks and the live
+success-path demo on 2026-11-22 have passed. The demo used the existing installation
+and connected credentials. A complete fresh-install run and restart verification
+remain open under C-18; this is not yet a verified end-to-end installation guide.
 
 ### Workflow screenshots
 
@@ -540,8 +543,9 @@ Activate only one status workflow for the target project. Create and move one te
 ticket after the configured cutoff, then verify the event ID, creator address,
 ticket ID, one received status mail and the matching `sent` delivery record.
 Repeat the same event and restart n8n to verify duplicate protection and persistence.
-The full scheduled/restart acceptance run remains open under C-18. The narrower
-import and manual delivery checks below have passed.
+Automatic polling and status delivery passed in the existing installation on
+2026-11-22, as recorded below. Restart persistence and the full fresh-install
+acceptance run remain open under C-18.
 
 
 ### Verified status-workflow checks — 2026-11-21
@@ -564,10 +568,43 @@ import and manual delivery checks below have passed.
   workflow's version, nodes and connections were unchanged and it remained active.
   The test copy remained inactive after the manual runs.
 
-These are two complementary checks, not a full installation acceptance:
-new OAuth connections, automatic polling, restart persistence and a fresh
-Collector-to-status-mail demonstration still require verification. The synthetic
-event also does not constitute a new Board interaction test.
+These are two complementary import/delivery checks, not a full installation
+acceptance. The synthetic event did not test a Board interaction. The later live
+demo below verified automatic polling and an actual Board change using the
+existing installation; new OAuth setup and restart persistence remain unverified.
+
+### Verified live demo — 2026-11-22
+
+The regular Collector and status-notification workflows were tested in the
+existing installation with its connected credentials. Ollama was started before
+processing, and n8n could reach the installed `qwen3:4b-instruct` model.
+
+- **Intake and AI:** One new external test email automatically triggered the
+  Collector. Exactly one corresponding ticket appeared in the hosted Board's
+  Triage column, with the full message, external creator, AI indicator,
+  Technical Task category, Medium priority and no invented deadline.
+- **Confirmation and filing:** The sender received exactly one confirmation
+  containing that ticket's ID. The reservation was `completed`, confirmation
+  state `sent` and filing state `filed`. The original email had `erledigt`
+  and no `INBOX` label. The daily counter showed one completed place and zero
+  reserved places, with a limit of ten.
+- **Board change and status mail:** Moving the same ticket once from Triage to
+  To do produced one event with its ticket ID, old/new status and original
+  creator. Automatic status processing recorded `sent`. The creator received
+  exactly one status message with the same ticket ID and readable status “Offen”.
+  The recipient mailbox contained two messages for the demo: one confirmation
+  and one status notification.
+- **Scope:** Regular workflow definitions were unchanged. Technical execution,
+  ticket, event and delivery references are recorded on C-18, not in this README.
+  This run began with a sent test email; it did not repeat the public form/mail
+  handler test or inject an error/limit failure.
+
+**Still open:** A complete fresh installation with newly connected credentials
+and recorded service/model versions, plus restart persistence, automatic polling
+and duplicate prevention after restart. Earlier isolated import/repeat tests and
+this successful existing-installation demo are separate evidence, not substitutes
+for those checks. Error-path evidence still needs to be reconciled with the current
+release for the final C-18 demonstration acceptance.
 
 ## Ollama Setup
 
@@ -613,7 +650,8 @@ their separate workflow is installed. Record the Git commit, n8n/Docker/Compose/
 `ollama list`, and results on C-18. Restart n8n, then repeat a new-mail test to
 verify persistent credentials and automatic polling. Keep workflow execution IDs
 and test ticket IDs with the result; never record tokens or passwords.
-These are acceptance steps, not a claim that a clean import has already passed.
+These are full setup/restart acceptance steps. The structural imports have passed;
+they do not establish that a fresh installation or restart has passed.
 
 
 ## Usage
@@ -632,8 +670,10 @@ Guest and authenticated users work with the same shared Firestore data set.
 
 ## Demo Walkthrough
 
-This is a presentation guide, not a new live-test result. Use a unique subject
-such as `DEMO-YYYYMMDD-HHMM - Board does not load` to identify one complete run.
+The steps below are a presentation guide. The separately recorded live result
+covers the existing installation from incoming email to status notification.
+Use a unique subject such as `DEMO-YYYYMMDD-HHMM - Board does not load` to
+identify each run.
 
 ### Before the demonstration
 

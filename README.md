@@ -42,12 +42,78 @@ that turns incoming emails into validated, AI-assisted tickets in Triage.
 
 [Project repository](https://github.com/andrewojak1618-debug/Join-with-n8n-implem.)
 
+## Submission snapshot — 2026-11-22
+
+C-18 is accepted; its evidence and explicit test boundaries are recorded on the
+project card. This snapshot identifies the reviewed implementation, not a new
+end-to-end test or deployment.
+
+- Reviewed `main` commit: `989010999d77be837f8f754eed359abd66290de5`.
+  Local HEAD and GitHub `refs/heads/main` matched when checked. This documentation
+  update follows that revision and is not included in the referenced commit.
+- [Project repository](https://github.com/andrewojak1618-debug/Join-with-n8n-implem.)
+  returned HTTP 200 with the expected repository title.
+- [Hosted Join](https://join-n8n-andre-2026.web.app/) returned HTTP 200 with
+  `Welcome | Join`. These are reachability/content checks, not a new browser
+  regression or proof that Hosting matches every file in the current Git commit.
+
+### Recorded environment and model
+
+| Component | Observed version or configuration |
+| --- | --- |
+| Regular and isolated test n8n | 2.45.4, read inside both running containers |
+| Node.js inside both n8n containers | v26.12.1 |
+| Docker client / server | 29.9.2 / 29.9.2 |
+| Docker Compose | v5.6.1 |
+| Host Node.js | v24.18.0 |
+| Git | 2.53.0.windows.1 |
+| Firebase Web SDK | 12.15.0, pinned in application imports |
+| Running Ollama server | 0.32.11, read from `/api/version` |
+| Collector model | `qwen3:4b-instruct`, configured in the export and present in `/api/tags` |
+| Model details | Qwen3, 4.0B parameters, GGUF, Q4_K_M, 2,497,293,803 bytes |
+
+Installed model digest:
+`0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0`.
+Both running n8n containers use image ID
+`sha256:80e23ced901f0e22597d4f3464e3aaf9d835372262ea6f08ef760d8ca35df25c`.
+The running server API supplied the Ollama version because its CLI was not on
+this shell's PATH. No model was downloaded, changed or invoked for this inventory.
+The table records the current environment; it does not retroactively establish
+the exact versions used for every historical test. No Firebase CLI was run or
+installed, and no historical deployment-tool version is inferred.
+
+### Final export verification
+
+The final sanitized Collector was freshly imported as a new inactive workflow
+in the existing isolated n8n instance and exported again. All 97 nodes (including
+parameters, types and positions), 115 connections and settings matched the
+source. Placeholders were retained; no credentials or pinned data were assigned.
+The imported workflow had no active version and zero executions. The regular
+Collector's definition, activation and version identifiers remained unchanged.
+This closes the final-export structure check; it is not another delivery test
+or a fresh Docker/cloud installation. The separate status-workflow import and
+delivery evidence remains in its own section below.
+
+### Deferred browser test and other boundaries
+
+**Safari, separately deferred:** Real Safari still needs verification of all
+four empty-field messages in Your Request and navigation from Summary to Board.
+No Safari pass is claimed by the C-18 completion or these link checks.
+
+**Other untested scope:** A complete new Firebase/frontend/Hosting setup and
+the documented Compose example have not been exercised end to end. There was
+no new complete production request-to-statusmail run after all recovery changes,
+nor a forced concurrent recovery claim, process termination between claim and
+result storage, or uncertain external-action timeout. Earlier scenario-specific
+results and fixture limitations remain as documented below.
+
 ## Preview
 
 ![Current Join Summary with blue header, white sidebar and Email Requests tile](./components/assets/img/join-summary-preview.jpg)
 
 ## Table of Contents
 
+- [Submission snapshot](#submission-snapshot--2026-11-22)
 - [Features](#features)
 - [Issue Collector](#issue-collector)
 - [Workflow screenshots](#workflow-screenshots)
@@ -316,21 +382,19 @@ packaging command described under Deployment.
 6. Import and verify the separate status-notification workflow.
 7. Configure Hosting separately if a public deployment is required.
 
-The following are still required before claiming a complete, reproducible installation:
+C-18's evidence review is complete. The current environment, model digest and
+project-link checks are recorded in the submission snapshot above. The isolated
+installation test used repository revision `2ee920c`, n8n 2.45.4 and
+`qwen3:4b-instruct`; current inventory values must not be assumed for that entire
+historical run.
 
-- A from-scratch Firebase/frontend/Hosting setup following the documented steps;
-  the isolated n8n setup below reused the existing Firebase project and Ollama service.
-- A complete environment inventory, including Docker/Compose and Ollama versions
-  and model digest. The isolated workflow test used repository revision `2ee920c`,
-  n8n 2.45.4 and `qwen3:4b-instruct`.
-- A final acceptance review of the evidence and boundaries below. The isolated
-  error/limit checks now include recipient delivery, recovery and forced replay;
-  they do not constitute one fresh-install run of every scenario against the
-  final combined export. New OAuth connections, automatic intake, confirmation,
-  filing, status delivery and replay after the isolated n8n restart have passed.
-
-These gaps do not prevent a local frontend setup. They do prevent treating the
-current repository as a complete deployment package. Track completion on C-18.
+A complete from-scratch Firebase/frontend/Hosting setup and the Compose example
+remain untested. The isolated n8n setup reused the existing Firebase project and
+Ollama service. Its new OAuth connections, automatic intake, confirmation,
+filing, status delivery and replay after restart passed. Separate error/limit
+checks include recipient delivery, recovery and forced replay, but do not
+constitute one fresh-install run of every scenario against the final combined
+export. C-18 completion does not remove these limits on installation claims.
 
 ## Quickstart
 
@@ -780,10 +844,11 @@ workflow still has no retry-count limit/backoff for definite failures and does
 not automatically resend `unconfirmed` or outstanding `reserved` deliveries.
 
 The isolated n8n installation/restart evidence remains separate from a complete
-new Firebase/frontend/Hosting installation, the untested Compose example and the
-incomplete environment/model inventory. The previously deferred real Safari
-browser check is also separate from these backend tests. C-18's final acceptance
-review must retain these boundaries; no additional test is implied by this
+new Firebase/frontend/Hosting installation and the untested Compose example.
+The current environment/model inventory is recorded in the submission snapshot;
+it does not establish historical versions for every earlier run. The previously deferred real Safari
+browser check is also separate from these backend tests. C-18's completed acceptance
+review retains these boundaries; no additional test is implied by this
 documentation update.
 
 ## Ollama Setup

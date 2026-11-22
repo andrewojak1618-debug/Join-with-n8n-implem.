@@ -117,12 +117,16 @@ The existing collector export is in `n8n/issue-collector-workflow.json`.
 The structural workflow imports, isolated status delivery checks and the live
 success-path demo on 2026-11-22 have passed. The demo used the existing installation
 and connected credentials. Restart verification and a live insufficient-content
-check also passed in that installation, as detailed below. A complete fresh-install
-run remains open under C-18; this is not yet a verified end-to-end installation guide.
+check also passed in that installation. A separate n8n setup with new OAuth connections
+and its own restart/replay test has now passed, as detailed below. This used isolated
+collections in the existing Firebase project; it does not establish a complete
+from-scratch cloud, frontend and Hosting installation.
 
 ### Workflow screenshots
 
-The overview shows the complete 89-node Collector editor layout. Expand a stage
+The overview shows the 89-node Collector editor layout captured before the
+reply and review-label recovery branches were added on 2026-11-22. It is not
+a complete view of the current export; use the JSON for the current connections. Expand a stage
 below for readable detail views; select an image to open it at its original size.
 Connections leaving a detail view continue in the overview or an adjacent stage.
 The disconnected diagnostic nodes at the top left are separate from the intake path.
@@ -274,9 +278,10 @@ and feature-specific interactions into focused files.
   An email application or browser mail handler is required for the request draft.
 
 The hosted frontend needs no local installation. Email automation additionally
-needs running n8n/Ollama services and connected credentials. Versions of n8n,
-Docker and Ollama must be recorded during the pending fresh-install test; no
-tested version matrix is claimed here.
+needs running n8n/Ollama services and connected credentials. The isolated setup used n8n 2.45.4 and
+`qwen3:4b-instruct`. Exact Docker/Compose and Ollama versions and the model digest
+remain to be recorded for a reproducible environment inventory; no broader
+version compatibility matrix is claimed here.
 
 ### Installation scope and required inputs
 
@@ -313,11 +318,16 @@ packaging command described under Deployment.
 
 The following are still required before claiming a complete, reproducible installation:
 
-- A combined installation test with newly connected credentials,
-  automatic polling and restart verification. The structural imports of both the Collector
-  and the separate status workflow have passed.
-- A recorded fresh-install run with commit, service versions, model identity and results
-  for intake, confirmation, filing, duplicate prevention and status delivery after restart.
+- A from-scratch Firebase/frontend/Hosting setup following the documented steps;
+  the isolated n8n setup below reused the existing Firebase project and Ollama service.
+- A complete environment inventory, including Docker/Compose and Ollama versions
+  and model digest. The isolated workflow test used repository revision `2ee920c`,
+  n8n 2.45.4 and `qwen3:4b-instruct`.
+- A final acceptance review of the evidence and boundaries below. The isolated
+  error/limit checks now include recipient delivery, recovery and forced replay;
+  they do not constitute one fresh-install run of every scenario against the
+  final combined export. New OAuth connections, automatic intake, confirmation,
+  filing, status delivery and replay after the isolated n8n restart have passed.
 
 These gaps do not prevent a local frontend setup. They do prevent treating the
 current repository as a complete deployment package. Track completion on C-18.
@@ -404,7 +414,8 @@ Do not recreate or delete an existing container/volume to fix an OAuth error.
 
 Use this only for a new installation, not to migrate the existing `n8n` container.
 The running project installation reported n8n `2.45.4` on 2026-11-21. The example
-pins that version; the status-workflow import passed on it, while the complete setup remains unverified.
+pins that version. Isolated n8n setup and restart passed on it; this Compose
+example and a complete from-scratch cloud/frontend setup remain unverified.
 Do not silently replace it with `latest`. Record any deliberately chosen version.
 
 From the repository root, create the ignored local configuration directory:
@@ -484,6 +495,41 @@ This README example has not yet been used for a complete fresh-install acceptanc
    workflow. Disable duplicate/test listeners on the same inbox. Automatic polling
    only works while n8n is running and the workflow is published/active.
 
+### Collector recovery states
+
+Reprocessing the same mail identity first checks a failed review label, then
+existing reply state, before considering ticket processing. These branches run
+when the existing mail is processed again; they are not independent retry timers.
+Do not change a mail identity to force a retry.
+
+- **Manual and limit replies:** A definite rejection can be retried without new
+  AI processing, ticket creation, quota changes or filing. Successful recovery
+  stores `sent` and the Gmail message ID. `sent`, `sending` and `unconfirmed`
+  are not automatically resent. Manual feedback requires `quotaState: released`.
+  Older failed limit replies additionally require a saved definite HTTP rejection;
+  a legacy `failed` value alone is insufficient evidence that delivery failed.
+- **Review label:** `manualLabelStatus: failed` has its own branch even if the
+  reply was already sent. It uses a versioned claim, adds only the configured
+  `zu bearbeiten` label and records `applied` after Gmail confirms that label.
+  It does not remove `INBOX`, send a reply or release a place. The branch ends
+  there; if a reply also remains failed, a later processing attempt handles it.
+- **Bounds and intervention:** Each of these new branches allows at most three
+  recovery attempts. Claims and result writes use document-version conditions.
+  A label claim records `pending`; an interrupted claim is not automatically
+  reclaimed. Inspect Gmail and the execution/reservation before resolving
+  `pending`, `sending`, `unconfirmed` or exhausted attempts. Do not blindly
+  reset state after an uncertain outcome. A successful external action followed
+  by a failed result write remains a case requiring inspection.
+- **Confirmation and completed-mail filing:** Their existing separate states
+  allow recovery of the missing confirmation or `erledigt`/archive action
+  without creating another ticket. The live evidence below covers definite
+  rejection; it is not proof of every interrupted or uncertain-delivery case.
+
+Replace `YOUR_REVIEW_LABEL_ID` in both the label request and its result check.
+The reply and label branches are included in the repository export and were
+published to the regular Collector. Their live failure/replay evidence was
+collected in isolated copies, not by injecting faults into the regular workflow.
+
 The separate status workflow is supplied as `n8n/status-notification-workflow.json`.
 Configure and import it separately as described below; importing the collector alone
 does not install status notifications. See the separate import and delivery results below.
@@ -546,7 +592,8 @@ ticket ID, one received status mail and the matching `sent` delivery record.
 Repeat the same event and restart n8n to verify duplicate protection and persistence.
 Automatic polling and status delivery passed in the existing installation on
 2026-11-22, as recorded below. Restart persistence also passed in that existing
-installation. The full fresh-install acceptance run remains open under C-18.
+installation. The separate n8n setup/restart check below adds new-connection and
+forced-replay evidence; full cloud/frontend installation remains outside its scope.
 
 
 ### Verified status-workflow checks — 2026-11-21
@@ -573,7 +620,8 @@ These are two complementary import/delivery checks, not a full installation
 acceptance. The synthetic event did not test a Board interaction. The later live
 demo below verified automatic polling and an actual Board change using the
 existing installation. The restart check below adds persistence evidence for
-that installation; setup with new OAuth connections remains unverified.
+that installation. New OAuth connections were subsequently verified in the
+separate n8n setup described below.
 
 ### Verified live demo — 2026-11-22
 
@@ -649,15 +697,94 @@ identifiers and greetings are rejected; short concrete issues remain valid.
 Execution and test-data references are kept on C-18. These results establish
 the observed cases, not a guarantee against every possible model fabrication.
 
-### Remaining fresh-install acceptance
+### Verified isolated n8n setup and restart — 2026-11-22
 
-A complete fresh installation with newly connected credentials and recorded
-service/model versions remains open. It must demonstrate automatic intake,
-confirmation, filing, status delivery and duplicate prevention after its own
-restart. The existing-installation restart and AI regression checks above do
-not replace that acceptance. Earlier isolated imports and replay tests remain
-separate evidence. The remaining error/limit cases still need a final mapping
-to the current release for the complete C-18 demonstration acceptance.
+The imported Collector and status workflow ran in a separate n8n 2.45.4 instance
+on port 5680 with its own persistent volume and newly connected Gmail/Firestore
+credentials. Only dedicated test collections in the existing Firebase project
+were used. The Gmail trigger was restricted to the test sender and subject.
+
+- **Automatic intake:** A real email triggered the Collector without a manual
+  start. The installed `qwen3:4b-instruct` model processed the concrete issue;
+  exactly one corresponding ticket was stored with status `triage`.
+- **Confirmation and filing:** Exactly one confirmation with the correct ticket
+  ID arrived. The reservation was `completed`, confirmation `sent` and filing
+  `filed`. The original email had `erledigt` and no `INBOX` label. The test
+  counter was one completed place, zero reserved places, daily limit ten.
+- **Status notification:** An isolated helper atomically changed the test ticket
+  from `triage` to `todo` and created its event with the original creator.
+  Automatic polling sent exactly one status email with the same ticket ID and
+  readable status “Offen”; its delivery record was `sent`.
+- **Restart and forced replay:** After restarting only the test container, the
+  same original email and the same status event were explicitly processed again.
+  No second ticket, confirmation or status email was produced. Stored Gmail IDs
+  and the test counter remained unchanged; credentials worked without reconnecting.
+  The recipient mailbox and sender query still contained exactly two matching
+  messages: one confirmation and one status notification.
+- **Production isolation:** No regular workflow was edited or restarted.
+  A before/after export confirmed the regular Collector's nodes, connections,
+  settings, active version and activation state were unchanged.
+
+**Test boundaries:** This verifies the isolated n8n setup and its persistence,
+not a new Firebase project, a new Ollama installation, the README Compose example,
+frontend/Hosting installation or the public form/mail handler. The status change
+used an atomic API helper, not the regular Board UI. Only the status test copy
+added `Auto-Submitted: auto-generated` and `X-Auto-Response-Suppress: All` to
+prevent its reply from entering the regular Collector as a new request; this
+adaptation is not claimed as a change to the repository export. No failure or
+limit was injected in this run. Private test identifiers and execution references
+remain on C-18 rather than in this README.
+
+### Verified error, limit and recovery checks — 2026-11-22
+
+The following C-18 runs supplement the historical IC-11, IC-12, IC-14 and IC-17
+acceptances. They used inactive, manually executed copies in the separate n8n
+instance, dedicated test collections and real Gmail/Firestore requests where
+specified. Regular workflows were unchanged during fault injection. Technical
+mail/event IDs, collection names and execution references remain on C-18.
+
+| Scenario | Observed result | Test boundary |
+| --- | --- | --- |
+| Insufficient input and AI connection failure | One feedback message without a ticket ID, no ticket, and one total quota release after repeating the same mail. A fresh AI-error mail confirmed the corrected replay check. | Real input mail and isolated failure; not a general guarantee of AI accuracy or every network-failure timing. |
+| Storage failure after reservation | Firestore rejected the ticket commit; reservation became `failed`/`released`, no ticket or success confirmation, one received feedback message. Replay made no second reservation, release or reply. | Invalid update-time condition caused a definite atomic-commit rejection, not a timeout after a possibly successful commit. |
+| Two overlapping arrivals at 9/10 | One automatic ticket and confirmation; the other mail took the limit path with one limit reply, review label and `INBOX` retained. Final counter 10 completed/0 reserved. Replaying both changed no ticket, counter or message IDs. | The initial nine completed places were a synthetic counter value. Runs overlapped, but a simultaneous Firestore commit conflict was not forced. |
+| Confirmation failure | Definite Gmail rejection stored; recovery sent one confirmation with the original ticket ID and completed filing. Third pass sent nothing. Ticket and counter stayed unchanged. | Invalid MIME raw payload caused rejection before delivery; uncertain delivery was not injected. |
+| Completed-mail filing failure | Invalid label caused saved filing failure. Recovery added `erledigt` and removed `INBOX`, without a new ticket or second confirmation. Third pass changed nothing. | Separate from the review-label path and from network interruption. |
+| Manual and limit reply failure | Both definite Gmail errors stored. Recovery sent exactly one received reply of each type, without ticket IDs. Replay did not claim or send; test tickets and counter remained unchanged. | Prepared reservations and counter isolated the reply branch; initial intake and quota release were not repeated in this run. |
+| Statusmail failure | Error, event reference and retry message stored. Recovery sent one received message with the correct ticket reference and status. Fresh-cursor replay hit `ALREADY_EXISTS` and sent nothing. | Synthetic saved event, not a new Board interaction. The existing retry branch made a second rejected attempt during the initial failing run. |
+| Review-label errors | Limit, AI, validation and storage label nodes each stored failed state, mail ID, step and a nonempty error. A separate label-read error stored filing failure. | Prepared upstream data exercised the real label/error-storage boundary. The four Gmail nodes exposed only a generic service error; the label-read test used a missing resource (404), not a network outage. |
+| Independent review-label recovery | Four failed test reservations with already-sent replies became `applied`, each with one attempt. Only `zu bearbeiten` was added; replay changed nothing and sent no reply or quota operation. | Four reservations referenced one existing archived mail. No complete intake or fresh quota-release cycle was executed. |
+| New inbox mail, label recovery | A new real mail initially had `INBOX` and no review label. Recovery added only `zu bearbeiten`, kept `INBOX`, and replay performed no claim or label change. Reservation, Gmail state and outgoing messages stayed unchanged on replay. | Prepared failed-label/sent-reply reservation; the sent-reply value was a fixture, not a claim that this mail received feedback. |
+
+### Recovery publication and remaining boundaries
+
+The processing-retry correction, separate reply recovery and independent label
+recovery were subsequently published to the regular Collector and sanitized
+export. Published versions were read back and matched to the intended nodes and
+connections; n8n health checks passed after restart. Existing unrelated nodes
+and settings were retained. Final label-branch publication includes 188 passing
+automated tests; 30 focused recovery tests passed again before its commit.
+These checks supplement the live evidence; they do not establish delivery alone.
+
+The latest reply/label duplicate checks used already-recovered records in the
+isolated copies. They verified unchanged records and outgoing mail, including
+`INBOX` for the new label test. No new complete production intake-to-statusmail
+run was performed after combining all recovery changes. Earlier structure-only
+import checks apply to their recorded exports, not automatically to later JSON.
+
+Not exercised: concurrent recovery claims, process termination between claim and
+result storage, or a timeout after a possibly completed external action. Version
+guards are configured and covered locally; a live race was not forced. Pending
+claims and uncertain outcomes require the inspection described above. The status
+workflow still has no retry-count limit/backoff for definite failures and does
+not automatically resend `unconfirmed` or outstanding `reserved` deliveries.
+
+The isolated n8n installation/restart evidence remains separate from a complete
+new Firebase/frontend/Hosting installation, the untested Compose example and the
+incomplete environment/model inventory. The previously deferred real Safari
+browser check is also separate from these backend tests. C-18's final acceptance
+review must retain these boundaries; no additional test is implied by this
+documentation update.
 
 ## Ollama Setup
 
@@ -703,9 +830,9 @@ their separate workflow is installed. Record the Git commit, n8n/Docker/Compose/
 `ollama list`, and results on C-18. Restart n8n, then repeat a new-mail test to
 verify persistent credentials and automatic polling. Keep workflow execution IDs
 and test ticket IDs with the result; never record tokens or passwords.
-These are full setup/restart acceptance steps for the new installation. Structural
-imports and the existing-installation restart check have passed separately;
-neither establishes that a complete fresh installation has passed.
+These are full setup/restart acceptance steps for a new installation. The isolated
+n8n setup above passed with new connections, restart and forced replay. Its stated
+boundaries still apply: it does not establish a complete cloud/frontend installation.
 
 
 ## Usage

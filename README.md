@@ -114,8 +114,7 @@ that turns incoming emails into validated, AI-assisted tickets in Triage.
 The hosted frontend does not run n8n or Ollama. Automatic ticket creation and
 notifications require the configured workflows and services to be running.
 The existing collector export is in `n8n/issue-collector-workflow.json`.
-The setup instructions below are documented; all required exports and a clean import test are still being
-prepared under C-18; this README is not yet a verified end-to-end install guide.
+The setup instructions below are documented; the status-workflow import and isolated delivery checks below have passed. A complete fresh-install run remains open under C-18; this README is not yet a verified end-to-end install guide.
 
 ### Workflow screenshots
 
@@ -305,13 +304,14 @@ packaging command described under Deployment.
 3. Install Ollama, pull the model and verify one response before importing the workflow.
 4. Start the isolated n8n installation, connect credentials and replace workflow placeholders.
 5. Run the intake acceptance checks below with one unique test mail.
-6. Install and verify the separate status workflow when its export is available.
+6. Import and verify the separate status-notification workflow.
 7. Configure Hosting separately if a public deployment is required.
 
 The following are still required before claiming a complete, reproducible installation:
 
-- A sanitized export of the status-notification workflow, including its event trigger,
-  credential mapping and retry configuration. Only the collector export is tracked today.
+- A combined installation test with newly connected credentials,
+  automatic polling and restart verification. The structural imports of both the Collector
+  and the separate status workflow have passed.
 - A recorded fresh-install run with commit, service versions, model identity and results
   for intake, confirmation, filing, duplicate prevention and status delivery after restart.
 
@@ -400,7 +400,7 @@ Do not recreate or delete an existing container/volume to fix an OAuth error.
 
 Use this only for a new installation, not to migrate the existing `n8n` container.
 The running project installation reported n8n `2.45.4` on 2026-11-21. The example
-pins that version as a starting point; a fresh import with it is still pending.
+pins that version; the status-workflow import passed on it, while the complete setup remains unverified.
 Do not silently replace it with `latest`. Record any deliberately chosen version.
 
 From the repository root, create the ignored local configuration directory:
@@ -480,13 +480,94 @@ This README example has not yet been used for a complete fresh-install acceptanc
    workflow. Disable duplicate/test listeners on the same inbox. Automatic polling
    only works while n8n is running and the workflow is published/active.
 
-The separate status-notification workflow is not yet supplied in `n8n/`.
-Its export, event-input configuration and import verification remain C-18 work;
-importing the collector alone does not install status notifications.
+The separate status workflow is supplied as `n8n/status-notification-workflow.json`.
+Configure and import it separately as described below; importing the collector alone
+does not install status notifications. See the separate import and delivery results below.
 For an external OAuth app in Testing mode, refresh tokens with these service scopes
 expire after seven days; reconnecting may therefore be required even if Docker is healthy.
 See [Google refresh-token expiration](https://developers.google.com/identity/protocols/oauth2#expiration).
 Reference: [Google OAuth setup in n8n](https://docs.n8n.io/integrations/builtin/credentials/google/oauth-single-service/).
+
+### Status-notification workflow
+
+Import `n8n/status-notification-workflow.json` as a separate, inactive workflow.
+It contains the published 16-node status pipeline exported on 2026-11-21.
+Credentials, pinned data, saved polling cursors, workflow ownership/version metadata
+and deployment-specific identifiers have been removed. The fresh import and separate
+isolated delivery check passed as documented below.
+
+Before activation, configure these values throughout the imported workflow:
+
+| Setting | Required value |
+| --- | --- |
+| `YOUR_FIREBASE_PROJECT` | The same project as the Board and collector, using database `(default)`. |
+| `YOUR_MESSAGE_ID_DOMAIN` | A domain for your installation's Message-ID, such as its Hosting domain, without scheme or path. |
+| `YOUR_STATUS_START_UTC` | UTC cutoff in `Neue Statusereignisse`, for example the actual activation time from `(Get-Date).ToUniversalTime().ToString('o')`. Set it before creating the test event. |
+| Firestore OAuth2 credential | Assign to the five Firestore HTTP nodes listed below. |
+| Gmail OAuth2 credential | Assign to `Statusnachricht senden`; this account sends the notifications. |
+
+The workflow has five Firestore HTTP nodes: `Statusereignisse lesen`,
+`Versand reservieren`, `Versand speichern`, `Fehlgeschlagene Zustellungen lesen`
+and `Wiederholung reservieren`. Assign the Firestore credential to each of these.
+No Ollama credential or Gmail label IDs are needed for this separate workflow.
+
+`Jede Minute` polls once per minute; it is not a webhook. The event query reads
+the `statusEvents` collection group created by saved Board status changes.
+Each event must include `ticketId`, `oldStatus`, `newStatus` and a creator map
+whose `email` identifies the original recipient. Allowed statuses are `triage`,
+`todo`, `in-progress`, `feedback` and `done`. Events without a creator address
+are skipped. Configure the Board against the same project before testing.
+
+The initial cutoff prevents sending historical events from a previous installation.
+The exported cursor is empty; an unchanged placeholder stops processing with an
+explicit configuration error. After published runs, n8n stores its event cursor
+in workflow static data. Keep the persistent n8n volume across restarts. Do not
+reset the cursor or set an old cutoff against shared data merely to test import.
+
+`issue-collector-status-deliveries/{eventId}` stores delivery reservations and
+results. Existing reservations suppress a second initial send. `sent` records the
+Gmail message ID; `failed` stores error details and the message needed for retry.
+The second schedule branch retries `failed` records using an update-time condition
+to reserve each retry. The current export has no retry-count limit or backoff;
+an ongoing definite failure is retried on subsequent polls. `unconfirmed` results
+and outstanding `reserved` records are not automatically resent: inspect Gmail
+and execution history before recovery to avoid duplicate mail. A stable Message-ID
+alone does not guarantee Gmail deduplication.
+
+Use a separate test project for import checks, including an empty delivery
+collection: the retry branch reads failed records independently of the event cutoff.
+Activate only one status workflow for the target project. Create and move one test
+ticket after the configured cutoff, then verify the event ID, creator address,
+ticket ID, one received status mail and the matching `sent` delivery record.
+Repeat the same event and restart n8n to verify duplicate protection and persistence.
+The full scheduled/restart acceptance run remains open under C-18. The narrower
+import and manual delivery checks below have passed.
+
+
+### Verified status-workflow checks — 2026-11-21
+
+- **Fresh import:** Imported the sanitized 16-node JSON into n8n 2.45.4 with a
+  new, separate Docker data volume. A read-back export confirmed the workflow
+  was inactive and had no credential bindings. This check did not send mail.
+- **Isolated delivery:** Imported a separate test copy into the existing n8n
+  installation and assigned its existing Gmail/Firestore connections. Only
+  separate test collections for status events and delivery records were used.
+  The schedule was replaced by a manual trigger for controlled execution.
+- **Result:** A synthetic event for an isolated test ticket changed from `triage`
+  to `todo`. Exactly one
+  message arrived in the designated test recipient's Gmail inbox, showing that
+  ticket ID and the readable status “Offen”. The delivery record was `sent`.
+- **Repeat:** Processing the same event again encountered the existing delivery
+  reservation (`ALREADY_EXISTS`) and did not send another message. The sender's
+  mailbox contained exactly one matching message after the repeat.
+- **Production unchanged:** Before/after exports confirmed the regular status
+  workflow's version, nodes and connections were unchanged and it remained active.
+  The test copy remained inactive after the manual runs.
+
+These are two complementary checks, not a full installation acceptance:
+new OAuth connections, automatic polling, restart persistence and a fresh
+Collector-to-status-mail demonstration still require verification. The synthetic
+event also does not constitute a new Board interaction test.
 
 ## Ollama Setup
 
@@ -560,7 +641,7 @@ such as `DEMO-YYYYMMDD-HHMM - Board does not load` to identify one complete run.
   Executions. Use a separate sender account with an address you can read.
 - Confirm Firebase is reachable, Ollama responds, and the regular collector and
   separate status-notification workflow are active. Only one intake workflow
-  should watch this inbox. A fresh import still needs the missing status export.
+  should watch this inbox. A fresh import also needs the configured status workflow.
 - Check today's Europe/Berlin quota: fewer than ten completed plus reserved
   places are needed for the automatic success path. Record its starting value.
   Do not reset the shared production counter for a demonstration.
@@ -621,7 +702,7 @@ than presenting a creation confirmation as proof of a status notification.
 - `components/assets/`: fonts, images and icons.
 - `components/css/` and `components/html/`: shared controls, dialogs and pages.
 - `components/js/`: page logic, stores, Firebase adapters and validation.
-- `n8n/`: collector workflow export; `n8n/local/` is ignored for local material.
+- `n8n/`: collector and status-notification workflow exports; `n8n/local/` is ignored for local material.
 - `tests/`: automated checks; `tests/local/` is ignored.
 - Root HTML files: Welcome, login, signup, stakeholder, request form and board pages.
 - `main.js` / `base.css`: shared entry logic and base styling.

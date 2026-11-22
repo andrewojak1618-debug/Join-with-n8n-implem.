@@ -1,0 +1,477 @@
+{
+  "name": "Join – Status notifications",
+  "nodes": [
+    {
+      "id": "status-node-1",
+      "name": "Jede Minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "status-node-2",
+      "name": "Statusereignisse lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://firestore.googleapis.com/v1/projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents:runQuery",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"structuredQuery\":{\"from\":[{\"collectionId\":\"statusEvents\",\"allDescendants\":true}]}}",
+        "options": {}
+      }
+    },
+    {
+      "id": "status-node-3",
+      "name": "Neue Statusereignisse",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "const state = $getWorkflowStaticData('global');\nconst since = state.since || 'YOUR_STATUS_START_UTC';\nif (!Number.isFinite(Date.parse(since))) throw new Error('Configure YOUR_STATUS_START_UTC before activation.');\nconst previous = new Set(state.paths || []);\nconst documents = $input.all().flatMap(item => [item.json].flat()).map(row => row.document).filter(Boolean);\nconst fresh = documents.filter(doc => doc.createTime.replace(/Z$/, '').padEnd(29,'0') > since.replace(/Z$/, '').padEnd(29,'0') || (doc.createTime === since && !previous.has(doc.name)));\nfresh.sort((a,b) => a.createTime.replace(/Z$/, '').padEnd(29,'0').localeCompare(b.createTime.replace(/Z$/, '').padEnd(29,'0')));\nif (fresh.length) {\n  const latest = fresh[fresh.length - 1].createTime;\n  state.since = latest;\n  state.paths = [...new Set([...(latest === since ? previous : []), ...fresh.filter(doc => doc.createTime === latest).map(doc => doc.name)])];\n}\nreturn fresh.map(doc => ({json:{eventId:doc.name.split('/').pop(),ticketId:doc.fields.ticketId.stringValue,oldStatus:doc.fields.oldStatus.stringValue,newStatus:doc.fields.newStatus.stringValue,document:doc}}));"
+      },
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "id": "status-node-4",
+      "name": "Empfänger aus Ersteller bestimmen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const event = $json;\nconst email = event.document.fields.creator?.mapValue?.fields?.email?.stringValue;\nconst recipientEmail = typeof email === 'string' ? email.trim() || null : null;\nreturn { json: { ...event, recipientEmail } };"
+      }
+    },
+    {
+      "id": "status-node-5",
+      "name": "Statusnachricht vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const { ticketId, newStatus } = $json;\nconst labels = {\n  triage: 'In Prüfung',\n  todo: 'Offen',\n  'in-progress': 'In Bearbeitung',\n  feedback: 'Rückmeldung ausstehend',\n  done: 'Erledigt'\n};\nconst status = labels[newStatus];\nif (!ticketId || !status) throw new Error('Ticket-ID oder gültiger Status fehlt.');\nconst subject = 'Join: Neuer Ticketstatus – ' + status;\nconst text = ['Hallo,', '', 'Ihr Ticket hat jetzt den Status „' + status + '“.', 'Ticket-ID: ' + ticketId, '', 'Ihr Join-Team'].join('\\n');\nreturn { json: { ...$json, subject, text } };"
+      }
+    },
+    {
+      "id": "status-node-6",
+      "name": "Adressierte Nachrichten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return $input.all().flatMap((item,index) => item.json.recipientEmail ? [{json:item.json,pairedItem:{item:index}}] : []);"
+      }
+    },
+    {
+      "id": "status-node-7",
+      "name": "Versand reservieren",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1440,
+        0
+      ],
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "method": "POST",
+        "url": "https://firestore.googleapis.com/v1/projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents/issue-collector-status-deliveries",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "documentId",
+              "value": "={{ $json.eventId }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"fields\":{\"state\":{\"stringValue\":\"reserved\"},\"ticketId\":{\"stringValue\":\"{{ $json.ticketId }}\"},\"recipient\":{\"stringValue\":\"{{ $json.recipientEmail }}\"}}}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "status-node-8",
+      "name": "Neue Reservierungen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return $input.all().flatMap((item,index)=>{\n const {statusCode,body}=item.json;\n if(statusCode===409 && body.error?.status==='ALREADY_EXISTS') return [];\n if(statusCode!==200) throw new Error('Versandreservierung fehlgeschlagen: '+statusCode);\n return [{json:$('Adressierte Nachrichten').itemMatching(index).json,pairedItem:{item:index}}];\n});"
+      }
+    },
+    {
+      "id": "status-node-9",
+      "name": "Statusnachricht senden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1920,
+        0
+      ],
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "method": "POST",
+        "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {raw: ('To: '+$json.recipientEmail+'\\r\\nMessage-ID: <join-status-'+$json.eventId+'@YOUR_MESSAGE_ID_DOMAIN>\\r\\nSubject: =?UTF-8?B?'+$json.subject.base64Encode()+'?=\\r\\nMIME-Version: 1.0\\r\\nContent-Type: text/plain; charset=UTF-8\\r\\nContent-Transfer-Encoding: base64\\r\\n\\r\\n'+$json.text.base64Encode()).base64Encode().replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'')} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "status-node-10",
+      "name": "Versand speichern",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2160,
+        0
+      ],
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "method": "PATCH",
+        "url": "=https://firestore.googleapis.com/v1/projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents/issue-collector-status-deliveries/{{ $json.eventId }}?currentDocument.exists=true&{{ Object.keys($json.fields).map(k => \"updateMask.fieldPaths=\"+k).join(\"&\") }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({fields:$json.fields}) }}"
+      }
+    },
+    {
+      "id": "status-node-11",
+      "name": "Versanddaten übernehmen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "position": [
+        1450,
+        0
+      ]
+    },
+    {
+      "id": "status-node-12",
+      "name": "Versandergebnis erfassen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "return $input.all().map((item,index)=>{\n const message=$('Versanddaten übernehmen').itemMatching(index).json;\n const {statusCode,body,error}=item.json;\n const sent=statusCode===200 && !!body?.id;\n const state=sent?'sent':([400,401,403,404,429].includes(statusCode)?'failed':'unconfirmed');\n const fields={state:{stringValue:state}};\n if(sent) fields.gmailMessageId={stringValue:body.id};\n else {\n   fields.lastError={stringValue:String(body?.error?.message || error?.message || error || 'Versandergebnis unbekannt')};\n   fields.failedAt={timestampValue:new Date().toISOString()};\n   fields.httpStatus={integerValue:String(statusCode || 0)};\n   fields.retryMessage={stringValue:JSON.stringify({eventId:message.eventId,ticketId:message.ticketId,recipientEmail:message.recipientEmail,subject:message.subject,text:message.text})};\n }\n return {json:{eventId:message.eventId,fields},pairedItem:{item:index}};\n});"
+      },
+      "position": [
+        1930,
+        0
+      ]
+    },
+    {
+      "id": "status-node-13",
+      "name": "Fehlgeschlagene Zustellungen lesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "method": "POST",
+        "url": "https://firestore.googleapis.com/v1/projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents:runQuery",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"structuredQuery\":{\"from\":[{\"collectionId\":\"issue-collector-status-deliveries\"}],\"where\":{\"fieldFilter\":{\"field\":{\"fieldPath\":\"state\"},\"op\":\"EQUAL\",\"value\":{\"stringValue\":\"failed\"}}}}}",
+        "options": {}
+      },
+      "position": [
+        240,
+        320
+      ]
+    },
+    {
+      "id": "status-node-14",
+      "name": "Wiederholung vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "return $input.all().flatMap((item,index)=>{const doc=item.json.document;if(!doc || doc.fields.state.stringValue!=='failed') return [];return [{json:{...JSON.parse(doc.fields.retryMessage.stringValue),version:doc.updateTime},pairedItem:{item:index}}];});"
+      },
+      "position": [
+        480,
+        320
+      ]
+    },
+    {
+      "id": "status-node-15",
+      "name": "Wiederholung reservieren",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "method": "PATCH",
+        "url": "=https://firestore.googleapis.com/v1/projects/YOUR_FIREBASE_PROJECT/databases/(default)/documents/issue-collector-status-deliveries/{{ $json.eventId }}?updateMask.fieldPaths=state&currentDocument.updateTime={{ $json.version }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"fields\":{\"state\":{\"stringValue\":\"reserved\"}}}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "position": [
+        720,
+        320
+      ]
+    },
+    {
+      "id": "status-node-16",
+      "name": "Reservierte Wiederholungen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "parameters": {
+        "jsCode": "return $input.all().flatMap((item,index)=>{const {statusCode,body}=item.json;if(body?.error?.status==='FAILED_PRECONDITION')return [];if(statusCode!==200)throw new Error('Wiederholung fehlgeschlagen: '+statusCode);return [{json:$('Wiederholung vorbereiten').itemMatching(index).json,pairedItem:{item:index}}];});"
+      },
+      "position": [
+        960,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Jede Minute": {
+      "main": [
+        [
+          {
+            "node": "Statusereignisse lesen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fehlgeschlagene Zustellungen lesen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Statusereignisse lesen": {
+      "main": [
+        [
+          {
+            "node": "Neue Statusereignisse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Neue Statusereignisse": {
+      "main": [
+        [
+          {
+            "node": "Empfänger aus Ersteller bestimmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Empfänger aus Ersteller bestimmen": {
+      "main": [
+        [
+          {
+            "node": "Statusnachricht vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Statusnachricht vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Adressierte Nachrichten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adressierte Nachrichten": {
+      "main": [
+        [
+          {
+            "node": "Versand reservieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Versand reservieren": {
+      "main": [
+        [
+          {
+            "node": "Neue Reservierungen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Neue Reservierungen": {
+      "main": [
+        [
+          {
+            "node": "Versanddaten übernehmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Statusnachricht senden": {
+      "main": [
+        [
+          {
+            "node": "Versandergebnis erfassen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Versanddaten übernehmen": {
+      "main": [
+        [
+          {
+            "node": "Statusnachricht senden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Versandergebnis erfassen": {
+      "main": [
+        [
+          {
+            "node": "Versand speichern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fehlgeschlagene Zustellungen lesen": {
+      "main": [
+        [
+          {
+            "node": "Wiederholung vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wiederholung vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Wiederholung reservieren",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wiederholung reservieren": {
+      "main": [
+        [
+          {
+            "node": "Reservierte Wiederholungen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reservierte Wiederholungen": {
+      "main": [
+        [
+          {
+            "node": "Versanddaten übernehmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all"
+  },
+  "active": false,
+  "pinData": {}
+}

@@ -17,9 +17,9 @@ function runCode(name, input, linked = {}) {
 
 /** Supplies a valid classified mail without using personal test data. */
 function validMail() {
-  return { ticket: { title: 'Login blocked', description: 'Login unavailable', issueType: 'bug', category: 'technical-task', priority: 'urgent', deadline: null },
+  return { ticket: { hasActionableRequest: true, sourceQuote: 'Login unavailable', title: 'Login blocked', description: 'Login unavailable', issueType: 'bug', category: 'technical-task', priority: 'urgent', deadline: null },
     gmailMessageId: 'gmail-test', mailMessageId: '<test@example.com>', senderEmail: 'sender@example.com',
-    senderName: 'Sender', emailSubject: 'Original subject', emailBody: 'Original\nbody',
+    senderName: 'Sender', emailSubject: 'Original subject', emailBody: 'Login unavailable',
     deduplicationKey: 'mail-key', reservationId: 'a'.repeat(64),
     reservation: { name: 'mail-reservation', updateTime: 'mail-version' },
     quota: { state: 'reserved', counterName: 'counter' }, validation: { valid: true, errors: [] } };
@@ -176,4 +176,49 @@ test('classification accepts all three supported mappings and rejects missing de
   const mail = validMail();
   Object.assign(mail.ticket, { description: ' ', category: 'user-story' });
   assert.equal(runCode('Ticketdaten prüfen', [mail])[0].json.validation.errors.length, 2);
+});
+
+test('insufficient mail and invented calendar evidence never reach storage', () => {
+  const examples = [
+    { emailBody: '*DEMO-2026-B*', emailSubject: 'DEMO-2026-B', sourceQuote: 'DEMO-2026-B' },
+    { emailBody: 'Hallo, danke!', emailSubject: 'Test', sourceQuote: 'Hallo, danke!' },
+    { emailBody: 'TEST-2026-A', emailSubject: 'Test', sourceQuote: 'Kalenderhilfe für relative Lieferfristen' },
+    { emailBody: 'Board bleibt leer', emailSubject: 'Board', sourceQuote: 'Nicht vorhandenes Anliegen' },
+  ];
+  for (const example of examples) {
+    const mail = { ...validMail(), ...example };
+    mail.ticket = { ...mail.ticket, sourceQuote: example.sourceQuote };
+    const checked = runCode('Ticketdaten prüfen', [mail])[0].json;
+    assert.equal(checked.validation.valid, false);
+    assert.throws(() => runCode('Ticketabschluss vorbereiten', [counter()], { 'Ticketdaten gültig?': [checked] }));
+  }
+});
+
+test('missing or negative actionable classification fails closed', () => {
+  for (const hasActionableRequest of [undefined, false, 'true']) {
+    const mail = validMail();
+    mail.ticket.hasActionableRequest = hasActionableRequest;
+    assert.equal(runCode('Ticketdaten prüfen', [mail])[0].json.validation.valid, false);
+  }
+});
+
+test('short concrete requests and subject evidence remain accepted', () => {
+  for (const [emailSubject, emailBody, sourceQuote] of [
+    ['Problem', 'Login kaputt', 'Login kaputt'],
+    ['Board bleibt leer', 'Bitte prüfen', 'Board bleibt leer'],
+    ['Fehler', 'Board\nbleibt leer', 'Board bleibt leer'],
+  ]) {
+    const mail = { ...validMail(), emailSubject, emailBody };
+    mail.ticket.sourceQuote = sourceQuote;
+    assert.equal(runCode('Ticketdaten prüfen', [mail])[0].json.validation.valid, true);
+  }
+});
+
+test('insufficient requests retain the invalid-data release and review path', () => {
+  const failure = { ...validMail(), status: 'manual_review', reservationUpdateTime: 'mail-version', failedAt: stamp };
+  const writes = runCode('Tagesplatz-Freigabe vorbereiten', [counter(1, 1)], { 'Freigabedaten bereitstellen': [failure] })[0].json.commit.writes;
+  assert.equal(writes[0].update.fields.reservedCount.integerValue, '0');
+  assert.equal(writes[1].update.fields.status.stringValue, 'manual_review');
+  assert.equal(writes[1].update.fields.quotaState.stringValue, 'released');
+  assert.throws(() => runCode('Tagesplatz-Freigabe vorbereiten', [counter(0, 1)], { 'Freigabedaten bereitstellen': [failure] }));
 });

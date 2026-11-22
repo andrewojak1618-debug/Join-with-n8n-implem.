@@ -116,8 +116,9 @@ notifications require the configured workflows and services to be running.
 The existing collector export is in `n8n/issue-collector-workflow.json`.
 The structural workflow imports, isolated status delivery checks and the live
 success-path demo on 2026-11-22 have passed. The demo used the existing installation
-and connected credentials. A complete fresh-install run and restart verification
-remain open under C-18; this is not yet a verified end-to-end installation guide.
+and connected credentials. Restart verification and a live insufficient-content
+check also passed in that installation, as detailed below. A complete fresh-install
+run remains open under C-18; this is not yet a verified end-to-end installation guide.
 
 ### Workflow screenshots
 
@@ -544,8 +545,8 @@ ticket after the configured cutoff, then verify the event ID, creator address,
 ticket ID, one received status mail and the matching `sent` delivery record.
 Repeat the same event and restart n8n to verify duplicate protection and persistence.
 Automatic polling and status delivery passed in the existing installation on
-2026-11-22, as recorded below. Restart persistence and the full fresh-install
-acceptance run remain open under C-18.
+2026-11-22, as recorded below. Restart persistence also passed in that existing
+installation. The full fresh-install acceptance run remains open under C-18.
 
 
 ### Verified status-workflow checks — 2026-11-21
@@ -571,7 +572,8 @@ acceptance run remain open under C-18.
 These are two complementary import/delivery checks, not a full installation
 acceptance. The synthetic event did not test a Board interaction. The later live
 demo below verified automatic polling and an actual Board change using the
-existing installation; new OAuth setup and restart persistence remain unverified.
+existing installation. The restart check below adds persistence evidence for
+that installation; setup with new OAuth connections remains unverified.
 
 ### Verified live demo — 2026-11-22
 
@@ -599,12 +601,63 @@ processing, and n8n could reach the installed `qwen3:4b-instruct` model.
   This run began with a sent test email; it did not repeat the public form/mail
   handler test or inject an error/limit failure.
 
-**Still open:** A complete fresh installation with newly connected credentials
-and recorded service/model versions, plus restart persistence, automatic polling
-and duplicate prevention after restart. Earlier isolated import/repeat tests and
-this successful existing-installation demo are separate evidence, not substitutes
-for those checks. Error-path evidence still needs to be reconciled with the current
-release for the final C-18 demonstration acceptance.
+### Verified restart — 2026-11-22
+
+The existing n8n 2.45.4 container was restarted with its persistent data volume.
+The service became reachable again, both regular workflows remained active,
+and the stored trigger/cursor state and connected credentials were retained.
+
+- **Automatic processing:** A new external email started the Collector without
+  a manual run. Exactly one Triage ticket, one confirmation with its ticket ID,
+  and the expected `erledigt` filing without `INBOX` were verified.
+- **Status delivery:** Moving that ticket once from `triage` to `todo` created
+  one matching event. Exactly one status message with the correct ticket ID
+  and new status arrived in the creator's inbox.
+- **Persistence and duplicates:** Previously sent message IDs remained unchanged;
+  no extra delivery caused by the restart was observed. This was not a forced
+  replay of the same email or event. The isolated repeat test above remains
+  a separate duplicate-prevention check.
+- **AI limitation found:** The restart email contained only a test identifier.
+  Although the technical flow passed, the model invented ticket content from
+  the calendar aid. This was not accepted as correct classification. The fix
+  and subsequent live regression check are recorded below.
+
+### Verified insufficient-content handling — 2026-11-22
+
+The Collector prompt, output schema and validation now require an explicit
+`hasActionableRequest` result and a verbatim `sourceQuote` from the email.
+Calendar metadata must not become ticket content. Missing evidence, test-only
+identifiers and greetings are rejected; short concrete issues remain valid.
+
+- **Isolated checks:** Four real Ollama cases distinguished identifiers and
+  greetings from short and detailed issue reports. All 158 automated tests
+  passed, including 16 Collector tests covering invented evidence and the
+  existing release/review path.
+- **Regular workflow:** The three corrected nodes were published and verified
+  in the active Collector. Its connections were unchanged. A new greeting-only
+  email automatically triggered the regular workflow with `qwen3:4b-instruct`.
+- **Model and validation:** The output had `hasActionableRequest: false`, empty
+  title, description and source quote, `issueType: unknown`, and no deadline
+  candidates. Validation rejected it; no corresponding ticket was stored.
+- **Review and quota:** The mail reservation became `manual_review` with
+  `quotaState: released`. The counter went from two completed/one reserved
+  during processing to two completed/zero reserved. The original email stayed
+  in the inbox with the configured review label. The manual reply was recorded
+  as `sent`; this check did not independently verify the recipient's inbox or
+  replay the same mail.
+
+Execution and test-data references are kept on C-18. These results establish
+the observed cases, not a guarantee against every possible model fabrication.
+
+### Remaining fresh-install acceptance
+
+A complete fresh installation with newly connected credentials and recorded
+service/model versions remains open. It must demonstrate automatic intake,
+confirmation, filing, status delivery and duplicate prevention after its own
+restart. The existing-installation restart and AI regression checks above do
+not replace that acceptance. Earlier isolated imports and replay tests remain
+separate evidence. The remaining error/limit cases still need a final mapping
+to the current release for the complete C-18 demonstration acceptance.
 
 ## Ollama Setup
 
@@ -650,8 +703,9 @@ their separate workflow is installed. Record the Git commit, n8n/Docker/Compose/
 `ollama list`, and results on C-18. Restart n8n, then repeat a new-mail test to
 verify persistent credentials and automatic polling. Keep workflow execution IDs
 and test ticket IDs with the result; never record tokens or passwords.
-These are full setup/restart acceptance steps. The structural imports have passed;
-they do not establish that a fresh installation or restart has passed.
+These are full setup/restart acceptance steps for the new installation. Structural
+imports and the existing-installation restart check have passed separately;
+neither establishes that a complete fresh installation has passed.
 
 
 ## Usage

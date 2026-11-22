@@ -433,7 +433,7 @@
           "conditions": [
             {
               "id": "04fb2438-f275-4f6c-b430-e6d7f49d6782",
-              "leftValue": "={{ $json.fields?.status?.stringValue === 'failed' && $json.fields.manualReplyStatus?.stringValue !== 'sent' && Number($json.fields.aiAttemptCount?.integerValue ?? 1) < 3 }}",
+              "leftValue": "={{ $json.fields?.status?.stringValue === 'failed' && !$json.fields.manualReplyStatus && !$json.fields.limitReplyStatus && Number($json.fields.aiAttemptCount?.integerValue ?? 1) < 3 }}",
               "rightValue": "",
               "operator": {
                 "type": "boolean",
@@ -1719,7 +1719,7 @@
         "method": "PATCH",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {fields:{limitReplyStatus:{stringValue:'failed'} ,limitReplyHttpStatus:($json.statusCode ? {integerValue:String($json.statusCode)}  : {nullValue:null} ),limitReplyErrorMailId:{stringValue:$('Tageslimit vorbereiten').item.json.id} ,limitReplyErrorStep:{stringValue:\"Limitantwort senden\"} ,limitReplyErrorMessage:{stringValue:String($json.body?.error?.message || $json.error?.message || $json.error || $json.message || 'Gmail-Fehler').slice(0,2000)}  }  }  }}"
+        "jsonBody": "={{ {fields:{limitReplyStatus:{stringValue:([400,401,403,404,413,422,429].includes($json.statusCode) && Boolean($json.body?.error) ? 'failed' : 'unconfirmed')} ,limitReplyHttpStatus:($json.statusCode ? {integerValue:String($json.statusCode)}  : {nullValue:null} ),limitReplyErrorMailId:{stringValue:$('Tageslimit vorbereiten').item.json.id} ,limitReplyErrorStep:{stringValue:\"Limitantwort senden\"} ,limitReplyErrorMessage:{stringValue:String($json.body?.error?.message || $json.error?.message || $json.error || $json.message || 'Gmail-Fehler').slice(0,2000)}  }  }  }}"
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
@@ -1993,7 +1993,7 @@
         "method": "PATCH",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {fields:{manualReplyStatus:{stringValue:'unconfirmed'} ,manualReplyErrorStep:{stringValue:\"Manuelle Rückmeldung senden\"} ,manualReplyErrorMailId:{stringValue:$('Tageslimit vorbereiten').item.json.id} ,manualReplyErrorMessage:{stringValue:String($json.body?.error?.message || $json.error?.message || $json.error || $json.message || 'Gmail-Fehler').slice(0,2000)} } }  }}"
+        "jsonBody": "={{ {fields:{manualReplyStatus:{stringValue:([400,401,403,404,413,422,429].includes($json.statusCode) && Boolean($json.body?.error) ? 'failed' : 'unconfirmed')} ,manualReplyErrorStep:{stringValue:\"Manuelle Rückmeldung senden\"} ,manualReplyErrorMailId:{stringValue:$('Tageslimit vorbereiten').item.json.id} ,manualReplyErrorMessage:{stringValue:String($json.body?.error?.message || $json.error?.message || $json.error || $json.message || 'Gmail-Fehler').slice(0,2000)} } }  }}"
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
@@ -2122,6 +2122,147 @@
       ],
       "id": "dbe7c07a-e31d-415e-b373-c2cfa6b788fa",
       "name": "Freigabe für KI-Fehler?"
+    },
+    {
+      "id": "713299f7-a97b-4718-9da8-5103af554f46",
+      "name": "Antwortstatus vorhanden?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3200,
+        -520
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "04fb2438-f275-4f6c-b430-e6d7f49d6782",
+              "leftValue": "={{ Boolean($json.fields?.manualReplyStatus || $json.fields?.limitReplyStatus) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "50c5de25-5082-488d-9f3a-e513f7941adf",
+      "name": "Antwort-Nachversand vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3480,
+        -520
+      ],
+      "parameters": {
+        "jsCode": "const out=[];\nfor (const [index,item] of $input.all().entries()) {\n  const doc=item.json, f=doc.fields || {}, status=f.status?.stringValue;\n  const kind=status==='limit_reached'?'limit':['failed','manual_review'].includes(status)?'manual':null;\n  if(!kind || (kind==='manual' && f.quotaState?.stringValue!=='released')) continue;\n  if(kind==='limit' && ![400,401,403,404,413,422,429].includes(Number(f.limitReplyHttpStatus?.integerValue))) continue;\n  const prefix=kind+'Reply', attempts=Number(f[prefix+'RetryCount']?.integerValue || 0);\n  if(f[prefix+'Status']?.stringValue!=='failed' || !Number.isSafeInteger(attempts) || attempts<0 || attempts>=3) continue;\n  const mail=$('Mail eindeutig kennzeichnen').itemMatching(index).json;\n  const recipient=mail.from?.value?.[0]?.address;\n  if(!/^[^\\s@<>,;:]+@[^\\s@<>,;:]+$/.test(recipient) || !doc.updateTime || !doc.name) throw Error('Antwortdaten unvollständig');\n  const subject=kind==='limit'?'Join - Tageslimit erreicht':'Join - Nachricht erhalten';\n  const body=kind==='limit'?'Heute sind alle zehn automatischen Ticketplätze belegt. Für deine Anfrage wurde kein Ticket erstellt. Deine E-Mail ist zur manuellen Nachbearbeitung vorgemerkt.':'Wir haben deine Nachricht erhalten. Unser Team prüft deine Anfrage und meldet sich bei dir.';\n  const raw=Buffer.from(['To: '+recipient,'Subject: '+subject,'Auto-Submitted: auto-replied','X-Auto-Response-Suppress: All','MIME-Version: 1.0','Content-Type: text/plain; charset=UTF-8','',body].join('\\r\\n')).toString('base64url');\n  out.push({json:{name:doc.name,updateTime:doc.updateTime,prefix,attempts:attempts+1,raw,mailId:mail.id},pairedItem:{item:index}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "f0a3b931-a887-4228-8b15-e4611155f48f",
+      "name": "Antwort-Nachversand übernehmen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        3760,
+        -520
+      ],
+      "parameters": {
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json.name + '?updateMask.fieldPaths=' + $json.prefix + 'Status&updateMask.fieldPaths=' + $json.prefix + 'RetryCount&currentDocument.updateTime=' + encodeURIComponent($json.updateTime) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "method": "PATCH",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { fields: { [$json.prefix+'Status']: {stringValue:'sending'}, [$json.prefix+'RetryCount']: {integerValue:String($json.attempts)} } } }}"
+      }
+    },
+    {
+      "id": "eb3d6f51-72d2-4869-9076-d80d5c5d089a",
+      "name": "Antwort nachsenden",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4040,
+        -520
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {raw:$('Antwort-Nachversand vorbereiten').item.json.raw} }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "c2a73f77-2641-4177-aca8-b43df27295a4",
+      "name": "Antwort-Nachversand Ergebnis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4320,
+        -520
+      ],
+      "parameters": {
+        "jsCode": "return $input.all().map((item,index)=>{\n  const response=item.json, data=$('Antwort-Nachversand vorbereiten').itemMatching(index).json;\n  const version=$('Antwort-Nachversand übernehmen').itemMatching(index).json.updateTime;\n  const sent=response.statusCode===200 && Boolean(response.body?.id);\n  const rejected=[400,401,403,404,413,422,429].includes(response.statusCode) && Boolean(response.body?.error);\n  const state=sent?'sent':rejected?'failed':'unconfirmed';\n  const p=data.prefix, fields={ [p+'Status']:{stringValue:state}, [p+'HttpStatus']:Number.isInteger(response.statusCode)?{integerValue:String(response.statusCode)}:{nullValue:null} };\n  if(sent) fields[p+'MessageId']={stringValue:response.body.id};\n  else Object.assign(fields,{[p+'ErrorMailId']:{stringValue:data.mailId},[p+'ErrorStep']:{stringValue:'Antwort nachsenden'},[p+'ErrorMessage']:{stringValue:String(response.body?.error?.message || response.error?.message || response.error || response.message || 'Zustellung unbestätigt').slice(0,2000)}});\n  return {json:{name:data.name,version,fields},pairedItem:{item:index}};\n});"
+      }
+    },
+    {
+      "id": "54e313eb-2c75-4ea7-8aa9-b8b697c70c41",
+      "name": "Antwort-Nachversand speichern",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        4600,
+        -520
+      ],
+      "parameters": {
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json.name + '?' + Object.keys($json.fields).map(key=>'updateMask.fieldPaths='+key).join('&') + '&currentDocument.updateTime=' + encodeURIComponent($json.version) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleFirebaseCloudFirestoreOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "method": "PATCH",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {fields:$json.fields} }}"
+      }
     }
   ],
   "connections": {
@@ -2300,7 +2441,7 @@
       "main": [
         [
           {
-            "node": "Reservierung fehlgeschlagen?",
+            "node": "Antwortstatus vorhanden?",
             "type": "main",
             "index": 0
           }
@@ -3127,6 +3268,75 @@
         [
           {
             "node": "Tagesplatz bei ungültigen Daten freigeben",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwortstatus vorhanden?": {
+      "main": [
+        [
+          {
+            "node": "Antwort-Nachversand vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reservierung fehlgeschlagen?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort-Nachversand vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Antwort-Nachversand übernehmen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort-Nachversand übernehmen": {
+      "main": [
+        [
+          {
+            "node": "Antwort nachsenden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort nachsenden": {
+      "main": [
+        [
+          {
+            "node": "Antwort-Nachversand Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Antwort-Nachversand Ergebnis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Antwort-Nachversand Ergebnis": {
+      "main": [
+        [
+          {
+            "node": "Antwort-Nachversand speichern",
             "type": "main",
             "index": 0
           }

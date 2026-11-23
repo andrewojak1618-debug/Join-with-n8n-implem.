@@ -163,7 +163,7 @@
         "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {raw: ('To: '+$json.recipientEmail+'\\r\\nMessage-ID: <join-status-'+$json.eventId+'@YOUR_MESSAGE_ID_DOMAIN>\\r\\nSubject: =?UTF-8?B?'+$json.subject.base64Encode()+'?=\\r\\nMIME-Version: 1.0\\r\\nContent-Type: text/plain; charset=UTF-8\\r\\nContent-Transfer-Encoding: base64\\r\\n\\r\\n'+$json.text.base64Encode()).base64Encode().replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'')} }}",
+        "jsonBody": "={{ {raw: ('To: '+$json.recipientEmail+'\\r\\nAuto-Submitted: auto-generated\\r\\nX-Auto-Response-Suppress: All\\r\\nMessage-ID: <join-status-'+$json.eventId+'@YOUR_MESSAGE_ID_DOMAIN>\\r\\nSubject: =?UTF-8?B?'+$json.subject.base64Encode()+'?=\\r\\nMIME-Version: 1.0\\r\\nContent-Type: text/plain; charset=UTF-8\\r\\nContent-Transfer-Encoding: base64\\r\\n\\r\\n'+$json.text.base64Encode()).base64Encode().replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'')} }}",
         "options": {
           "response": {
             "response": {
@@ -174,7 +174,8 @@
           }
         }
       },
-      "onError": "continueRegularOutput"
+      "onError": "continueRegularOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "id": "status-node-10",

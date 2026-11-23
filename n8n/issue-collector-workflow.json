@@ -13,7 +13,7 @@
         },
         "simple": false,
         "filters": {
-          "q": "in:inbox -from:collector@example.com"
+          "q": "in:inbox to:jissuecollector@gmail.com -from:jissuecollector@gmail.com -from:no-reply@google.com -from:no-reply@accounts.google.com"
         },
         "options": {}
       },
@@ -24,7 +24,8 @@
         48
       ],
       "id": "d199da0b-dfac-4feb-8feb-7110510bb3f1",
-      "name": "Gmail Trigger"
+      "name": "Gmail Trigger",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -127,7 +128,7 @@
             {
               "id": "7a6d8a88-1119-4f99-a7c6-efa2a40bba3c",
               "name": "deduplicationKey",
-              "value": "={{ JSON.stringify(['collector@example.com', $('Gmail Trigger').item.json.messageId.trim()]) }}",
+              "value": "={{ JSON.stringify(['jissuecollector@gmail.com', $('Gmail Trigger').item.json.messageId.trim()]) }}",
               "type": "string"
             },
             {
@@ -224,7 +225,8 @@
       ],
       "id": "1e25e3bc-07f9-4dd0-bc8b-c0a63b2f0ea3",
       "name": "Mail zur Nachbearbeitung markieren",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -233,7 +235,7 @@
             {
               "id": "e670cf9d-dc55-4f13-af18-362ce9397d99",
               "name": "deduplicationKey",
-              "value": "={{ JSON.stringify(['collector@example.com', $json.messageId.trim()]) }}",
+              "value": "={{ JSON.stringify(['jissuecollector@gmail.com', $json.messageId.trim()]) }}",
               "type": "string"
             }
           ]
@@ -927,7 +929,8 @@
       ],
       "id": "50de2593-6802-40bc-80bb-31e37d673944",
       "name": "Mail wegen Tageslimit markieren",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -1044,7 +1047,8 @@
       ],
       "id": "7cdd25b3-6617-420e-b6f5-d4b9d3417151",
       "name": "Mail bei KI-Fehler markieren",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -1071,7 +1075,7 @@
     },
     {
       "parameters": {
-        "jsCode": "/** Reads Gmail's case-insensitive headers, including mailparser's raw header lines. */\nfunction readHeader(mail, name) {\n  const entry = Object.entries(mail.headers ?? {}).find(([key]) => key.toLowerCase() === name);\n  return String(entry?.[1] ?? '').replace(new RegExp('^' + name + ':\\\\s*', 'i'), '').trim();\n}\n\n/** Detects vacation agents and delivery reports without rejecting human reply subjects. */\nfunction isAutomatic(mail) {\n  const auto = readHeader(mail, 'auto-submitted').split(';')[0].trim().toLowerCase();\n  const mime = readHeader(mail, 'content-type');\n  const sender = mail.from?.value?.[0]?.address ?? readHeader(mail, 'from');\n  return (auto !== '' && auto !== 'no')\n    || ['x-autoreply', 'x-autorespond'].some(key => /^(?!no$|false$|0$).+/i.test(readHeader(mail, key)))\n    || /report-type\\s*=\\s*\"?delivery-status\\b|^message\\/(?:global-)?delivery-status\\b/i.test(mime)\n    || readHeader(mail, 'return-path') === '<>'\n    || /(?:^|<)(?:mailer-daemon|postmaster)@/i.test(sender);\n}\n\nreturn $input.all().flatMap((item, index) =>\n  isAutomatic(item.json) ? [] : [{ ...item, pairedItem: { item: index } }]\n);"
+        "jsCode": "const OWN_MAILBOXES = ['jissuecollector@gmail.com', 'ai.viralreelcreator@gmail.com'];\nconst SYSTEM_SENDERS = ['no-reply@google.com', 'no-reply@accounts.google.com'];\n\n/** Converts parsed header values to comparable text.\n * @param {unknown} value - Header value.\n * @returns {string} Text including MIME parameters.\n */\nfunction headerText(value) {\n  if (typeof value === 'string') return value;\n  if (!value || typeof value !== 'object') return '';\n  const parameters = Object.entries(value.params || {}).map(([key, part]) => key + '=' + part);\n  return [value.value || value.text || '', ...parameters].join('; ');\n}\n\n\n/** Collects header entries from supported Gmail representations.\n * @param {Object} mail - Incoming message.\n * @returns {Object[]} Named header entries.\n */\nfunction headerEntries(mail) {\n  const headers = mail.headers || {};\n  const entries = Array.isArray(headers) ? headers : Object.entries(headers).flatMap(([name, value]) =>\n    (Array.isArray(value) ? value : [value]).map(part => ({ name, value: part })));\n  const lines = (mail.headerLines || []).map(entry => ({\n    name: entry.key || String(entry.line || '').split(':')[0], value: entry.line\n  }));\n  return [...entries, ...(mail.payload?.headers || []), ...lines];\n}\n\n\n/** Reads all case-insensitive values without discarding duplicate headers.\n * @param {Object} mail - Incoming message.\n * @param {string} name - Lowercase header name.\n * @returns {string[]} Normalized header values.\n */\nfunction readHeaders(mail, name) {\n  return headerEntries(mail).filter(entry => String(entry.name).toLowerCase() === name)\n    .map(entry => headerText(entry.value).replace(new RegExp('^' + name + ':\\\\s*', 'i'), '').trim());\n}\n\n\n/** Normalizes aliases only for Gmail addresses.\n * @param {string} address - Extracted mailbox.\n * @returns {string} Canonical comparison key.\n */\nfunction canonicalAddress(address) {\n  const [local, domain] = address.toLowerCase().trim().split('@');\n  if (domain !== 'gmail.com' && domain !== 'googlemail.com') return address.toLowerCase().trim();\n  return local.split('+')[0].replace(/\\./g, '') + '@gmail.com';\n}\n\n\n/** Extracts all sender mailboxes, including parsed and raw forms.\n * @param {Object} mail - Incoming message.\n * @returns {string[]} Canonical sender addresses.\n */\nfunction senderAddresses(mail) {\n  const parsed = mail.from?.value?.map(entry => entry.address) || [];\n  const raw = typeof mail.from === 'string' ? [mail.from] : [];\n  const values = [...parsed, ...raw, ...readHeaders(mail, 'from'), ...readHeaders(mail, 'sender')];\n  return values.flatMap(value => String(value).match(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+/gi) || [])\n    .map(canonicalAddress);\n}\n\n\n/** Checks configured service senders and delivery agents.\n * @param {Object} mail - Incoming message.\n * @returns {boolean} Whether the sender must be excluded.\n */\nfunction hasExcludedSender(mail) {\n  const excluded = [...OWN_MAILBOXES, ...SYSTEM_SENDERS].map(canonicalAddress);\n  return senderAddresses(mail).some(address => excluded.includes(address) || /^(mailer-daemon|postmaster)@/i.test(address));\n}\n\n\n/** Checks explicit automatic-response and mailing-list indicators.\n * @param {Object} mail - Incoming message.\n * @returns {boolean} Whether headers identify automation.\n */\nfunction hasAutomaticHeader(mail) {\n  const auto = readHeaders(mail, 'auto-submitted').map(value => value.split(';')[0].trim().toLowerCase());\n  const replies = ['x-autoreply', 'x-autorespond'].flatMap(name => readHeaders(mail, name));\n  const precedence = readHeaders(mail, 'precedence');\n  return auto.some(value => value !== '' && value !== 'no')\n    || replies.some(value => value !== '' && !/^(no|false|0)$/i.test(value))\n    || precedence.some(value => /^(bulk|list|junk)$/i.test(value.trim()));\n}\n\n\n/** Recognizes delivery reports without examining security-message bodies.\n * @param {Object} mail - Incoming message.\n * @returns {boolean} Whether the mail is a delivery report.\n */\nfunction isDeliveryReport(mail) {\n  return readHeaders(mail, 'return-path').some(value => /^<\\s*>$/.test(value))\n    || readHeaders(mail, 'content-type').some(value =>\n      /report-type\\s*=\\s*\"?(?:delivery-status|disposition-notification)\\b|^message\\/(?:global-)?delivery-status\\b/i.test(value));\n}\n\n\n/** Keeps human requests and their input linkage.\n * @param {Object} item - n8n input item.\n * @param {number} index - Input position.\n * @returns {Object[]} Either the original linked item or no output.\n */\nfunction keepHumanRequest(item, index) {\n  const mail = item.json;\n  if (hasExcludedSender(mail) || hasAutomaticHeader(mail) || isDeliveryReport(mail)) return [];\n  return [{ ...item, pairedItem: { item: index } }];\n}\n\nreturn $input.all().flatMap(keepHumanRequest);\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1121,7 +1125,8 @@
             }
           }
         }
-      }
+      },
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -1292,7 +1297,8 @@
         "method": "GET",
         "url": "https://gmail.googleapis.com/gmail/v1/users/me/labels"
       },
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "id": "fd5c352e-5484-417f-af18-21fc52370a39",
@@ -1312,7 +1318,8 @@
         "specifyBody": "json",
         "jsonBody": "={{ { addLabelIds: [$json.labels.find(label => label.name === 'erledigt').id], removeLabelIds: ['INBOX'] } }}"
       },
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -1642,7 +1649,8 @@
         }
       },
       "retryOnFail": false,
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -1916,7 +1924,8 @@
         }
       },
       "retryOnFail": false,
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -2020,7 +2029,8 @@
       ],
       "id": "aa2716d5-69d4-44f4-a9ed-344d6a1004c1",
       "name": "Mail bei Speicherfehler markieren",
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "parameters": {
@@ -2223,7 +2233,8 @@
           }
         }
       },
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "id": "c2a73f77-2641-4177-aca8-b43df27295a4",
@@ -2364,7 +2375,8 @@
           }
         }
       },
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "notes": "Assign the Gmail OAuth2 connection for jissuecollector@gmail.com. Credentials are intentionally excluded from this export."
     },
     {
       "id": "Label-Nachholung Ergebnis",
